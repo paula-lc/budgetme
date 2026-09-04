@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presupuesto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --surface:#F4F5F0;
+    --surface-2:#ECEEE7;
+    --ink:#14151A;
+    --ink-soft:#6E7078;
+    --ink-faint:#A6A8A2;
+    --line:#DFE1D9;
+    --accent-fixed:#3452FF;
+    --accent-fixed-soft:#EDF0FF;
+    --accent-variable:#FF5A36;
+    --accent-variable-soft:#FFEFEA;
+    --accent-total:#00B87C;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:40px 20px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  /* Header */
+  header{margin-bottom:32px;}
+  h1{
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:0;
+  }
+
+  /* Summary */
+  .summary{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-top:24px;
+  }
+  .stat{
+    background:var(--bg);
+    padding:16px 18px;
+  }
+  .stat-label{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .stat-value{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:19px;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
+  }
+  .stat.fixed .stat-value{color:var(--accent-fixed);}
+  .stat.variable .stat-value{color:var(--accent-variable);}
+  .stat.total .stat-value{color:var(--accent-total);}
+
+  /* composition bar */
+  .split{
+    display:flex;
+    height:6px;
+    border-radius:4px;
+    overflow:hidden;
+    margin-top:14px;
+    background:var(--surface-2);
+  }
+  .split-fixed{background:var(--accent-fixed);}
+  .split-variable{background:var(--accent-variable);}
+
+  /* Card */
+  .card{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    border-bottom-left-radius:0;
+    border-bottom-right-radius:0;
+    margin-top:36px;
+    overflow:hidden;
+  }
+
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    text-align:left;
+    font-size:12px;
+    font-weight:500;
+    color:var(--ink-soft);
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    background:var(--surface);
+  }
+  thead th.num{text-align:right;}
+  thead th.actions{width:36px;}
+
+  tbody td{
+    padding:0;
+    border-bottom:1px solid var(--line);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+
+  td.cat input, td.amt input{
+    width:100%;
+    border:none;
+    background:transparent;
+    padding:11px 16px;
+    font-family:inherit;
+    font-size:14px;
+    color:var(--ink);
+    outline:none;
+  }
+  td.amt input{
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+    font-variant-numeric:tabular-nums;
+  }
+  td.cat input:focus, td.amt input:focus{
+    background:var(--surface);
+  }
+  td.cat input::placeholder, td.amt input::placeholder{color:var(--ink-faint);}
+
+  td.del{width:36px;text-align:center;padding:0;}
+  .del-btn{
+    border:none;background:none;cursor:pointer;
+    color:var(--ink-faint);
+    font-size:16px;
+    line-height:1;
+    padding:8px;
+    border-radius:6px;
+  }
+  .del-btn:hover{color:var(--ink);background:var(--surface);}
+
+  .empty-row td{
+    padding:28px 16px;
+    text-align:center;
+    color:var(--ink-faint);
+    font-size:13px;
+  }
+
+  .add-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 16px;
+    background:var(--surface);
+    cursor:text;
+  }
+  .add-row .plus{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+  }
+  .add-row.fixed .plus{color:var(--accent-fixed);}
+  .add-row.variable .plus{color:var(--accent-variable);}
+  .add-row span.label{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  /* Sheet tabs, Excel-style */
+  .tabs{
+    display:flex;
+    gap:6px;
+    padding:0 4px;
+  }
+  .tab{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    padding:10px 20px 9px;
+    border:1px solid var(--line);
+    border-top:none;
+    background:var(--surface);
+    color:var(--ink-soft);
+    cursor:pointer;
+    clip-path:polygon(8% 0, 92% 0, 100% 100%, 0% 100%);
+    margin-top:-1px;
+  }
+  .tab.active{
+    background:var(--bg);
+    color:var(--ink);
+  }
+  .tab.fixed.active{box-shadow:inset 0 3px 0 var(--accent-fixed);}
+  .tab.variable.active{box-shadow:inset 0 3px 0 var(--accent-variable);}
+
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* footer */
+  footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:18px;
+    font-size:12px;
+    color:var(--ink-faint);
+  }
+  .save-state{display:flex;align-items:center;gap:6px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-total);}
+  .reset-btn{
+    border:none;background:none;color:var(--ink-faint);
+    font-size:12px;cursor:pointer;text-decoration:underline;
+    font-family:inherit;padding:0;
+  }
+  .reset-btn:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Presupuesto</h1>
+    <p class="subtitle">Gastos fijos y variables, en un solo sitio.</p>
+  </header>
+
+  <div class="summary">
+    <div class="stat fixed">
+      <div class="stat-label">Gastos fijos</div>
+      <div class="stat-value" id="totalFixed">0,00 €</div>
+    </div>
+    <div class="stat variable">
+      <div class="stat-label">Gastos variables</div>
+      <div class="stat-value" id="totalVariable">0,00 €</div>
+    </div>
+    <div class="stat total">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="totalAll">0,00 €</div>
+    </div>
+  </div>
+  <div class="split">
+    <div class="split-fixed" id="splitFixed" style="width:50%"></div>
+    <div class="split-variable" id="splitVariable" style="width:50%"></div>
+  </div>
+
+  <div class="card">
+    <div class="tab-panel active" id="panel-fixed">
+      <table>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th class="num">Importe mensual</th>
+            <th class="actions"></th>
+          </tr>
+        </thead>
+        <tbody id="rows-fixed"></tbody>
+      </table>
+      <div class="add-row fixed" id="addRowFixed">
+        <span class="plus">+</span>
+        <span class="label">Añadir gasto fijo</span>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-variable">
+      <table>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th class="num">Importe</th>
+            <th class="actions"></th>
+          </tr>
+        </thead>
+        <tbody id="rows-variable"></tbody>
+      </table>
+      <div class="add-row variable" id="addRowVariable">
+        <span class="plus">+</span>
+        <span class="label">Añadir gasto variable</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab fixed active" data-tab="fixed">Gastos fijos</div>
+    <div class="tab variable" data-tab="variable">Gastos variables</div>
+  </div>
+
+  <footer>
+    <div class="save-state"><span class="dot" id="saveDot"></span><span id="saveText">Guardado</span></div>
+    <button class="reset-btn" id="resetBtn">Borrar todos los datos</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEYS = { fixed: 'expenses:fixed', variable: 'expenses:variable' };
+  let data = { fixed: [], variable: [] };
+  let idCounter = 1;
+
+  function newId(){ return 'row_' + (idCounter++); }
+
+  function formatEUR(n){
+    if (isNaN(n)) n = 0;
+    return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  function parseAmount(str){
+    if (!str) return 0;
+    const cleaned = str.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  }
+
+  async function loadData(){
+    setSaveState('loading');
+    for (const key of ['fixed','variable']){
+      try{
+        const res = await window.storage.get(STORAGE_KEYS[key], false);
+        if (res && res.value){
+          data[key] = JSON.parse(res.value);
+        }
+      } catch(e){
+        data[key] = [];
+      }
+    }
+    // ensure ids
+    [...data.fixed, ...data.variable].forEach(r => {
+      if (!r.id) r.id = newId();
+    });
+    render();
+    setSaveState('saved');
+  }
+
+  async function saveData(key){
+    setSaveState('saving');
+    try{
+      const res = await window.storage.set(STORAGE_KEYS[key], JSON.stringify(data[key]), false);
+      setSaveState(res ? 'saved' : 'error');
+    } catch(e){
+      setSaveState('error');
+    }
+  }
+
+  function setSaveState(state){
+    const dot = document.getElementById('saveDot');
+    const text = document.getElementById('saveText');
+    if (state === 'saving'){ dot.style.background = '#A6A8A2'; text.textContent = 'Guardando…'; }
+    else if (state === 'saved'){ dot.style.background = 'var(--accent-total)'; text.textContent = 'Guardado'; }
+    else if (state === 'loading'){ dot.style.background = '#A6A8A2'; text.textContent = 'Cargando…'; }
+    else { dot.style.background = 'var(--accent-variable)'; text.textContent = 'Error al guardar'; }
+  }
+
+  function addRow(key){
+    data[key].push({ id: newId(), category: '', amount: 0 });
+    render();
+    saveData(key);
+    // focus the new row's category input
+    requestAnimationFrame(() => {
+      const body = document.getElementById('rows-' + key);
+      const last = body.querySelector('tr:last-child td.cat input');
+      if (last) last.focus();
+    });
+  }
+
+  function removeRow(key, id){
+    data[key] = data[key].filter(r => r.id !== id);
+    render();
+    saveData(key);
+  }
+
+  function updateRow(key, id, field, value){
+    const row = data[key].find(r => r.id === id);
+    if (!row) return;
+    row[field] = field === 'amount' ? parseAmount(value) : value;
+    updateTotals();
+    saveData(key);
+  }
+
+  function renderRows(key){
+    const body = document.getElementById('rows-' + key);
+    body.innerHTML = '';
+    if (data[key].length === 0){
+      body.innerHTML = '<tr class="empty-row"><td colspan="3">Sin gastos todavía. Añade el primero abajo.</td></tr>';
+      return;
+    }
+    data[key].forEach(row => {
+      const tr = document.createElement('tr');
+
+      const tdCat = document.createElement('td');
+      tdCat.className = 'cat';
+      const inputCat = document.createElement('input');
+      inputCat.type = 'text';
+      inputCat.placeholder = 'Categoría';
+      inputCat.value = row.category;
+      inputCat.addEventListener('input', e => updateRow(key, row.id, 'category', e.target.value));
+      tdCat.appendChild(inputCat);
+
+      const tdAmt = document.createElement('td');
+      tdAmt.className = 'amt';
+      const inputAmt = document.createElement('input');
+      inputAmt.type = 'text';
+      inputAmt.inputMode = 'decimal';
+      inputAmt.placeholder = '0,00 €';
+      inputAmt.value = row.amount ? row.amount.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}) : '';
+      inputAmt.addEventListener('input', e => updateRow(key, row.id, 'amount', e.target.value));
+      inputAmt.addEventListener('blur', () => renderRows(key));
+      tdAmt.appendChild(inputAmt);
+
+      const tdDel = document.createElement('td');
+      tdDel.className = 'del';
+      const btn = document.createElement('button');
+      btn.className = 'del-btn';
+      btn.textContent = '×';
+      btn.setAttribute('aria-label', 'Eliminar fila');
+      btn.addEventListener('click', () => removeRow(key, row.id));
+      tdDel.appendChild(btn);
+
+      tr.appendChild(tdCat);
+      tr.appendChild(tdAmt);
+      tr.appendChild(tdDel);
+      body.appendChild(tr);
+    });
+  }
+
+  function updateTotals(){
+    const totalFixed = data.fixed.reduce((s,r) => s + (r.amount||0), 0);
+    const totalVariable = data.variable.reduce((s,r) => s + (r.amount||0), 0);
+    const total = totalFixed + totalVariable;
+    document.getElementById('totalFixed').textContent = formatEUR(totalFixed);
+    document.getElementById('totalVariable').textContent = formatEUR(totalVariable);
+    document.getElementById('totalAll').textContent = formatEUR(total);
+
+    let pctFixed = 50, pctVariable = 50;
+    if (total > 0){
+      pctFixed = (totalFixed/total)*100;
+      pctVariable = 100 - pctFixed;
+    }
+    document.getElementById('splitFixed').style.width = pctFixed + '%';
+    document.getElementById('splitVariable').style.width = pctVariable + '%';
+  }
+
+  function render(){
+    renderRows('fixed');
+    renderRows('variable');
+    updateTotals();
+  }
+
+  function switchTab(tab){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => switchTab(t.dataset.tab));
+  });
+
+  document.getElementById('addRowFixed').addEventListener('click', () => addRow('fixed'));
+  document.getElementById('addRowVariable').addEventListener('click', () => addRow('variable'));
+
+  document.getElementById('resetBtn').addEventListener('click', async () => {
+    if (!confirm('¿Borrar todos los gastos guardados? Esta acción no se puede deshacer.')) return;
+    data = { fixed: [], variable: [] };
+    render();
+    await saveData('fixed');
+    await saveData('variable');
+  });
+
+  loadData();
+})();
+</script>
+</body>
+</html>
