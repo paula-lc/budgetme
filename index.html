@@ -1,931 +1,1913 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Presupuesto</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#ffffff;
-    --surface:#F4F5F0;
-    --surface-2:#ECEEE7;
-    --ink:#14151A;
-    --ink-soft:#6E7078;
-    --ink-faint:#A6A8A2;
-    --line:#DFE1D9;
-    --accent-fixed:#3452FF;
-    --accent-fixed-soft:#EDF0FF;
-    --accent-variable:#FF5A36;
-    --accent-variable-soft:#FFEFEA;
-    --accent-savings:#00B87C;
-    --accent-savings-soft:#E5FAF2;
-    --accent-income:#7B3FF2;
-    --accent-income-soft:#F3EDFF;
-    --accent-warning:#E0342A;
-    --radius:10px;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Space Grotesk', -apple-system, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    padding:40px 20px 80px;
-  }
-  .wrap{max-width:820px;margin:0 auto;}
-
-  /* Header */
-  header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:24px;
-    flex-wrap:wrap;
-    margin-bottom:28px;
-  }
-  .title-row{display:flex;align-items:center;gap:10px;}
-  .title-block h1{
-    font-size:22px;
-    font-weight:600;
-    letter-spacing:-0.01em;
-    margin:0;
-  }
-  .title-block .subtitle{
-    color:var(--ink-soft);
-    font-size:14px;
-    margin:4px 0 0;
-  }
-  .icon-btn{
-    width:30px;height:30px;flex-shrink:0;
-    border-radius:50%;
-    border:1px solid var(--line);
-    background:var(--bg);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;color:var(--ink-soft);
-    padding:0;
-  }
-  .icon-btn:hover{border-color:var(--accent-income);color:var(--accent-income);background:var(--accent-income-soft);}
-  .icon-btn svg{width:15px;height:15px;}
-
-  /* Trend modal */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(20,21,26,0.45);
-    display:none;align-items:center;justify-content:center;
-    z-index:100;padding:20px;
-  }
-  .modal-card{
-    background:var(--bg);border-radius:14px;
-    padding:22px 24px;max-width:560px;width:100%;
-    max-height:82vh;overflow-y:auto;
-  }
-  .modal-header{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:6px;
-  }
-  .modal-header h2{font-size:17px;font-weight:600;margin:0;}
-  .modal-close{
-    border:none;background:none;font-size:20px;color:var(--ink-faint);
-    cursor:pointer;line-height:1;padding:4px;
-  }
-  .modal-close:hover{color:var(--ink);}
-  .modal-sub{font-size:13px;color:var(--ink-soft);margin:0 0 14px;}
-  .modal-legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--ink-soft);}
-  .modal-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle;}
-
-  /* Income box */
-  .income-box{
-    background:var(--accent-income-soft);
-    border:1px solid #E1D3FF;
-    border-radius:var(--radius);
-    padding:14px 16px;
-    min-width:260px;
-    flex:1;
-    max-width:360px;
-  }
-  .income-box-label{
-    font-size:12px;
-    font-weight:500;
-    color:var(--accent-income);
-    margin-bottom:8px;
-  }
-  .income-row{
-    display:flex;
-    gap:6px;
-    align-items:center;
-    margin-bottom:6px;
-  }
-  .income-row input.income-label{
-    flex:1;
-    border:none;
-    background:#fff;
-    border-radius:6px;
-    padding:7px 9px;
-    font-size:13px;
-    font-family:inherit;
-    color:var(--ink);
-    outline:none;
-    min-width:0;
-  }
-  .income-row input.income-amount{
-    width:96px;
-    border:none;
-    background:#fff;
-    border-radius:6px;
-    padding:7px 9px;
-    font-size:13px;
-    font-family:'IBM Plex Mono', monospace;
-    text-align:right;
-    color:var(--ink);
-    outline:none;
-  }
-  .income-row .income-del{
-    border:none;background:none;color:var(--ink-faint);
-    cursor:pointer;font-size:14px;padding:2px 4px;
-  }
-  .income-row .income-del:hover{color:var(--accent-warning);}
-  .add-income-btn{
-    border:none;background:none;color:var(--accent-income);
-    font-size:12px;cursor:pointer;padding:4px 0 8px;
-    font-family:inherit;text-decoration:underline;
-  }
-  .income-total{
-    font-size:13px;
-    color:var(--ink-soft);
-    border-top:1px solid #E1D3FF;
-    padding-top:8px;
-    margin-top:2px;
-  }
-  .income-total span{
-    font-family:'IBM Plex Mono', monospace;
-    font-weight:600;
-    color:var(--accent-income);
-    font-size:15px;
-  }
-
-  /* Summary tiles */
-  .summary{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:1px;
-    background:var(--line);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    overflow:hidden;
-    margin-top:8px;
-  }
-  .stat{background:var(--bg);padding:14px 16px;}
-  .stat-label{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
-  .stat-value{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:18px;
-    font-weight:500;
-    font-variant-numeric:tabular-nums;
-  }
-  .stat-pct{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    color:var(--ink-faint);
-    margin-top:2px;
-  }
-  .stat.fixed .stat-value{color:var(--accent-fixed);}
-  .stat.variable .stat-value{color:var(--accent-variable);}
-  .stat.savings .stat-value{color:var(--accent-savings);}
-
-  .split{
-    display:flex;
-    height:6px;
-    border-radius:4px;
-    overflow:hidden;
-    margin-top:14px;
-    background:var(--surface-2);
-  }
-  .split > div{height:100%;}
-  .split-fixed{background:var(--accent-fixed);}
-  .split-variable{background:var(--accent-variable);}
-  .split-savings{background:var(--accent-savings);}
-  .split-unassigned{background:var(--surface-2);}
-
-  .warning-text{
-    font-size:12px;
-    color:var(--accent-warning);
-    margin-top:8px;
-  }
-  .hint-text{
-    font-size:12px;
-    color:var(--ink-faint);
-    margin-top:8px;
-  }
-
-  /* Card */
-  .card{
-    background:var(--bg);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    border-bottom-left-radius:0;
-    border-bottom-right-radius:0;
-    margin-top:32px;
-    overflow:hidden;
-  }
-  table{width:100%;border-collapse:collapse;}
-  thead th{
-    text-align:left;
-    font-size:12px;
-    font-weight:500;
-    color:var(--ink-soft);
-    padding:12px 16px;
-    border-bottom:1px solid var(--line);
-    background:var(--surface);
-  }
-  thead th.num{text-align:right;}
-  thead th.actions{width:36px;}
-  tbody td{padding:0;border-bottom:1px solid var(--line);}
-  tbody tr.group-row:last-child td, tbody tr.sub-row:last-child td{border-bottom:none;}
-
-  td.cat input{
-    width:100%;border:none;background:transparent;
-    padding:11px 16px;font-family:inherit;font-size:14px;
-    color:var(--ink);outline:none;
-  }
-  td.cat input:focus{background:var(--surface);}
-  td.cat input::placeholder{color:var(--ink-faint);}
-
-  td.amt{text-align:right;}
-  td.amt input{
-    width:100%;border:none;background:transparent;
-    padding:11px 16px;font-family:'IBM Plex Mono', monospace;
-    font-size:14px;text-align:right;color:var(--ink);outline:none;
-    font-variant-numeric:tabular-nums;
-  }
-  td.amt input:focus{background:var(--surface);}
-  td.amt input::placeholder{color:var(--ink-faint);}
-
-  .amt-merged{
-    width:100%;border:none;background:transparent;cursor:pointer;
-    padding:11px 16px;font-family:'IBM Plex Mono', monospace;
-    font-size:14px;text-align:right;color:var(--ink);
-    display:flex;justify-content:flex-end;align-items:center;gap:6px;
-  }
-  .amt-merged:hover{background:var(--surface);}
-  .amt-merged .count-badge{
-    font-family:'Space Grotesk', sans-serif;
-    font-size:11px;color:var(--ink-faint);
-    background:var(--surface-2);
-    border-radius:10px;padding:1px 7px;
-  }
-  .amt-merged .chevron{font-size:11px;color:var(--ink-faint);}
-
-  td.del{width:36px;text-align:center;padding:0;}
-  .del-btn{
-    border:none;background:none;cursor:pointer;color:var(--ink-faint);
-    font-size:16px;line-height:1;padding:8px;border-radius:6px;
-  }
-  .del-btn:hover{color:var(--accent-warning);background:var(--surface);}
-
-  .sub-row td{padding:0;background:var(--surface);}
-  .sub-wrap{padding:4px 16px 10px 32px;}
-  .sub-entry{
-    display:flex;align-items:center;gap:8px;
-    padding:6px 0;
-    border-bottom:1px dashed var(--line);
-  }
-  .sub-entry:last-of-type{border-bottom:none;}
-  .sub-entry .sub-dot{
-    width:4px;height:4px;border-radius:50%;background:var(--ink-faint);
-    flex-shrink:0;
-  }
-  .sub-entry input{
-    flex:1;border:none;background:#fff;border-radius:6px;
-    padding:6px 9px;font-family:'IBM Plex Mono', monospace;
-    font-size:13px;text-align:right;color:var(--ink);outline:none;
-  }
-  .sub-entry .del-btn{font-size:14px;padding:4px 6px;}
-  .sub-add{
-    display:flex;align-items:center;gap:8px;padding:8px 0 2px;
-  }
-  .sub-add span{font-size:12px;color:var(--ink-soft);}
-  .sub-add input{
-    width:110px;border:none;background:#fff;border-radius:6px;
-    padding:6px 9px;font-family:'IBM Plex Mono', monospace;
-    font-size:13px;text-align:right;color:var(--ink);outline:none;
-  }
-  .sub-add button{
-    border:none;background:var(--surface-2);color:var(--ink);
-    font-size:12px;border-radius:6px;padding:6px 10px;cursor:pointer;
-    font-family:inherit;
-  }
-
-  .empty-row td{padding:26px 16px;text-align:center;color:var(--ink-faint);font-size:13px;}
-
-  .add-row{
-    display:flex;align-items:center;gap:8px;
-    padding:10px 12px;background:var(--surface);
-  }
-  .add-row input.new-cat{
-    flex:1;border:1px solid var(--line);background:#fff;border-radius:7px;
-    padding:9px 11px;font-family:inherit;font-size:14px;outline:none;
-  }
-  .add-row input.new-amt{
-    width:120px;border:1px solid var(--line);background:#fff;border-radius:7px;
-    padding:9px 11px;font-family:'IBM Plex Mono', monospace;font-size:14px;
-    text-align:right;outline:none;
-  }
-  .add-row input:focus{border-color:var(--ink-faint);}
-  .add-row button{
-    border:none;color:#fff;font-size:13px;font-weight:500;
-    border-radius:7px;padding:9px 14px;cursor:pointer;font-family:inherit;
-    white-space:nowrap;
-  }
-  .add-row.fixed button{background:var(--accent-fixed);}
-  .add-row.variable button{background:var(--accent-variable);}
-  .add-row.savings button{background:var(--accent-savings);}
-
-  /* Sheet tabs */
-  .tabs{display:flex;gap:6px;padding:0 4px;}
-  .tab{
-    font-family:'Space Grotesk', sans-serif;font-size:13px;font-weight:500;
-    padding:10px 18px 9px;border:1px solid var(--line);border-top:none;
-    background:var(--surface);color:var(--ink-soft);cursor:pointer;
-    clip-path:polygon(8% 0, 92% 0, 100% 100%, 0% 100%);margin-top:-1px;
-  }
-  .tab.active{background:var(--bg);color:var(--ink);}
-  .tab.fixed.active{box-shadow:inset 0 3px 0 var(--accent-fixed);}
-  .tab.variable.active{box-shadow:inset 0 3px 0 var(--accent-variable);}
-  .tab.savings.active{box-shadow:inset 0 3px 0 var(--accent-savings);}
-  .tab-panel{display:none;}
-  .tab-panel.active{display:block;}
-
-  footer{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-top:18px;font-size:12px;color:var(--ink-faint);
-  }
-  .save-state{display:flex;align-items:center;gap:6px;}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-savings);}
-  .reset-btn{
-    border:none;background:none;color:var(--ink-faint);font-size:12px;
-    cursor:pointer;text-decoration:underline;font-family:inherit;padding:0;
-  }
-  .reset-btn:hover{color:var(--ink);}
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="title-block">
-      <div class="title-row">
-        <h1>Presupuesto</h1>
-        <button class="icon-btn" id="trendIconBtn" title="Ver tendencia mensual" aria-label="Ver tendencia mensual">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0}
+  body{background:#FFFFFF;color:#1A1712;font-family:Jost,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  input,select,button{font-family:inherit}
+  a{color:#C0562A;text-decoration:none}
+  a:hover{color:#51000E}
+  ::selection{background:#BDE0FF}
+  @keyframes ov{from{opacity:0}to{opacity:1}}
+  @keyframes card{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:44px 28px 72px">
+<div style="max-width:1060px;margin:0 auto">
+
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;padding-bottom:26px">
+    <sc-for list="{{ views }}" as="v" hint-placeholder-count="3">
+      <span onClick="{{ v.onClick }}" style="font:500 10.5px/1 Jost,sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:{{ v.ink }};border-bottom:1px solid {{ v.line }};padding-bottom:5px;cursor:pointer">{{ v.name }}</span>
+    </sc-for>
+    <div style="flex:1"></div>
+    <span onClick="{{ openImport }}" style="font:400 11.5px/1 Jost,sans-serif;color:#6E6656;text-decoration:underline;cursor:pointer" style-hover="color:#1A1712">Importar extracto</span>
+    <span onClick="{{ openLetter }}" style="font:400 11.5px/1 Jost,sans-serif;color:#6E6656;text-decoration:underline;cursor:pointer" style-hover="color:#1A1712">Carta para el banco</span>
+  </div>
+
+  <sc-if value="{{ isMonth }}" hint-placeholder-val="{{ true }}">
+  <div>
+  <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:space-between">
+    <div style="min-width:260px;flex:1">
+      <div style="display:flex;align-items:center;gap:14px">
+        <h1 style="margin:0;font:500 44px/1 Jost,sans-serif;letter-spacing:-0.035em">Presupuesto</h1>
+        <button onClick="{{ openChart }}" title="Tendencia mensual" style="width:40px;height:40px;flex:none;border-radius:50%;border:1px solid #1A1712;background:transparent;color:#1A1712;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-hover="background:#1A1712;color:#EFE3C8">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M7 14.5l4-5 3 3 5-7"></path></svg>
         </button>
+        <button onClick="{{ openCalc }}" title="Calculadora de salario neto" style="width:40px;height:40px;flex:none;border-radius:50%;border:1px solid #1A1712;background:transparent;color:#1A1712;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font:800 15px/1 Outfit,sans-serif" style-hover="background:#1A1712;color:#FFFFFF">€</button>
       </div>
-      <p class="subtitle">Gastos fijos, variables y ahorro, en un solo sitio.</p>
+      <sc-if value="{{ showControlsTop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:20px">
+          <button onClick="{{ toggleCarry }}" style="border:1px solid {{ carryBorder }};background:{{ carryBg }};color:{{ carryInk }};font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:7px">
+            <span style="width:22px;height:12px;border-radius:8px;background:{{ carrySwitchBg }};position:relative;display:inline-block">
+              <span style="position:absolute;top:2px;left:{{ carryKnobLeft }};width:8px;height:8px;border-radius:50%;background:#FFFBF2"></span>
+            </span>
+            Arrastrar saldo
+          </button>
+          <button onClick="{{ duplicatePrev }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer" style-hover="border-color:#1A1712;color:#1A1712">Duplicar mes anterior</button>
+          <button onClick="{{ exportCsv }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer" style-hover="border-color:#1A1712;color:#1A1712">CSV del año</button>
+          <button onClick="{{ toggleCompact }}" title="Densidad" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer" style-hover="border-color:#1A1712;color:#1A1712">{{ densityLabel }}</button>
+        </div>
+      </sc-if>
     </div>
-    <div class="income-box">
-      <div class="income-box-label">Ingresos</div>
-      <div id="incomeRows"></div>
-      <button class="add-income-btn" id="addIncomeBtn">+ Añadir otra fuente</button>
-      <div class="income-total">Presupuesto total: <span id="incomeTotalValue">0,00 €</span></div>
-    </div>
-  </header>
-
-  <div class="summary">
-    <div class="stat fixed">
-      <div class="stat-label">Gastos fijos</div>
-      <div class="stat-value" id="totalFixed">0,00 €</div>
-      <div class="stat-pct" id="pctFixed">—</div>
-    </div>
-    <div class="stat variable">
-      <div class="stat-label">Gastos variables</div>
-      <div class="stat-value" id="totalVariable">0,00 €</div>
-      <div class="stat-pct" id="pctVariable">—</div>
-    </div>
-    <div class="stat savings">
-      <div class="stat-label">Ahorros</div>
-      <div class="stat-value" id="totalSavings">0,00 €</div>
-      <div class="stat-pct" id="pctSavings">—</div>
-    </div>
-  </div>
-  <div class="split" id="splitBar">
-    <div class="split-fixed" style="width:0%"></div>
-    <div class="split-variable" style="width:0%"></div>
-    <div class="split-savings" style="width:0%"></div>
-    <div class="split-unassigned" style="width:100%"></div>
-  </div>
-  <div id="summaryNote"></div>
-
-  <div class="card">
-    <div class="tab-panel active" id="panel-fixed">
-      <table>
-        <thead><tr><th>Categoría</th><th class="num">Importe</th><th class="actions"></th></tr></thead>
-        <tbody id="rows-fixed"></tbody>
-      </table>
-      <div class="add-row fixed">
-        <input class="new-cat" id="newCat-fixed" list="datalist-fixed" placeholder="Categoría (ej. Alquiler)">
-        <input class="new-amt" id="newAmt-fixed" inputmode="decimal" placeholder="0,00 €">
-        <button id="addBtn-fixed">Añadir</button>
+    <div style="background:#F5E0D2;border:1px solid #DFB79A;padding:16px 18px 14px;min-width:300px;max-width:380px;flex:1">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <span style="font:500 10.5px/1 Jost,sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:#C0562A">Ingresos</span>
+        <span style="font:300 11px/1 Jost,sans-serif;color:#A0745B">{{ monthShort }}</span>
       </div>
-    </div>
-
-    <div class="tab-panel" id="panel-variable">
-      <table>
-        <thead><tr><th>Categoría</th><th class="num">Importe</th><th class="actions"></th></tr></thead>
-        <tbody id="rows-variable"></tbody>
-      </table>
-      <div class="add-row variable">
-        <input class="new-cat" id="newCat-variable" list="datalist-variable" placeholder="Categoría (ej. Cena fuera)">
-        <input class="new-amt" id="newAmt-variable" inputmode="decimal" placeholder="0,00 €">
-        <button id="addBtn-variable">Añadir</button>
-      </div>
-    </div>
-
-    <div class="tab-panel" id="panel-savings">
-      <table>
-        <thead><tr><th>Categoría</th><th class="num">Importe</th><th class="actions"></th></tr></thead>
-        <tbody id="rows-savings"></tbody>
-      </table>
-      <div class="add-row savings">
-        <input class="new-cat" id="newCat-savings" list="datalist-savings" placeholder="Categoría (ej. Fondo de emergencia)">
-        <input class="new-amt" id="newAmt-savings" inputmode="decimal" placeholder="0,00 €">
-        <button id="addBtn-savings">Añadir</button>
+      <sc-for list="{{ incomeRows }}" as="r" hint-placeholder-count="2">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 104px 22px;align-items:center;gap:6px;margin-bottom:6px">
+          <input value="{{ r.label }}" onChange="{{ r.onLabel }}" placeholder="Fuente de ingreso" style="border:none;background:#FFFBF2;padding:9px 10px;font:400 13.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;min-width:0" style-focus="background:#fff"></input>
+          <input value="{{ r.amountStr }}" onChange="{{ r.onAmount }}" onBlur="{{ r.onBlur }}" inputMode="decimal" placeholder="0,00" style="border:none;background:#FFFBF2;padding:9px 10px;font:600 13.5px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none" style-focus="background:#fff"></input>
+          <sc-if value="{{ r.canDelete }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ r.onDelete }}" style="border:none;background:none;color:#C29C86;cursor:pointer;font-size:15px;padding:0;line-height:1" style-hover="color:#51000E">×</button>
+          </sc-if>
+        </div>
+      </sc-for>
+      <button onClick="{{ addIncome }}" style="border:none;background:none;color:#C0562A;font:400 12.5px/1 Jost,sans-serif;cursor:pointer;padding:6px 0 10px;text-decoration:underline">+ Añadir otra fuente</button>
+      <div style="border-top:1px solid #DFB79A;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font:300 12px/1 Jost,sans-serif;color:#8A6A55">Total del mes</span>
+        <span style="font:800 20px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#C0562A">{{ incomeTotalStr }}</span>
       </div>
     </div>
   </div>
 
-  <div class="tabs">
-    <div class="tab fixed active" data-tab="fixed">Gastos fijos</div>
-    <div class="tab variable" data-tab="variable">Gastos variables</div>
-    <div class="tab savings" data-tab="savings">Ahorros</div>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:40px 0 0;padding:0 0 16px;border-bottom:1px solid #D5C4A1">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button onClick="{{ prevMonth }}" aria-label="Mes anterior" style="width:30px;height:30px;border-radius:50%;border:1px solid #D5C4A1;background:transparent;color:#6E6656;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="border-color:#1A1712;color:#1A1712">‹</button>
+      <span style="font:500 17px/1 Jost,sans-serif;letter-spacing:-0.01em;min-width:168px;text-align:center;text-transform:capitalize">{{ monthLabel }}</span>
+      <button onClick="{{ nextMonth }}" aria-label="Mes siguiente" style="width:30px;height:30px;border-radius:50%;border:1px solid #D5C4A1;background:transparent;color:#6E6656;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="border-color:#1A1712;color:#1A1712">›</button>
+      <sc-if value="{{ showToday }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goToday }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 11px/1 Jost,sans-serif;letter-spacing:0.06em;text-transform:uppercase;padding:7px 11px;border-radius:20px;cursor:pointer" style-hover="border-color:#1A1712;color:#1A1712">Hoy</button>
+      </sc-if>
+      <sc-if value="{{ isFuture }}" hint-placeholder-val="{{ false }}">
+        <span style="font:400 10.5px/1 Jost,sans-serif;letter-spacing:0.1em;text-transform:uppercase;color:#A79C86;border:1px dashed #C9BB9C;padding:6px 9px">Previsión</span>
+      </sc-if>
+    </div>
+    <div style="flex:1"></div>
+    <sc-if value="{{ showControlsInline }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+        <button onClick="{{ toggleCarry }}" style="border:1px solid {{ carryBorder }};background:{{ carryBg }};color:{{ carryInk }};font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:7px">
+          <span style="width:22px;height:12px;border-radius:8px;background:{{ carrySwitchBg }};position:relative;display:inline-block">
+            <span style="position:absolute;top:2px;left:{{ carryKnobLeft }};width:8px;height:8px;border-radius:50%;background:#FFFBF2"></span>
+          </span>
+          Arrastrar saldo
+        </button>
+        <button onClick="{{ duplicatePrev }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer">Duplicar mes anterior</button>
+        <button onClick="{{ exportCsv }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer">CSV del año</button>
+        <button onClick="{{ toggleCompact }}" title="Densidad" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:8px 12px;cursor:pointer">{{ densityLabel }}</button>
+      </div>
+    </sc-if>
   </div>
 
-  <footer>
-    <div class="save-state"><span class="dot" id="saveDot"></span><span id="saveText">Guardado en este dispositivo</span></div>
-    <button class="reset-btn" id="resetBtn">Borrar todos los datos</button>
-  </footer>
+  <div style="display:grid;grid-template-columns:{{ statCols }};gap:1px;background:#D5C4A1;border:1px solid #D5C4A1;margin-top:28px">
+    <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+      <div onClick="{{ s.onClick }}" title="{{ s.title }}" style="background:#FBF4E4;padding:16px 18px 18px;cursor:{{ s.cursor }}" style-hover="background:{{ s.hoverBg }}">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+          <span style="width:8px;height:8px;background:{{ s.dot }};display:inline-block"></span>
+          <span style="font:500 10.5px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#6E6656">{{ s.name }}</span>
+        </div>
+        <div style="font:800 27px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;color:{{ s.ink }}">{{ s.value }}</div>
+        <div style="font:400 11.5px/1.4 Jost,sans-serif;color:#A79C86;margin-top:6px">{{ s.pct }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;height:10px;margin-top:14px;background:#E3D7BC;overflow:hidden">
+    <sc-for list="{{ bars }}" as="b" hint-placeholder-count="3">
+      <div style="height:100%;width:{{ b.w }};background:{{ b.color }}"></div>
+    </sc-for>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font:400 12px/1.5 Jost,sans-serif;color:#6E6656">
+    <span>{{ paidLine }}</span>
+    <sc-if value="{{ hasCarryNote }}" hint-placeholder-val="{{ false }}">
+      <span style="color:#C0562A">{{ carryNote }}</span>
+    </sc-if>
+    <sc-if value="{{ hasOver }}" hint-placeholder-val="{{ false }}">
+      <span style="color:#51000E">{{ overNote }}</span>
+    </sc-if>
+    <sc-if value="{{ hasAlerts }}" hint-placeholder-val="{{ false }}">
+      <span style="color:#51000E">{{ alertNote }}</span>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ showInvestor }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;gap:0;margin-top:24px;border-top:1px solid #D5C4A1;border-bottom:1px solid #D5C4A1">
+      <div style="padding:14px 26px 14px 0;margin-right:26px;border-right:1px solid #D5C4A1">
+        <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86">Tasa de ahorro</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:7px">
+          <span style="font:800 20px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#1A1712">{{ savingsRate }}</span>
+          <span style="font:300 12px/1 Jost,sans-serif;color:#6E6656">de los ingresos del mes</span>
+        </div>
+      </div>
+      <div style="padding:14px 26px 14px 0;margin-right:26px;border-right:1px solid #D5C4A1">
+        <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86">Colchón de emergencia</div>
+        <div style="display:flex;align-items:baseline;gap:7px;margin-top:7px;flex-wrap:wrap">
+          <span style="font:800 20px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ cushionInk }}">{{ cushionMonths }}</span>
+          <span style="font:300 12px/1 Jost,sans-serif;color:#6E6656">meses ahorrados de</span>
+          <input value="{{ cushionTarget }}" onChange="{{ onCushionTarget }}" onBlur="{{ onCushionBlur }}" inputMode="decimal" placeholder="6" style="width:34px;border:none;border-bottom:1px solid #D5C4A1;background:transparent;padding:0 0 2px;font:800 16px/1 Outfit,sans-serif;text-align:center;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+          <span style="font:300 12px/1 Jost,sans-serif;color:#6E6656">{{ cushionNote }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="display:flex;align-items:flex-end;gap:4px;margin-top:44px;overflow-x:auto;padding:0 2px">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+      <div onClick="{{ t.onClick }}" style="flex:none;display:flex;align-items:center;gap:9px;font:500 13px/1 Jost,sans-serif;letter-spacing:0.01em;padding:12px 22px 11px;background:{{ t.bg }};color:{{ t.ink }};cursor:pointer;clip-path:polygon(7% 0, 93% 0, 100% 100%, 0% 100%);box-shadow:{{ t.shadow }}">
+        <span>{{ t.name }}</span>
+        <sc-if value="{{ t.showDelete }}" hint-placeholder-val="{{ false }}">
+          <span onClick="{{ t.onDelete }}" title="Eliminar pestaña" style="font:400 14px/1 Jost,sans-serif;color:#A79C86;padding:0 1px" style-hover="color:#51000E">×</span>
+        </sc-if>
+      </div>
+    </sc-for>
+    <button onClick="{{ openNewTab }}" title="Nueva pestaña" style="flex:none;font:400 15px/1 Jost,sans-serif;padding:11px 16px 10px;border:none;background:#E3D7BC;color:#6E6656;cursor:pointer;clip-path:polygon(14% 0, 86% 0, 100% 100%, 0% 100%)" style-hover="background:#1A1712;color:#EFE3C8">+</button>
+  </div>
+
+  <div style="background:#FBF4E4;border:1px solid #D5C4A1;border-top:2px solid {{ accentInk }}">
+    <div style="overflow-x:auto">
+    <div style="min-width:{{ tableMinWidth }}">
+
+      <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;background:#EFE3C8;border-bottom:1px solid #D5C4A1">
+        <sc-for list="{{ heads }}" as="h" hint-placeholder-count="5">
+          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:11px 14px;text-align:{{ h.align }}">{{ h.label }}</div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="5">
+            <div style="border-bottom:1px solid #E7DCC2">
+              <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center">
+                <div style="padding:{{ padCell }};min-width:0">
+                  <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:400 14.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;padding:0" style-focus="color:#51000E"></input>
+                  <div style="font:300 11px/1.3 Jost,sans-serif;color:{{ row.capInk }};margin-top:5px">{{ row.caption }}</div>
+                </div>
+                <sc-if value="{{ showTarget }}" hint-placeholder-val="{{ true }}">
+                  <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:400 13px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8A8069;outline:none;padding:14px" style-focus="background:#EFE3C8;color:#1A1712"></input>
+                </sc-if>
+                <sc-if value="{{ row.single }}" hint-placeholder-val="{{ true }}">
+                  <input value="{{ row.amountStr }}" onChange="{{ row.onAmt }}" onBlur="{{ row.onAmtBlur }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:none;background:transparent;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none;padding:14px" style-focus="background:#EFE3C8"></input>
+                </sc-if>
+                <sc-if value="{{ row.merged }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ row.toggle }}" style="width:100%;border:none;background:transparent;cursor:pointer;display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:14px;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#1A1712" style-hover="background:#EFE3C8">
+                    {{ row.amountStr }}
+                    <span style="font:500 10px/1 Jost,sans-serif;color:#6E6656;background:#E3D7BC;border-radius:10px;padding:3px 7px">{{ row.count }}</span>
+                    <span style="font-size:9px;color:#A79C86">{{ row.chevron }}</span>
+                  </button>
+                </sc-if>
+                <button onClick="{{ row.togglePaid }}" title="Marcar como pagado" style="width:22px;height:22px;margin:0 auto;border:1px solid {{ row.checkBorder }};background:{{ row.checkBg }};color:{{ row.checkInk }};cursor:pointer;font-size:11px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center">✓</button>
+                <button onClick="{{ row.onDelete }}" style="border:none;background:none;color:#C9BB9C;cursor:pointer;font-size:16px;line-height:1;padding:8px" style-hover="color:#51000E">×</button>
+              </div>
+              <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#EFE3C8;border-top:1px dashed #D5C4A1;padding:10px 14px 12px 28px">
+                  <sc-for list="{{ row.subs }}" as="s" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:10px;padding:5px 0">
+                      <span style="width:4px;height:4px;border-radius:50%;background:#C9BB9C;flex:none"></span>
+                      <span style="font:300 11.5px/1 Jost,sans-serif;color:#8A8069;flex:1">{{ s.note }}</span>
+                      <input value="{{ s.amountStr }}" onChange="{{ s.onAmt }}" onBlur="{{ s.onBlur }}" inputMode="decimal" style="width:112px;border:none;background:#FFFBF2;padding:7px 10px;font:600 13px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none" style-focus="background:#fff"></input>
+                      <button onClick="{{ s.onDelete }}" style="border:none;background:none;color:#C9BB9C;cursor:pointer;font-size:14px;line-height:1;padding:4px" style-hover="color:#51000E">×</button>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
+                    <span style="font:300 11.5px/1 Jost,sans-serif;color:#8A8069;flex:1;padding-left:14px">Añadir otro importe</span>
+                    <input value="{{ row.subDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #D5C4A1;background:#FFFBF2;padding:6px 10px;font:600 13px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+                    <button onClick="{{ row.addSub }}" style="border:none;background:#E3D7BC;color:#1A1712;font:400 12px/1 Jost,sans-serif;padding:7px 10px;cursor:pointer" style-hover="background:#1A1712;color:#EFE3C8">Añadir</button>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPeriodic }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <sc-for list="{{ prows }}" as="p" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;border-bottom:1px solid #E7DCC2">
+              <div style="padding:{{ padCell }};min-width:0">
+                <input value="{{ p.category }}" onChange="{{ p.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:400 14.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;padding:0" style-focus="color:#51000E"></input>
+                <div style="font:300 11px/1.3 Jost,sans-serif;color:{{ p.capInk }};margin-top:5px">{{ p.caption }}</div>
+              </div>
+              <input value="{{ p.amountStr }}" onChange="{{ p.onAmt }}" onBlur="{{ p.onAmtBlur }}" inputMode="decimal" style="width:100%;border:none;background:transparent;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none;padding:14px" style-focus="background:#EFE3C8"></input>
+              <select value="{{ p.freq }}" onChange="{{ p.onFreq }}" style="width:100%;border:none;background:transparent;font:400 13px/1.2 Jost,sans-serif;color:#1A1712;outline:none;padding:13px 12px;cursor:pointer" style-focus="background:#EFE3C8">
+                <option value="trimestral">Trimestral</option>
+                <option value="semestral">Semestral</option>
+                <option value="anual">Anual</option>
+                <option value="deuda">Deuda a plazos</option>
+              </select>
+              <div style="padding:0 10px">
+                <sc-if value="{{ p.isDebt }}" hint-placeholder-val="{{ false }}">
+                  <span style="font:600 11.5px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.instInk }};border:1px solid {{ p.instInk }};padding:5px 8px;display:inline-block">{{ p.instLabel }}</span>
+                </sc-if>
+                <sc-if value="{{ p.isCyclic }}" hint-placeholder-val="{{ true }}">
+                  <select value="{{ p.charge }}" onChange="{{ p.onCharge }}" style="width:100%;border:none;background:transparent;font:400 12.5px/1.2 Jost,sans-serif;color:#6E6656;outline:none;padding:13px 4px;cursor:pointer" style-focus="background:#EFE3C8">
+                    <sc-for list="{{ monthOptions }}" as="mo" hint-placeholder-count="12">
+                      <option value="{{ mo.value }}">{{ mo.label }}</option>
+                    </sc-for>
+                  </select>
+                </sc-if>
+              </div>
+              <div style="text-align:right;padding:14px;font:600 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.quotaInk }}">{{ p.quotaStr }}</div>
+              <button onClick="{{ p.onDelete }}" style="border:none;background:none;color:#C9BB9C;cursor:pointer;font-size:16px;line-height:1;padding:8px" style-hover="color:#51000E">×</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:34px 16px;text-align:center;font:300 13.5px/1.5 Jost,sans-serif;color:#A79C86">{{ emptyText }}</div>
+      </sc-if>
+
+      <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;background:#EFE3C8;border-top:1px solid #D5C4A1">
+          <input value="{{ draftCat }}" onChange="{{ onDraftCat }}" onKeyDown="{{ onDraftCatKey }}" list="cat-suggest" placeholder="{{ draftPlaceholder }}" style="flex:1;min-width:180px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:400 14px/1.2 Jost,sans-serif;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+          <input value="{{ draftAmt }}" onChange="{{ onDraftAmt }}" onKeyDown="{{ onDraftAmtKey }}" inputMode="decimal" placeholder="0,00" style="width:128px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:600 14px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+          <button onClick="{{ addEntry }}" style="border:none;background:{{ accentInk }};color:#FFFBF2;font:500 13px/1 Jost,sans-serif;padding:11px 18px;cursor:pointer">Añadir</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPeriodic }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#EFE3C8;border-top:1px solid #D5C4A1">
+          <div style="padding:11px 14px;font:300 12px/1 Jost,sans-serif;color:#6E6656;border-bottom:1px solid #D5C4A1">Reserva mensual total: <span style="font:600 13px/1 Outfit,sans-serif;color:#1A1712">{{ periodicTotalStr }}</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px">
+            <input value="{{ draftCat }}" onChange="{{ onDraftCat }}" list="cat-suggest" placeholder="Categoría (ej. Seguro del coche)" style="flex:1;min-width:170px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:400 14px/1.2 Jost,sans-serif;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+            <input value="{{ draftAmt }}" onChange="{{ onDraftAmt }}" inputMode="decimal" placeholder="{{ draftAmtPlaceholder }}" style="width:150px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:600 14px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+            <select value="{{ draftFreq }}" onChange="{{ onDraftFreq }}" style="border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:400 13.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+              <option value="trimestral">Trimestral</option>
+              <option value="semestral">Semestral</option>
+              <option value="anual">Anual</option>
+              <option value="deuda">Deuda a plazos</option>
+            </select>
+            <sc-if value="{{ draftIsDebt }}" hint-placeholder-val="{{ false }}">
+              <input value="{{ draftInst }}" onChange="{{ onDraftInst }}" inputMode="numeric" placeholder="Nº de cuotas" style="width:130px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:600 14px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+            </sc-if>
+            <sc-if value="{{ draftIsCyclic }}" hint-placeholder-val="{{ true }}">
+              <select value="{{ draftCharge }}" onChange="{{ onDraftCharge }}" style="border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:400 13.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+                <sc-for list="{{ monthOptions }}" as="mo" hint-placeholder-count="12">
+                  <option value="{{ mo.value }}">{{ mo.label }}</option>
+                </sc-for>
+              </select>
+            </sc-if>
+            <button onClick="{{ addPeriodic }}" style="border:none;background:{{ accentInk }};color:#FFFBF2;font:500 13px/1 Jost,sans-serif;padding:11px 18px;cursor:pointer">Añadir</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+    </div>
+  </div>
+
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isForecast }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px">
+      <div>
+        <h1 style="margin:0;font:500 40px/1 Jost,sans-serif;letter-spacing:-0.035em">Previsión</h1>
+        <p style="margin:10px 0 0;font:300 13.5px/1.5 Jost,sans-serif;color:#6E6656;max-width:52ch">Año a año, en columnas. Escribe cualquier cifra a mano para sustituir lo calculado, y marca cada celda como real o prevista con el punto de su izquierda.</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onClick="{{ addYear }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 12px/1 Jost,sans-serif;padding:9px 13px;cursor:pointer" style-hover="border-color:#1A1712;color:#1A1712">+ Añadir año</button>
+      </div>
+    </div>
+
+    <div style="margin-top:30px;overflow-x:auto">
+      <div style="min-width:{{ fcMinWidth }};border:1px solid #D5C4A1;background:#FBF4E4">
+        <div style="display:grid;grid-template-columns:{{ fcCols }};background:#EFE3C8;border-bottom:1px solid #D5C4A1">
+          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:13px 16px">Concepto</div>
+          <sc-for list="{{ fcYears }}" as="y" hint-placeholder-count="4">
+            <div style="padding:11px 14px;text-align:right">
+              <div style="font:800 15px/1 Outfit,sans-serif;color:{{ y.ink }}">{{ y.year }}</div>
+              <div style="display:flex;justify-content:flex-end;align-items:center;gap:7px;margin-top:5px">
+                <span style="font:300 10px/1 Jost,sans-serif;color:#A79C86">{{ y.note }}</span>
+                <sc-if value="{{ y.canRemove }}" hint-placeholder-val="{{ false }}">
+                  <span onClick="{{ y.onRemove }}" title="Quitar año" style="font:400 12px/1 Jost,sans-serif;color:#C9BB9C;cursor:pointer" style-hover="color:#51000E">×</span>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-for list="{{ fcRows }}" as="r" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:{{ fcCols }};align-items:stretch;border-bottom:1px solid #E7DCC2;background:{{ r.bg }}">
+            <div style="padding:14px 16px;display:flex;align-items:center;gap:9px">
+              <span style="width:8px;height:8px;background:{{ r.dot }};display:inline-block"></span>
+              <span style="font:{{ r.font }};color:{{ r.ink }}">{{ r.name }}</span>
+            </div>
+            <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 12px 0 0;border-left:1px solid #E7DCC2">
+                <sc-if value="{{ c.editable }}" hint-placeholder-val="{{ true }}">
+                  <span onClick="{{ c.toggleReal }}" title="{{ c.realTitle }}" style="width:7px;height:7px;border-radius:50%;border:1px solid {{ c.realBorder }};background:{{ c.realBg }};cursor:pointer;flex:none"></span>
+                </sc-if>
+                <sc-if value="{{ c.editable }}" hint-placeholder-val="{{ true }}">
+                  <input value="{{ c.value }}" onChange="{{ c.onChange }}" onBlur="{{ c.onBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:{{ c.font }};font-variant-numeric:tabular-nums;text-align:right;color:{{ c.ink }};outline:none;padding:14px 4px" style-focus="background:#EFE3C8"></input>
+                </sc-if>
+                <sc-if value="{{ c.readonly }}" hint-placeholder-val="{{ false }}">
+                  <span style="font:{{ c.font }};font-variant-numeric:tabular-nums;color:{{ c.ink }};padding:14px 4px">{{ c.value }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <p style="margin:16px 0 0;font:300 11.5px/1.5 Jost,sans-serif;color:#A79C86">Punto lleno: cifra real. Punto vacío: previsión. Las celdas sin valor propio se calculan con tus entradas de ese año.</p>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isInvest }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px">
+      <div>
+        <h1 style="margin:0;font:500 40px/1 Jost,sans-serif;letter-spacing:-0.035em">Inversión</h1>
+        <p style="margin:10px 0 0;font:300 13.5px/1.5 Jost,sans-serif;color:#6E6656;max-width:52ch">Cada caja son {{ unitStr }} invertidos. El color dice en qué producto está, y las cajas con borde son beneficio acumulado.</p>
+      </div>
+      <label style="display:block">
+        <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">Valor de cada caja</span>
+        <input value="{{ unitValue }}" onChange="{{ onUnit }}" onBlur="{{ onUnitBlur }}" inputMode="decimal" style="width:120px;border:1px solid #D5C4A1;background:#FBF4E4;padding:9px 12px;font:800 14px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+      </label>
+    </div>
+
+    <div style="display:grid;grid-template-columns:{{ invStatCols }};gap:1px;background:#D5C4A1;border:1px solid #D5C4A1;margin-top:28px">
+      <sc-for list="{{ invStats }}" as="s" hint-placeholder-count="4">
+        <div style="background:#FBF4E4;padding:16px 18px 18px">
+          <div style="font:500 10.5px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#6E6656">{{ s.name }}</div>
+          <div style="font:800 27px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;color:{{ s.ink }};margin-top:11px">{{ s.value }}</div>
+          <div style="font:400 11.5px/1.4 Jost,sans-serif;color:#A79C86;margin-top:6px">{{ s.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:34px">
+      <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:14px">Composición en cajas</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;max-width:820px">
+        <sc-for list="{{ invBoxes }}" as="b" hint-placeholder-count="24">
+          <span title="{{ b.title }}" style="width:26px;height:26px;background:{{ b.bg }};border:1px solid {{ b.border }};display:block"></span>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:16px">
+        <sc-for list="{{ invLegend }}" as="l" hint-placeholder-count="3">
+          <span style="display:flex;align-items:center;gap:8px;font:400 12px/1 Jost,sans-serif;color:#6E6656">
+            <span style="width:11px;height:11px;background:{{ l.bg }};border:1px solid {{ l.border }};display:inline-block"></span>
+            {{ l.label }}
+          </span>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="margin-top:36px;border:1px solid #D5C4A1;background:#FBF4E4">
+      <div style="display:grid;grid-template-columns:{{ invCols }};background:#EFE3C8;border-bottom:1px solid #D5C4A1">
+        <sc-for list="{{ invHeads }}" as="h" hint-placeholder-count="5">
+          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:11px 14px;text-align:{{ h.align }}">{{ h.label }}</div>
+        </sc-for>
+      </div>
+      <sc-for list="{{ invRows }}" as="r" hint-placeholder-count="3">
+        <div style="display:grid;grid-template-columns:{{ invCols }};align-items:center;border-bottom:1px solid #E7DCC2">
+          <input value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:none;background:transparent;font:400 14.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;padding:14px" style-focus="color:#51000E"></input>
+          <select value="{{ r.type }}" onChange="{{ r.onType }}" style="width:100%;border:none;background:transparent;font:400 13px/1.2 Jost,sans-serif;color:#1A1712;outline:none;padding:13px 12px;cursor:pointer" style-focus="background:#EFE3C8">
+            <option value="indexado">Fondo indexado</option>
+            <option value="monetario">Fondo monetario</option>
+            <option value="acciones">Acciones</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input value="{{ r.investedStr }}" onChange="{{ r.onInvested }}" onBlur="{{ r.onInvestedBlur }}" inputMode="decimal" style="width:100%;border:none;background:transparent;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none;padding:14px" style-focus="background:#EFE3C8"></input>
+          <input value="{{ r.valueStr }}" onChange="{{ r.onValue }}" onBlur="{{ r.onValueBlur }}" inputMode="decimal" style="width:100%;border:none;background:transparent;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none;padding:14px" style-focus="background:#EFE3C8"></input>
+          <div style="text-align:right;padding:14px;font:600 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ r.gainInk }}">{{ r.gainStr }}</div>
+          <button onClick="{{ r.onDelete }}" style="border:none;background:none;color:#C9BB9C;cursor:pointer;font-size:16px;line-height:1;padding:8px" style-hover="color:#51000E">×</button>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;background:#EFE3C8">
+        <input value="{{ invDraftName }}" onChange="{{ onInvDraftName }}" placeholder="Nombre del producto" style="flex:1;min-width:180px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:400 14px/1.2 Jost,sans-serif;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        <select value="{{ invDraftType }}" onChange="{{ onInvDraftType }}" style="border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:400 13.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+          <option value="indexado">Fondo indexado</option>
+          <option value="monetario">Fondo monetario</option>
+          <option value="acciones">Acciones</option>
+          <option value="otro">Otro</option>
+        </select>
+        <input value="{{ invDraftInvested }}" onChange="{{ onInvDraftInvested }}" inputMode="decimal" placeholder="Invertido" style="width:130px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:600 14px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        <input value="{{ invDraftValue }}" onChange="{{ onInvDraftValue }}" inputMode="decimal" placeholder="Valor actual" style="width:130px;border:1px solid #D5C4A1;background:#FFFBF2;padding:10px 12px;font:600 14px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        <button onClick="{{ addHolding }}" style="border:none;background:#14655A;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:11px 18px;cursor:pointer">Añadir</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:34px;padding-top:16px;border-top:1px solid #D5C4A1;font:300 11.5px/1 Jost,sans-serif;color:#A79C86">
+    <span>{{ saveText }}</span>
+    <button onClick="{{ reset }}" style="border:none;background:none;color:#A79C86;font:300 11.5px/1 Jost,sans-serif;text-decoration:underline;cursor:pointer;padding:0" style-hover="color:#51000E">Borrar todos los datos</button>
+  </div>
+
+  <datalist id="cat-suggest">
+    <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="0">
+      <option value="{{ s }}"></option>
+    </sc-for>
+  </datalist>
+
+</div>
 </div>
 
-<div class="modal-overlay" id="trendModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h2>Tendencia mensual</h2>
-      <button class="modal-close" id="closeTrendBtn" aria-label="Cerrar">×</button>
-    </div>
-    <p class="modal-sub">Gasto total (fijo + variable) por mes.</p>
-    <div id="trendChartWrap"></div>
-    <div class="modal-legend">
-      <span><i style="background:var(--accent-fixed)"></i>Fijos</span>
-      <span><i style="background:var(--accent-variable)"></i>Variables</span>
+<sc-if value="{{ chartOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(26,23,18,0.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #1A1712;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div>
+          <h2 style="margin:0;font:500 26px/1.1 Jost,sans-serif;letter-spacing:-0.025em">Tendencia mensual</h2>
+          <p style="margin:7px 0 0;font:300 13px/1.4 Jost,sans-serif;color:#6E6656">Gasto asignado por mes, con media móvil de 3 meses.</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="border:1px solid #1A1712;background:transparent;color:#1A1712;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="background:#1A1712;color:#EFE3C8">×</button>
+      </div>
+
+      <div style="position:relative;margin-top:18px;height:220px">
+        <svg viewBox="0 0 620 220" width="100%" height="220" style="display:block">
+          <sc-for list="{{ chartGrid }}" as="g" hint-placeholder-count="4">
+            <line x1="46" y1="{{ g.y }}" x2="608" y2="{{ g.y }}" stroke="#D5C4A1" stroke-width="1"></line>
+          </sc-for>
+          <path d="{{ avgPath }}" fill="none" stroke="#C0562A" stroke-width="1.6" stroke-dasharray="5 4"></path>
+          <path d="{{ linePath }}" fill="none" stroke="#51000E" stroke-width="2.2" stroke-linejoin="round"></path>
+          <sc-for list="{{ chartPoints }}" as="p" hint-placeholder-count="3">
+            <circle cx="{{ p.x }}" cy="{{ p.y }}" r="3.6" fill="#51000E"></circle>
+          </sc-for>
+        </svg>
+        <sc-for list="{{ chartLabels }}" as="l" hint-placeholder-count="6">
+          <div style="position:absolute;left:{{ l.left }};top:{{ l.top }};transform:{{ l.transform }};white-space:nowrap;font:{{ l.font }};color:{{ l.color }};font-variant-numeric:tabular-nums">{{ l.text }}</div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:18px;font:300 11.5px/1 Jost,sans-serif;color:#6E6656;margin-top:2px">
+        <span>— Gasto total del mes</span>
+        <span style="color:#C0562A">- - Media de 3 meses</span>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:26px;padding-top:22px;border-top:1px solid #D5C4A1">
+        <div style="flex:none">
+          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:12px">Composición del mes</div>
+          <div style="position:relative;width:164px;height:164px">
+            <svg viewBox="0 0 180 180" width="164" height="164" style="display:block">
+              <sc-for list="{{ donut }}" as="d" hint-placeholder-count="3">
+                <path d="{{ d.path }}" fill="{{ d.color }}"></path>
+              </sc-for>
+              <circle cx="90" cy="90" r="46" fill="#FFFFFF"></circle>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;pointer-events:none">
+              <span style="font:800 18px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#1A1712">{{ donutCenter }}</span>
+              <span style="font:300 9px/1 Jost,sans-serif;color:#8A8069">asignado</span>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:250px">
+          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:14px">Dónde va tu dinero · media de 3 meses</div>
+          <sc-for list="{{ topCats }}" as="c" hint-placeholder-count="5">
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;font:400 12.5px/1 Jost,sans-serif;color:#1A1712">
+                <span>{{ c.name }}</span>
+                <span style="font:600 12.5px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#6E6656">{{ c.value }}</span>
+              </div>
+              <div style="height:5px;background:#E3D7BC;margin-top:6px"><div style="height:100%;width:{{ c.w }};background:{{ c.color }}"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-if value="{{ hasUpcoming }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:22px;padding:14px 16px;background:#F5E0D2;border:1px solid #DFB79A">
+          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#C0562A;margin-bottom:9px">Próximos cargos y vencimientos</div>
+          <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="2">
+            <div style="font:400 12.5px/1.6 Jost,sans-serif;color:#5C3A28">{{ u }}</div>
+          </sc-for>
+        </div>
+      </sc-if>
     </div>
   </div>
-</div>
+</sc-if>
 
-<datalist id="datalist-fixed">
-  <option value="Alquiler"><option value="Hipoteca"><option value="Comunidad">
-  <option value="Factura de agua"><option value="Factura de luz"><option value="Factura de móvil">
-  <option value="Internet"><option value="Seguro del coche"><option value="Seguro del hogar">
-  <option value="Seguro de salud"><option value="Gimnasio"><option value="Suscripción Netflix">
-  <option value="Suscripción HBO"><option value="Suscripción Spotify"><option value="Transporte (abono)">
-  <option value="Guardería / colegio"><option value="Préstamo personal">
-</datalist>
-<datalist id="datalist-variable">
-  <option value="Supermercado"><option value="Cena fuera"><option value="Ocio">
-  <option value="Ropa"><option value="Regalo"><option value="Transporte">
-  <option value="Farmacia"><option value="Gasolina"><option value="Viajes">
-  <option value="Peluquería"><option value="Imprevistos">
-</datalist>
-<datalist id="datalist-savings">
-  <option value="Fondo de emergencia"><option value="Vacaciones"><option value="Jubilación">
-  <option value="Objetivo de ahorro"><option value="Inversión">
-</datalist>
+<sc-if value="{{ importOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(26,23,18,0.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #1A1712;max-width:760px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div>
+          <h2 style="margin:0;font:500 26px/1.1 Jost,sans-serif;letter-spacing:-0.025em">Importar extracto</h2>
+          <p style="margin:7px 0 0;font:300 13px/1.45 Jost,sans-serif;color:#6E6656;max-width:52ch">{{ impIntro }}</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="border:1px solid #1A1712;background:transparent;color:#1A1712;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="background:#1A1712;color:#FFFFFF">×</button>
+      </div>
 
-<script>
-(function(){
-  const TABS = ['fixed','variable','savings'];
-  const KEYS = { income:'presupuesto:income', fixed:'presupuesto:fixed', variable:'presupuesto:variable', savings:'presupuesto:savings' };
-  let idCounter = 1;
-  const newId = () => 'id_' + (idCounter++);
-  const expanded = new Set();
+      <sc-if value="{{ impStep0 }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div onDragOver="{{ onDragOver }}" onDrop="{{ onDrop }}" style="margin-top:20px;border:1px dashed {{ dropBorder }};background:{{ dropBg }};padding:26px 20px;text-align:center">
+            <div style="font:400 14px/1.4 Jost,sans-serif;color:#1A1712">Arrastra aquí el CSV de tu banco</div>
+            <div style="font:300 12px/1.4 Jost,sans-serif;color:#8A8069;margin-top:6px">o pega el contenido en el cuadro de abajo</div>
+          </div>
+          <textarea value="{{ impText }}" onChange="{{ onImpText }}" placeholder="fecha;concepto;importe&#10;03/09/2026;COMPRA MERCADONA;-42,15" style="width:100%;height:130px;margin-top:12px;border:1px solid #D5C4A1;background:#FBF4E4;padding:12px;font:400 12.5px/1.6 ui-monospace,monospace;color:#1A1712;outline:none;resize:vertical" style-focus="border-color:#1A1712"></textarea>
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:14px">
+            <span style="font:300 11.5px/1.4 Jost,sans-serif;color:#A79C86;max-width:44ch">Nada sale de tu navegador. Detecto el separador, el formato de fecha y la coma decimal automáticamente.</span>
+            <button onClick="{{ parseImport }}" style="border:none;background:#1A1712;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:12px 20px;cursor:pointer">Leer movimientos</button>
+          </div>
+        </div>
+      </sc-if>
 
-  let state = {
-    income: [{ id:newId(), label:'Ingreso principal', amount:0 }],
-    fixed: [], variable: [], savings: []
+      <sc-if value="{{ impStep1 }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px">
+            <sc-for list="{{ impMapFields }}" as="f" hint-placeholder-count="3">
+              <label style="display:block">
+                <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">{{ f.label }}</span>
+                <select value="{{ f.value }}" onChange="{{ f.onChange }}" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:11px 12px;font:400 13.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+                  <sc-for list="{{ impColumns }}" as="c" hint-placeholder-count="3">
+                    <option value="{{ c.value }}">{{ c.label }}</option>
+                  </sc-for>
+                </select>
+              </label>
+            </sc-for>
+          </div>
+          <div style="margin-top:16px;border:1px solid #D5C4A1;overflow-x:auto">
+            <div style="min-width:520px">
+              <div style="display:grid;grid-template-columns:110px minmax(0,1fr) 120px;background:#EFE3C8;border-bottom:1px solid #D5C4A1">
+                <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:11px 14px">Fecha</div>
+                <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:11px 14px">Concepto</div>
+                <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:11px 14px;text-align:right">Importe</div>
+              </div>
+              <sc-for list="{{ impPreview }}" as="r" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:110px minmax(0,1fr) 120px;border-bottom:1px solid #E7DCC2;background:#FBF4E4">
+                  <div style="padding:10px 14px;font:400 12.5px/1.2 Jost,sans-serif;color:{{ r.ink }}">{{ r.date }}</div>
+                  <div style="padding:10px 14px;font:400 12.5px/1.3 Jost,sans-serif;color:{{ r.ink }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.concept }}</div>
+                  <div style="padding:10px 14px;font:600 12.5px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:{{ r.amountInk }}">{{ r.amount }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:14px">
+            <span style="font:300 11.5px/1.4 Jost,sans-serif;color:#A79C86">{{ impCountText }}</span>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ backImport }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 13px/1 Jost,sans-serif;padding:12px 16px;cursor:pointer">Atrás</button>
+              <button onClick="{{ classifyImport }}" style="border:none;background:#1A1712;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:12px 20px;cursor:pointer">Clasificar</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ impStep2 }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:18px;padding:14px 16px;background:#FBF4E4;border:1px solid #D5C4A1">
+            <sc-for list="{{ impSummary }}" as="s" hint-placeholder-count="4">
+              <div style="padding-right:18px;border-right:1px solid #D5C4A1">
+                <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86">{{ s.label }}</div>
+                <div style="font:800 17px/1 Outfit,sans-serif;color:{{ s.ink }};margin-top:6px">{{ s.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ impHasPending }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin:22px 0 12px">Revisa lo dudoso</div>
+              <sc-for list="{{ impPending }}" as="p" hint-placeholder-count="3">
+                <div style="border:1px solid #D5C4A1;background:#FBF4E4;padding:12px 14px;margin-bottom:8px">
+                  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px">
+                    <span style="font:400 13.5px/1.3 Jost,sans-serif;color:#1A1712">{{ p.concept }}</span>
+                    <span style="font:800 14px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.amountInk }}">{{ p.amount }}</span>
+                  </div>
+                  <div style="font:300 11px/1.3 Jost,sans-serif;color:#A79C86;margin-top:4px">{{ p.note }}</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center">
+                    <select value="{{ p.sheet }}" onChange="{{ p.onSheet }}" style="border:1px solid #D5C4A1;background:#FFFBF2;padding:9px 11px;font:400 13px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+                      <sc-for list="{{ impSheetOptions }}" as="o" hint-placeholder-count="4">
+                        <option value="{{ o.value }}">{{ o.label }}</option>
+                      </sc-for>
+                    </select>
+                    <input value="{{ p.category }}" onChange="{{ p.onCategory }}" list="cat-suggest" placeholder="Categoría" style="flex:1;min-width:150px;border:1px solid #D5C4A1;background:#FFFBF2;padding:9px 11px;font:400 13px/1.2 Jost,sans-serif;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+                    <button onClick="{{ p.onSkip }}" style="border:1px solid #D5C4A1;background:{{ p.skipBg }};color:{{ p.skipInk }};font:400 12px/1 Jost,sans-serif;padding:9px 12px;cursor:pointer">{{ p.skipLabel }}</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:18px">
+            <span style="font:300 11.5px/1.4 Jost,sans-serif;color:#A79C86;max-width:40ch">{{ impApplyNote }}</span>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ backImport }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 13px/1 Jost,sans-serif;padding:12px 16px;cursor:pointer">Atrás</button>
+              <button onClick="{{ applyImport }}" style="border:none;background:#C0562A;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:12px 20px;cursor:pointer">{{ impApplyLabel }}</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ impStep3 }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:22px">
+          <div style="border:1px solid #D5C4A1;background:#FBF4E4;padding:18px 20px">
+            <div style="font:800 22px/1 Outfit,sans-serif;color:#14655A">{{ impDoneTitle }}</div>
+            <sc-for list="{{ impDoneLines }}" as="l" hint-placeholder-count="3">
+              <div style="font:400 13px/1.7 Jost,sans-serif;color:#5C5545">{{ l }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+            <button onClick="{{ resetImport }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 13px/1 Jost,sans-serif;padding:12px 16px;cursor:pointer">Importar otro</button>
+            <button onClick="{{ closeModal }}" style="border:none;background:#1A1712;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:12px 20px;cursor:pointer">Listo</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ letterOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(26,23,18,0.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #1A1712;max-width:820px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div>
+          <h2 style="margin:0;font:500 26px/1.1 Jost,sans-serif;letter-spacing:-0.025em">Carta para el banco</h2>
+          <p style="margin:7px 0 0;font:300 13px/1.45 Jost,sans-serif;color:#6E6656;max-width:52ch">Solicitud de hipoteca. Las cifras salen de tus datos; completa lo personal y descárgala.</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="border:1px solid #1A1712;background:transparent;color:#1A1712;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="background:#1A1712;color:#FFFFFF">×</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px">
+        <sc-for list="{{ letterFields }}" as="f" hint-placeholder-count="8">
+          <label style="display:block">
+            <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">{{ f.label }}</span>
+            <input value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:10px 12px;font:400 13.5px/1.2 Jost,sans-serif;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+          </label>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:24px;border:1px solid #D5C4A1;background:#FFFFFF;padding:38px 42px">
+        <div style="max-width:64ch;margin:0 auto">
+          <div style="font:400 12px/1.6 Jost,sans-serif;color:#1A1712">{{ ltHeaderName }}</div>
+          <div style="font:300 12px/1.6 Jost,sans-serif;color:#6E6656">{{ ltHeaderMeta }}</div>
+          <div style="font:300 12px/1.6 Jost,sans-serif;color:#6E6656;margin-top:20px">{{ ltBankLine }}</div>
+          <div style="font:300 12px/1.6 Jost,sans-serif;color:#6E6656">{{ ltDateLine }}</div>
+          <div style="font:500 14px/1.5 Jost,sans-serif;color:#1A1712;margin-top:26px">{{ ltSubject }}</div>
+          <sc-for list="{{ ltParagraphs }}" as="p" hint-placeholder-count="4">
+            <p style="margin:16px 0 0;font:400 13px/1.75 Jost,sans-serif;color:#1A1712;text-wrap:pretty">{{ p }}</p>
+          </sc-for>
+
+          <div style="margin:26px 0 0;border-top:1px solid #D5C4A1;border-bottom:1px solid #D5C4A1">
+            <sc-for list="{{ ltFigures }}" as="f" hint-placeholder-count="7">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:9px 0;border-bottom:1px solid #EFE3C8">
+                <span style="font:400 12.5px/1.4 Jost,sans-serif;color:#5C5545">{{ f.label }}</span>
+                <span style="font:600 13px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#1A1712;white-space:nowrap">{{ f.value }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ ltHasFunds }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:22px">
+              <div style="font:500 12.5px/1.4 Jost,sans-serif;color:#1A1712;margin-bottom:8px">Desglose de la cartera de inversión</div>
+              <sc-for list="{{ ltFunds }}" as="f" hint-placeholder-count="2">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:6px 0;font:400 12.5px/1.5 Jost,sans-serif;color:#5C5545;border-bottom:1px solid #EFE3C8">
+                  <span>{{ f.label }}</span>
+                  <span style="font:600 12.5px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#1A1712;white-space:nowrap">{{ f.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-for list="{{ ltClosing }}" as="p" hint-placeholder-count="2">
+            <p style="margin:16px 0 0;font:400 13px/1.75 Jost,sans-serif;color:#1A1712;text-wrap:pretty">{{ p }}</p>
+          </sc-for>
+          <div style="margin-top:36px;font:400 13px/1.6 Jost,sans-serif;color:#1A1712">{{ ltSignName }}</div>
+          <div style="font:300 12px/1.6 Jost,sans-serif;color:#6E6656">{{ ltSignDni }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:16px">
+        <span style="font:300 11.5px/1.4 Jost,sans-serif;color:#A79C86;max-width:46ch">Revisa las cifras antes de enviarla: el banco pedirá justificantes de cada una.</span>
+        <button onClick="{{ downloadLetter }}" style="border:none;background:#1A1712;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:12px 20px;cursor:pointer">Descargar carta</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ calcOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(26,23,18,0.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #1A1712;max-width:660px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div>
+          <h2 style="margin:0;font:500 26px/1.1 Jost,sans-serif;letter-spacing:-0.025em">Salario neto</h2>
+          <p style="margin:7px 0 0;font:300 13px/1.45 Jost,sans-serif;color:#6E6656;max-width:46ch">Cotización y retención según las reglas vigentes de 2026. Orientativo: la escala autonómica de tu comunidad puede variar, así que puedes forzar el tipo real de tu nómina.</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="border:1px solid #1A1712;background:transparent;color:#1A1712;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="background:#1A1712;color:#FFFFFF">×</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px">
+        <label style="display:block">
+          <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">Salario base anual</span>
+          <input value="{{ calcGross }}" onChange="{{ onCalcGross }}" inputMode="decimal" placeholder="30.000" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:10px 12px;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">Nº de pagas</span>
+          <select value="{{ calcPagas }}" onChange="{{ onCalcPagas }}" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:11px 12px;font:400 14px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+            <option value="12">12 pagas</option>
+            <option value="14">14 pagas</option>
+          </select>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">Contrato</span>
+          <select value="{{ calcContract }}" onChange="{{ onCalcContract }}" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:11px 12px;font:400 14px/1.2 Jost,sans-serif;color:#1A1712;outline:none;cursor:pointer">
+            <option value="indefinido">Indefinido</option>
+            <option value="temporal">Temporal</option>
+          </select>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">Hijos a cargo</span>
+          <input value="{{ calcKids }}" onChange="{{ onCalcKids }}" inputMode="numeric" placeholder="0" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:10px 12px;font:800 15px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">De ellos, &lt; 3 años</span>
+          <input value="{{ calcKidsU3 }}" onChange="{{ onCalcKidsU3 }}" inputMode="numeric" placeholder="0" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:10px 12px;font:800 15px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:7px">Forzar retención %</span>
+          <input value="{{ calcOverride }}" onChange="{{ onCalcOverride }}" inputMode="decimal" placeholder="{{ calcRatePlaceholder }}" style="width:100%;border:1px solid #D5C4A1;background:#FBF4E4;padding:10px 12px;font:800 15px/1.2 Outfit,sans-serif;text-align:right;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+        </label>
+      </div>
+
+      <div style="margin-top:24px;border:1px solid #D5C4A1">
+        <sc-for list="{{ calcRows }}" as="r" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px;align-items:baseline;gap:12px;padding:{{ r.pad }};background:{{ r.bg }};border-bottom:1px solid #E7DCC2">
+            <div>
+              <div style="font:{{ r.font }};color:{{ r.ink }}">{{ r.label }}</div>
+              <div style="font:300 11px/1.3 Jost,sans-serif;color:#A79C86;margin-top:4px">{{ r.note }}</div>
+            </div>
+            <div style="text-align:right;font:{{ r.valueFont }};font-variant-numeric:tabular-nums;color:{{ r.valueInk }}">{{ r.value }}</div>
+          </div>
+        </sc-for>
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;background:#EFE3C8">
+          <span style="font:300 12px/1.4 Jost,sans-serif;color:#6E6656;max-width:34ch">Sustituye los ingresos de {{ monthLabel }} por el neto medio mensual.</span>
+          <button onClick="{{ applyNet }}" style="border:none;background:#C0562A;color:#FFFFFF;font:500 13px/1 Jost,sans-serif;padding:11px 16px;cursor:pointer">Usar como ingreso del mes</button>
+        </div>
+      </div>
+
+      <div style="margin-top:24px">
+        <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A79C86;margin-bottom:14px">Tu presupuesto sobre el neto mensual</div>
+        <sc-for list="{{ calcSplit }}" as="c" hint-placeholder-count="4">
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;font:400 12.5px/1 Jost,sans-serif;color:#1A1712">
+              <span>{{ c.name }}</span>
+              <span style="font:600 12.5px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#6E6656">{{ c.value }} · {{ c.pct }}</span>
+            </div>
+            <div style="height:6px;background:#EFE3C8;margin-top:6px"><div style="height:100%;width:{{ c.w }};background:{{ c.color }}"></div></div>
+          </div>
+        </sc-for>
+        <p style="margin:14px 0 0;font:300 11.5px/1.5 Jost,sans-serif;color:#A79C86">Los gastos anuales y periódicos entran repartidos entre doce, igual que en el resumen del mes. Cálculo orientativo, no sustituye a tu nómina ni al asesoramiento fiscal.</p>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ newTabOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(26,23,18,0.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #1A1712;max-width:420px;width:100%;padding:24px 26px 26px;animation:card .2s ease">
+      <h2 style="margin:0 0 4px;font:500 22px/1.2 Jost,sans-serif;letter-spacing:-0.02em">Nueva pestaña</h2>
+      <p style="margin:0 0 18px;font:300 13px/1.45 Jost,sans-serif;color:#6E6656">Mensual para gastos que repites cada mes. Periódica para trimestrales, semestrales, anuales y deudas a plazos, con cuota mensual calculada sola.</p>
+      <input value="{{ newTabName }}" onChange="{{ onNewTabName }}" placeholder="Nombre de la pestaña" style="width:100%;border:1px solid #D5C4A1;background:#FFFBF2;padding:11px 12px;font:400 14px/1.2 Jost,sans-serif;color:#1A1712;outline:none" style-focus="border-color:#1A1712"></input>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <sc-for list="{{ newTabKinds }}" as="k" hint-placeholder-count="2">
+          <button onClick="{{ k.onClick }}" style="flex:1;border:1px solid {{ k.border }};background:{{ k.bg }};color:{{ k.ink }};font:400 13px/1 Jost,sans-serif;padding:11px 10px;cursor:pointer">{{ k.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
+        <span style="font:300 12px/1 Jost,sans-serif;color:#6E6656;margin-right:4px">Color</span>
+        <sc-for list="{{ newTabAccents }}" as="a" hint-placeholder-count="5">
+          <button onClick="{{ a.onClick }}" title="{{ a.name }}" style="width:26px;height:26px;border:2px solid {{ a.border }};background:{{ a.color }};cursor:pointer;padding:0"></button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:22px;justify-content:flex-end">
+        <button onClick="{{ closeModal }}" style="border:1px solid #D5C4A1;background:transparent;color:#6E6656;font:400 13px/1 Jost,sans-serif;padding:11px 16px;cursor:pointer">Cancelar</button>
+        <button onClick="{{ createTab }}" style="border:none;background:#1A1712;color:#EFE3C8;font:500 13px/1 Jost,sans-serif;padding:11px 18px;cursor:pointer">Crear pestaña</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showMetrics&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Contenido&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cómoda&quot;,&quot;compacta&quot;],&quot;default&quot;:&quot;cómoda&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contenido&quot;}}">
+const KEY = 'presupuesto:v3';
+const FREQ = { trimestral: 3, semestral: 6, anual: 12 };
+const ACC = {
+  blue:      { name: 'Azul',       ink: '#17537F', bg: '#BDE0FF', dot: '#BDE0FF' },
+  garnet:    { name: 'Garnet',     ink: '#51000E', bg: '#51000E', dot: '#51000E' },
+  teal:      { name: 'Verde',      ink: '#14655A', bg: '#14655A', dot: '#14655A' },
+  terracotta:{ name: 'Terracota',  ink: '#C0562A', bg: '#C0562A', dot: '#C0562A' },
+  ink:       { name: 'Tinta',      ink: '#3A342A', bg: '#3A342A', dot: '#3A342A' }
+};
+const SUGG = ['Alquiler','Hipoteca','Comunidad','Factura de luz','Factura de agua','Internet','Factura de móvil','Seguro de salud','Seguro del hogar','Seguro del coche','Transporte (abono)','Gimnasio','Netflix','Spotify','Supermercado','Cena fuera','Ocio','Ropa','Gasolina','Farmacia','Regalos','Viajes','Peluquería','Imprevistos','Fondo de emergencia','Vacaciones','Inversión indexada','Jubilación','ITV','Préstamo personal'];
+const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+let _seq = 1;
+const uid = () => 'i' + (_seq++) + Math.random().toString(36).slice(2, 6);
+const idx = (k) => { const p = k.split('-'); return (+p[0]) * 12 + (+p[1]) - 1; };
+const fromIdx = (n) => Math.floor(n / 12) + '-' + String((n % 12) + 1).padStart(2, '0');
+const shift = (k, d) => fromIdx(idx(k) + d);
+
+class Component extends DCLogic {
+  state = {
+    ready: false, month: '', sheetId: 'fixed', expanded: {}, edits: {},
+    compact: false, modal: null, w: 1200,
+    draft: { cat: '', amt: '', freq: 'trimestral', charge: '3', inst: '36' },
+    subDraft: {}, view: 'month',
+    invDraft: { name: '', type: 'indexado', invested: '', value: '' },
+    imp: { step: 0, text: '', rows: [], header: true, map: { date: 0, concept: 1, amount: 2 }, pending: [], report: null },
+    newTab: { name: '', kind: 'monthly', accent: 'terracotta' }
   };
 
-  function formatEUR(n){
-    if (isNaN(n)) n = 0;
-    return n.toLocaleString('es-ES', { minimumFractionDigits:2, maximumFractionDigits:2 }) + ' €';
+  componentDidMount() {
+    this.d = this.load();
+    const m = this.thisMonth();
+    this.ensureIncome(m);
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.setState({ ready: true, month: m, w: window.innerWidth, compact: this.props.density === 'compacta' });
   }
-  function parseAmount(str){
-    if (!str) return 0;
-    const cleaned = String(str).replace(/\./g,'').replace(',','.').replace(/[^\d.-]/g,'');
-    const n = parseFloat(cleaned);
-    return isNaN(n) ? 0 : n;
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); }
+
+  thisMonth() { const n = new Date(); return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0'); }
+  save() { try { localStorage.setItem(KEY, JSON.stringify(this.d)); } catch (e) {} }
+  load() {
+    try { const r = localStorage.getItem(KEY); if (r) { const p = JSON.parse(r); if (p && p.v === 3) return p; } } catch (e) {}
+    return this.seed();
   }
+  touch() { this.save(); this.forceUpdate(); }
 
-  function currentMonthKey(){ return new Date().toISOString().slice(0,7); }
-
-  function loadAll(){
-    try{
-      const rawIncome = localStorage.getItem(KEYS.income);
-      if (rawIncome){ const parsed = JSON.parse(rawIncome); if (Array.isArray(parsed) && parsed.length) state.income = parsed; }
-    } catch(e){}
-    TABS.forEach(t => {
-      try{
-        const raw = localStorage.getItem(KEYS[t]);
-        if (raw) state[t] = JSON.parse(raw);
-      } catch(e){ state[t] = []; }
-    });
-    // Migrate entries created before monthly tracking existed: tag them with the current month.
-    ['fixed','variable'].forEach(t => {
-      let changed = false;
-      state[t].forEach(group => group.entries.forEach(entry => {
-        if (!entry.date){ entry.date = currentMonthKey(); changed = true; }
-      }));
-      if (changed) persist(t);
-    });
-  }
-
-  function persist(key){
-    setSaveState('saving');
-    try{
-      localStorage.setItem(KEYS[key], JSON.stringify(state[key]));
-      setSaveState('saved');
-    } catch(e){
-      setSaveState('error');
-    }
-  }
-
-  let saveTimer = null;
-  function setSaveState(s){
-    const dot = document.getElementById('saveDot');
-    const text = document.getElementById('saveText');
-    clearTimeout(saveTimer);
-    if (s === 'saving'){ dot.style.background = '#A6A8A2'; text.textContent = 'Guardando…'; }
-    else if (s === 'saved'){
-      dot.style.background = 'var(--accent-savings)'; text.textContent = 'Guardado en este dispositivo';
-    } else {
-      dot.style.background = 'var(--accent-warning)'; text.textContent = 'No se pudo guardar (almacenamiento no disponible)';
-    }
-  }
-
-  // ---------- Income ----------
-  function incomeTotal(){ return state.income.reduce((s,r) => s + (r.amount||0), 0); }
-
-  function renderIncome(){
-    const box = document.getElementById('incomeRows');
-    box.innerHTML = '';
-    state.income.forEach(row => {
-      const div = document.createElement('div');
-      div.className = 'income-row';
-
-      const inputLabel = document.createElement('input');
-      inputLabel.className = 'income-label';
-      inputLabel.value = row.label;
-      inputLabel.placeholder = 'Fuente de ingreso';
-      inputLabel.addEventListener('input', e => { row.label = e.target.value; persist('income'); });
-
-      const inputAmt = document.createElement('input');
-      inputAmt.className = 'income-amount';
-      inputAmt.inputMode = 'decimal';
-      inputAmt.value = row.amount ? row.amount.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
-      inputAmt.placeholder = '0,00';
-      inputAmt.addEventListener('input', e => { row.amount = parseAmount(e.target.value); persist('income'); renderSummary(); });
-      inputAmt.addEventListener('blur', renderIncome);
-
-      div.appendChild(inputLabel);
-      div.appendChild(inputAmt);
-
-      if (state.income.length > 1){
-        const del = document.createElement('button');
-        del.className = 'income-del';
-        del.textContent = '×';
-        del.addEventListener('click', () => {
-          state.income = state.income.filter(r => r.id !== row.id);
-          persist('income'); renderIncome(); renderSummary();
-        });
-        div.appendChild(del);
+  seed() {
+    const m0 = this.thisMonth(), m1 = shift(m0, -1), m2 = shift(m0, -2);
+    const g = (cat, vals, target) => ({ id: uid(), category: cat, targets: target ? { [m0]: target, [m1]: target, [m2]: target } : {},
+      entries: Object.keys(vals).flatMap(k => [].concat(vals[k]).map(a => ({ id: uid(), amount: a, date: k, paid: k !== m0 }))) });
+    return {
+      v: 3,
+      income: {
+        [m2]: [{ id: uid(), label: 'Nómina', amount: 2150 }, { id: uid(), label: 'Freelance', amount: 380 }],
+        [m1]: [{ id: uid(), label: 'Nómina', amount: 2150 }, { id: uid(), label: 'Freelance', amount: 420 }],
+        [m0]: [{ id: uid(), label: 'Nómina', amount: 2150 }, { id: uid(), label: 'Freelance', amount: 260 }]
+      },
+      carry: { [m1]: true, [m0]: true },
+      calc: { gross: '31.500', pagas: '12', contract: 'indefinido', kids: '', kidsU3: '', override: '' },
+      forecast: {}, rules: {}, imported: [],
+      invest: { unit: 500, holdings: [
+        { id: uid(), name: 'Fondo indexado global', type: 'indexado', invested: 4800, value: 5460 },
+        { id: uid(), name: 'Fondo monetario', type: 'monetario', invested: 3000, value: 3072 }
+      ] },
+      letter: { name: '', dni: '', address: '', city: '', bank: '', job: '', seniority: '', amount: '', term: '25', property: '' },
+      sheets: [
+        { id: 'fixed', name: 'Gastos fijos', kind: 'monthly', accent: 'blue' },
+        { id: 'variable', name: 'Gastos variables', kind: 'monthly', accent: 'garnet' },
+        { id: 'savings', name: 'Ahorros', kind: 'monthly', accent: 'teal' },
+        { id: 'periodics', name: 'Periódicos', kind: 'periodic', accent: 'ink' }
+      ],
+      groups: {
+        fixed: [
+          g('Alquiler', { [m2]: 850, [m1]: 850, [m0]: 850 }, 850),
+          g('Factura de luz', { [m2]: 61.2, [m1]: 74.1, [m0]: 58.4 }, 65),
+          g('Internet', { [m2]: 39.9, [m1]: 39.9, [m0]: 39.9 }),
+          g('Factura de móvil', { [m2]: 18, [m1]: 18, [m0]: 18 }),
+          g('Seguro de salud', { [m2]: 62.5, [m1]: 62.5, [m0]: 62.5 }),
+          g('Transporte (abono)', { [m2]: 54, [m1]: 54, [m0]: 54 }),
+          g('Netflix', { [m2]: 13.99, [m1]: 13.99, [m0]: 13.99 })
+        ],
+        variable: [
+          g('Supermercado', { [m2]: [96.4, 121.3, 88.15], [m1]: [104.2, 97.8, 132.4], [m0]: [92.4, 118.6, 74.15] }, 320),
+          g('Cena fuera', { [m2]: [38.5], [m1]: [52, 29.9], [m0]: [46.8, 32] }, 70),
+          g('Gasolina', { [m2]: 58, [m1]: 72.4, [m0]: 65 }),
+          g('Ropa', { [m1]: 45.9, [m0]: 79.95 }, 60),
+          g('Farmacia', { [m2]: 14.6, [m0]: 22.3 }),
+          g('Ocio', { [m2]: 52, [m1]: 34, [m0]: 40 })
+        ],
+        savings: [
+          g('Fondo de emergencia', { [m2]: 250, [m1]: 250, [m0]: 250 }, 250),
+          g('Vacaciones', { [m2]: 100, [m1]: 100, [m0]: 100 }),
+          g('Inversión indexada', { [m2]: 150, [m1]: 150, [m0]: 150 })
+        ]
+      },
+      prows: {
+        periodics: [
+          { id: uid(), category: 'Seguro del coche', amount: 412, freq: 'anual', charge: 3 },
+          { id: uid(), category: 'Gimnasio', amount: 165, freq: 'trimestral', charge: 2 },
+          { id: uid(), category: 'Préstamo del coche', amount: 189, freq: 'deuda', inst: { total: 36, start: shift(m0, -17) } }
+        ]
       }
-      box.appendChild(div);
+    };
+  }
+
+  // Retención IRPF 2026: escala agregada estatal + autonómica supletoria
+  irpfQuota(base) {
+    const S = [[12450, 0.19], [20200, 0.24], [35200, 0.30], [60000, 0.37], [300000, 0.45], [Infinity, 0.47]];
+    let q = 0, prev = 0;
+    for (const [top, rate] of S) { if (base <= prev) break; q += (Math.min(base, top) - prev) * rate; prev = top; }
+    return q;
+  }
+  personalMin(kids, kidsU3) {
+    const PER_KID = [2400, 2700, 4000, 4500];
+    let m = 5550;
+    for (let i = 0; i < kids; i++) m += PER_KID[Math.min(i, 3)];
+    m += Math.min(kidsU3, kids) * 2800;
+    return m;
+  }
+  salary() {
+    const c = this.d.calc || {};
+    const gross = this.parse(c.gross) || 0;
+    const pagas = c.pagas === '14' ? 14 : 12;
+    const kids = Math.max(0, parseInt(c.kids, 10) || 0);
+    const kidsU3 = Math.max(0, parseInt(c.kidsU3, 10) || 0);
+    // Cuota obrera 2026: contingencias comunes 4,70 + desempleo 1,55/1,60 + FP 0,10 + MEI 0,15
+    const ssRate = c.contract === 'temporal' ? 0.0655 : 0.065;
+    const MAX_BASE = 5101.20 * 12;
+    const ss = Math.min(gross, MAX_BASE) * ssRate;
+    const rn = Math.max(0, gross - ss - 2000);
+    const red = rn <= 14047.5 ? 6498 : (rn < 19747.5 ? 6498 - 1.14 * (rn - 14047.5) : 0);
+    const base = Math.max(0, rn - red);
+    const pm = this.personalMin(kids, kidsU3);
+    const autoRate = gross > 0 ? Math.max(0, this.irpfQuota(base) - this.irpfQuota(pm)) / gross : 0;
+    const forced = this.parse(c.override);
+    const rate = c.override && forced > 0 ? forced / 100 : autoRate;
+    const irpf = gross * rate;
+    const netAnnual = gross - ss - irpf;
+    return { gross, pagas, ss, ssRate, irpf, rate, autoRate, netAnnual, perPaga: pagas ? netAnnual / pagas : 0, monthly: netAnnual / 12, forced: !!(c.override && forced > 0) };
+  }
+
+  fmt(n) { return this.num(n) + ' €'; }
+  num(n) { return (isNaN(n) ? 0 : n).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' }); }
+  int(n) { return Math.round(isNaN(n) ? 0 : n).toLocaleString('es-ES', { useGrouping: 'always' }); }
+  pct(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+  parse(s) { if (s === '' || s == null) return 0; const c = String(s).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''); const n = parseFloat(c); return isNaN(n) ? 0 : n; }
+  label(k) { const p = k.split('-'); return MONTHS[(+p[1]) - 1] + ' ' + p[0]; }
+  short(k) { const p = k.split('-'); return MONTHS[(+p[1]) - 1].slice(0, 3) + ' ' + p[0].slice(2); }
+
+  ensureIncome(m) {
+    if (this.d.income[m]) return;
+    let src = null;
+    for (let i = 1; i <= 24; i++) { const p = shift(m, -i); if (this.d.income[p]) { src = this.d.income[p]; break; } }
+    this.d.income[m] = src ? src.map(r => ({ id: uid(), label: r.label, amount: r.amount })) : [{ id: uid(), label: 'Nómina', amount: 0 }];
+    if (this.d.carry[m] === undefined) this.d.carry[m] = true;
+    this.save();
+  }
+
+  monthlySheets() { return this.d.sheets.filter(s => s.kind === 'monthly'); }
+  gs(id) { if (!this.d.groups[id]) this.d.groups[id] = []; return this.d.groups[id]; }
+  ps(id) { if (!this.d.prows[id]) this.d.prows[id] = []; return this.d.prows[id]; }
+
+  entriesOf(g, m) { return g.entries.filter(e => e.date === m); }
+  groupTotal(g, m) { return this.entriesOf(g, m).reduce((s, e) => s + (e.amount || 0), 0); }
+  sheetTotal(id, m) { return this.gs(id).reduce((s, g) => s + this.groupTotal(g, m), 0); }
+
+  reserve(p, m) {
+    if (p.freq === 'deuda') {
+      const s = idx(p.inst.start), i = idx(m);
+      return (i >= s && i < s + p.inst.total) ? (p.amount || 0) : 0;
+    }
+    return (p.amount || 0) / (FREQ[p.freq] || 12);
+  }
+  isCharge(p, m) { if (p.freq === 'deuda') return false; const mm = +m.split('-')[1]; return ((mm - p.charge) % (FREQ[p.freq] || 12) + 12) % (FREQ[p.freq] || 12) === 0; }
+  periodicTotal(id, m) { return this.ps(id).reduce((s, p) => s + this.reserve(p, m), 0); }
+  allPeriodicTotal(m) { return this.d.sheets.filter(s => s.kind === 'periodic').reduce((t, s) => t + this.periodicTotal(s.id, m), 0); }
+
+  incomeTotal(m) { return (this.d.income[m] || []).reduce((s, r) => s + (r.amount || 0), 0); }
+  assigned(m) { return this.monthlySheets().reduce((t, s) => t + this.sheetTotal(s.id, m), 0) + this.allPeriodicTotal(m); }
+  firstMonth() {
+    let all = Object.keys(this.d.income);
+    this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => g.entries.forEach(e => all.push(e.date))));
+    return all.sort()[0] || this.thisMonth();
+  }
+  carryInto(m, depth) {
+    if (!this.d.carry[m]) return 0;
+    const p = shift(m, -1);
+    if ((depth || 0) > 36 || idx(p) < idx(this.firstMonth())) return 0;
+    if (!this.d.income[p] && this.assigned(p) === 0) return 0;
+    return (this.incomeTotal(p) + this.carryInto(p, (depth || 0) + 1)) - this.assigned(p);
+  }
+
+  ed(k, fallback) { return this.state.edits[k] !== undefined ? this.state.edits[k] : fallback; }
+  setEd(k, v) { this.setState(s => ({ edits: Object.assign({}, s.edits, { [k]: v }) })); }
+  clearEd(k) { this.setState(s => { const e = Object.assign({}, s.edits); delete e[k]; return { edits: e }; }); }
+
+  addOrMerge(sheetId, cat, amt, month) {
+    const c = (cat || '').trim(), a = this.parse(amt);
+    if (!c || !a) return;
+    const list = this.gs(sheetId);
+    let g = list.find(x => x.category.trim().toLowerCase() === c.toLowerCase());
+    if (g) { g.entries.push({ id: uid(), amount: a, date: month, paid: false }); }
+    else { list.push({ id: uid(), category: c, targets: {}, entries: [{ id: uid(), amount: a, date: month, paid: false }] }); }
+    this.touch();
+  }
+
+  csv() {
+    const year = this.state.month.slice(0, 4);
+    const lines = ['mes;hoja;categoria;importe;pagado'];
+    for (let i = 1; i <= 12; i++) {
+      const m = year + '-' + String(i).padStart(2, '0');
+      this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => this.entriesOf(g, m).forEach(e =>
+        lines.push([m, s.name, g.category, this.num(e.amount), e.paid ? 'sí' : 'no'].join(';')))));
+      this.d.sheets.filter(s => s.kind === 'periodic').forEach(s => this.ps(s.id).forEach(p => {
+        const r = this.reserve(p, m); if (r > 0) lines.push([m, s.name + ' (reserva)', p.category, this.num(r), ''].join(';'));
+      }));
+      const inc = this.incomeTotal(m); if (inc) lines.push([m, 'Ingresos', 'Total', this.num(inc), ''].join(';'));
+    }
+    const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'presupuesto-' + year + '.csv'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+
+  duplicate() {
+    const m = this.state.month, p = shift(m, -1);
+    ['fixed', 'savings'].concat(this.monthlySheets().map(s => s.id).filter(id => id !== 'fixed' && id !== 'savings' && id !== 'variable'))
+      .filter(id => this.d.groups[id]).forEach(id => {
+        this.gs(id).forEach(g => {
+          if (this.entriesOf(g, m).length) return;
+          this.entriesOf(g, p).forEach(e => g.entries.push({ id: uid(), amount: e.amount, date: m, paid: false }));
+          if (g.targets[p] && !g.targets[m]) g.targets[m] = g.targets[p];
+        });
+      });
+    this.touch();
+  }
+
+  arc(cx, cy, r, a0, a1) {
+    const p = (a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    const [x0, y0] = p(a0), [x1, y1] = p(a1);
+    const big = (a1 - a0) > Math.PI ? 1 : 0;
+    return 'M ' + cx + ' ' + cy + ' L ' + x0.toFixed(2) + ' ' + y0.toFixed(2) + ' A ' + r + ' ' + r + ' 0 ' + big + ' 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' Z';
+  }
+
+  setImp(patch) { this.setState(s => ({ imp: Object.assign({}, s.imp, patch) })); }
+  updPending(i, patch) {
+    this.setState(s => {
+      const list = (s.imp.pending || []).slice();
+      list[i] = Object.assign({}, list[i], patch);
+      return { imp: Object.assign({}, s.imp, { pending: list }) };
     });
-    document.getElementById('incomeTotalValue').textContent = formatEUR(incomeTotal());
   }
 
-  document.getElementById('addIncomeBtn').addEventListener('click', () => {
-    state.income.push({ id:newId(), label:'Otra fuente', amount:0 });
-    persist('income'); renderIncome(); renderSummary();
-  });
-
-  // ---------- Expense / savings tabs (grouped by category) ----------
-  function tabTotal(tab){
-    return state[tab].reduce((sum,g) => sum + g.entries.reduce((s,e) => s+(e.amount||0),0), 0);
+  // ---- Importador de extractos ----
+  splitRows(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+    if (!lines.length) return [];
+    const counts = [';', '\t', ',', '|'].map(d => ({ d: d, n: (lines[0].match(new RegExp('\\' + d, 'g')) || []).length }));
+    counts.sort((a, b) => b.n - a.n);
+    const del = counts[0].n > 0 ? counts[0].d : ';';
+    return lines.map(l => {
+      const out = []; let cur = '', q = false;
+      for (let i = 0; i < l.length; i++) {
+        const ch = l[i];
+        if (ch === '"') { q = !q; continue; }
+        if (ch === del && !q) { out.push(cur.trim()); cur = ''; continue; }
+        cur += ch;
+      }
+      out.push(cur.trim());
+      return out;
+    });
   }
-
-  function findGroup(tab, category){
-    const norm = category.trim().toLowerCase();
-    return state[tab].find(g => g.category.trim().toLowerCase() === norm);
+  guessMap(rows) {
+    const head = (rows[0] || []).map(h => h.toLowerCase());
+    const find = (re, fb) => { const i = head.findIndex(h => re.test(h)); return i >= 0 ? i : fb; };
+    const hasHeader = head.some(h => /fecha|concepto|importe|descrip|date|amount|movimiento/.test(h));
+    return { header: hasHeader, date: find(/fecha|date/, 0), concept: find(/concepto|descrip|detalle|movimiento|beneficiario/, 1), amount: find(/importe|amount|cantidad|euros/, 2) };
   }
-
-  function addOrMergeEntry(tab, categoryRaw, amountRaw){
-    const category = categoryRaw.trim();
-    const amount = parseAmount(amountRaw);
-    if (!category || !amount) return;
-    let group = findGroup(tab, category);
-    if (group){
-      group.entries.push({ id:newId(), amount, date:currentMonthKey() });
-      expanded.add(tab+':'+group.id);
-    } else {
-      group = { id:newId(), category, entries:[{ id:newId(), amount, date:currentMonthKey() }] };
-      state[tab].push(group);
+  toMonth(s) {
+    if (!s) return null;
+    const t = String(s).trim();
+    let mt = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+    if (mt) { let y = +mt[3]; if (y < 100) y += 2000; return y + '-' + String(+mt[2]).padStart(2, '0'); }
+    mt = t.match(/^(\d{4})[\/\-.](\d{1,2})/);
+    if (mt) return mt[1] + '-' + String(+mt[2]).padStart(2, '0');
+    return null;
+  }
+  toAmount(s) {
+    if (s == null) return 0;
+    let t = String(s).replace(/[€\s]/g, '');
+    const neg = /^-/.test(t) || /-$/.test(t) || /^\(.*\)$/.test(t);
+    t = t.replace(/[()\-]/g, '');
+    if (t.indexOf(',') > -1 && t.indexOf('.') > -1) t = t.lastIndexOf(',') > t.lastIndexOf('.') ? t.replace(/\./g, '').replace(',', '.') : t.replace(/,/g, '');
+    else if (t.indexOf(',') > -1) t = t.replace(/\./g, '').replace(',', '.');
+    const n = parseFloat(t);
+    if (isNaN(n)) return 0;
+    return neg ? -Math.abs(n) : n;
+  }
+  KEYWORDS() {
+    return [
+      [/mercadona|carrefour|lidl|dia |alcampo|eroski|consum|supermerc/i, 'variable', 'Supermercado'],
+      [/restaurant|bar |cafeter|glovo|just eat|uber eats|telepizza|burger|mcdon/i, 'variable', 'Cena fuera'],
+      [/repsol|cepsa|galp|shell|bp |gasolin|carburant/i, 'variable', 'Gasolina'],
+      [/farmacia|parafarm/i, 'variable', 'Farmacia'],
+      [/zara|h&m|decathl|primark|mango |ropa/i, 'variable', 'Ropa'],
+      [/cine|spotify|netflix|hbo|disney|prime video|filmin|teatro|concierto/i, 'variable', 'Ocio'],
+      [/alquiler|arrendam|hipotec/i, 'fixed', 'Alquiler'],
+      [/iberdrola|endesa|naturgy|holaluz|repsol luz|electric|luz /i, 'fixed', 'Factura de luz'],
+      [/canal isabel|aguas|hidrogea|emasesa|agua /i, 'fixed', 'Factura de agua'],
+      [/movistar|vodafone|orange|jazztel|digi|pepephone|yoigo|masmovil|fibra|internet/i, 'fixed', 'Internet'],
+      [/adeslas|sanitas|dkv|asisa|mapfre salud|seguro salud/i, 'fixed', 'Seguro de salud'],
+      [/mapfre|allianz|axa|linea directa|mutua|generali|seguro/i, 'fixed', 'Seguro del coche'],
+      [/gimnasio|basic fit|altafit|viva gym|mcfit|fitness/i, 'fixed', 'Gimnasio'],
+      [/emt |metro |renfe|abono transp|tmb|autobus/i, 'fixed', 'Transporte (abono)'],
+      [/comunidad prop|administracion finca/i, 'fixed', 'Comunidad'],
+      [/indexa|myinvestor|vanguard|amundi|ishares|fondo|acciones|broker|degiro|trade republic/i, 'savings', 'Inversión indexada'],
+      [/ahorro|hucha|emergenc/i, 'savings', 'Fondo de emergencia']
+    ];
+  }
+  isTransfer(concept) { return /traspaso|transferencia (a|entre) (mi|cuenta)|cuenta propia|entre cuentas|reintegro|aportacion a mi/i.test(concept); }
+  classifyOne(concept) {
+    const c = concept.toLowerCase();
+    const rules = this.d.rules || {};
+    for (const k of Object.keys(rules)) if (c.indexOf(k) > -1) return { sheet: rules[k].sheet, category: rules[k].category, why: 'regla guardada' };
+    for (const s of this.monthlySheets()) {
+      for (const g of this.gs(s.id)) {
+        const t = g.category.trim().toLowerCase();
+        if (t.length > 3 && c.indexOf(t) > -1) return { sheet: s.id, category: g.category, why: 'categoría existente' };
+      }
     }
-    persist(tab); renderTab(tab); renderSummary();
+    for (const [re, sheet, cat] of this.KEYWORDS()) if (re.test(concept)) return { sheet: sheet, category: cat, why: 'comercio reconocido' };
+    return null;
   }
+  fingerprint(mv) { return mv.month + '|' + mv.concept.toLowerCase().slice(0, 28) + '|' + Math.round(mv.amount * 100); }
 
-  function deleteGroup(tab, groupId){
-    state[tab] = state[tab].filter(g => g.id !== groupId);
-    expanded.delete(tab+':'+groupId);
-    persist(tab); renderTab(tab); renderSummary();
+  // ---- Previsión anual ----
+  yearList() {
+    const set = new Set();
+    Object.keys(this.d.income).forEach(k => set.add(k.slice(0, 4)));
+    this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => g.entries.forEach(e => set.add(e.date.slice(0, 4)))));
+    Object.keys(this.d.forecast || {}).forEach(y => set.add(y));
+    return Array.from(set).sort();
   }
-
-  function deleteEntry(tab, groupId, entryId){
-    const group = state[tab].find(g => g.id === groupId);
-    if (!group) return;
-    group.entries = group.entries.filter(e => e.id !== entryId);
-    if (group.entries.length === 0) deleteGroup(tab, groupId);
-    else { persist(tab); renderTab(tab); renderSummary(); }
-  }
-
-  function updateGroupCategory(tab, groupId, value){
-    const group = state[tab].find(g => g.id === groupId);
-    if (!group) return;
-    group.category = value;
-    persist(tab); renderSummary();
-  }
-
-  function updateEntryAmount(tab, groupId, entryId, value){
-    const group = state[tab].find(g => g.id === groupId);
-    if (!group) return;
-    const entry = group.entries.find(e => e.id === entryId);
-    if (!entry) return;
-    entry.amount = parseAmount(value);
-    persist(tab); renderSummary();
-  }
-
-  function renderTab(tab){
-    const body = document.getElementById('rows-' + tab);
-    body.innerHTML = '';
-    if (state[tab].length === 0){
-      body.innerHTML = '<tr class="empty-row"><td colspan="3">Sin entradas todavía. Añade la primera abajo.</td></tr>';
-      return;
+  yearAuto(y) {
+    let income = 0, fixed = 0, variable = 0, savings = 0, periodic = 0;
+    for (let i = 1; i <= 12; i++) {
+      const k = y + '-' + String(i).padStart(2, '0');
+      income += this.incomeTotal(k);
+      fixed += this.sheetTotal('fixed', k);
+      variable += this.sheetTotal('variable', k);
+      savings += this.sheetTotal('savings', k);
+      periodic += this.allPeriodicTotal(k);
     }
-    state[tab].forEach(group => {
-      const tr = document.createElement('tr');
-      tr.className = 'group-row';
+    this.monthlySheets().forEach(s => {
+      if (['fixed', 'variable', 'savings'].includes(s.id)) return;
+      for (let i = 1; i <= 12; i++) variable += this.sheetTotal(s.id, y + '-' + String(i).padStart(2, '0'));
+    });
+    return { income, fixed, variable, savings, periodic };
+  }
+  yearVal(y, field) {
+    const f = (this.d.forecast || {})[y] || {};
+    return f[field] !== undefined && f[field] !== null && f[field] !== '' ? this.parse(f[field]) : this.yearAuto(y)[field];
+  }
+  isRealCell(y, field) {
+    const f = (this.d.forecast || {})[y] || {};
+    if (f.real && f.real[field] !== undefined) return f.real[field];
+    return y < String(new Date().getFullYear());
+  }
 
-      const tdCat = document.createElement('td');
-      tdCat.className = 'cat';
-      const inputCat = document.createElement('input');
-      inputCat.value = group.category;
-      inputCat.addEventListener('input', e => updateGroupCategory(tab, group.id, e.target.value));
-      tdCat.appendChild(inputCat);
+  // ---- Inversión ----
+  inv() {
+    if (!this.d.invest) this.d.invest = { unit: 500, holdings: [] };
+    return this.d.invest;
+  }
 
-      const tdAmt = document.createElement('td');
-      tdAmt.className = 'amt';
-      const total = group.entries.reduce((s,e) => s+(e.amount||0),0);
+  renderVals() {
+    if (!this.state.ready || !this.d) return { ready: false, isMonthly: true, showTarget: true, gridCols: 'minmax(0,1fr) 108px 132px 44px 34px', statCols: 'repeat(4,1fr)', padCell: '14px', tableMinWidth: '0',
+      monthShort: '', monthLabel: '', incomeTotalStr: '', paidLine: '', saveText: '', accentInk: '#3A342A', densityLabel: '', draftPlaceholder: '', draftAmtPlaceholder: '', emptyText: '', periodicTotalStr: '' };
 
-      if (group.entries.length === 1){
-        const inputAmt = document.createElement('input');
-        inputAmt.inputMode = 'decimal';
-        inputAmt.value = total ? total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
-        inputAmt.placeholder = '0,00 €';
-        inputAmt.addEventListener('input', e => updateEntryAmount(tab, group.id, group.entries[0].id, e.target.value));
-        inputAmt.addEventListener('blur', () => renderTab(tab));
-        tdAmt.appendChild(inputAmt);
+    const m = this.state.month, narrow = this.state.w < 760, compact = this.state.compact;
+    this.ensureIncome(m);
+    if (!this.d.calc) this.d.calc = { gross: '', pagas: '12', contract: 'indefinido', kids: '', kidsU3: '', override: '' };
+    const c = this.d.calc, sal = this.salary();
+    const sheet = this.d.sheets.find(s => s.id === this.state.sheetId) || this.d.sheets[0];
+    const acc = ACC[sheet.accent] || ACC.ink;
+    const inc = this.incomeTotal(m), carry = this.carryInto(m), avail = inc + carry, assigned = this.assigned(m);
+    const showTarget = !narrow && !compact && sheet.kind === 'monthly';
+    const pad = compact ? '9px 12px' : '14px';
+
+    // stats (clicking one jumps to its sheet)
+    const go = (id) => () => this.setState({ sheetId: id, edits: {} });
+    const stats = this.monthlySheets().map(s => {
+      const t = this.sheetTotal(s.id, m), a = ACC[s.accent] || ACC.ink;
+      return { name: s.name, value: this.fmt(t), ink: a.ink, dot: a.dot, pct: avail > 0 ? this.pct(t / avail * 100) + ' del disponible' : '—',
+        onClick: go(s.id), cursor: 'pointer', hoverBg: '#EFE3C8', title: 'Ver ' + s.name.toLowerCase() };
+    });
+    const per = this.allPeriodicTotal(m);
+    const perSheet = this.d.sheets.find(s => s.kind === 'periodic');
+    if (per > 0) stats.push({ name: 'Reserva periódicos', value: this.fmt(per), ink: '#3A342A', dot: '#3A342A', pct: avail > 0 ? this.pct(per / avail * 100) + ' del disponible' : '—',
+      onClick: perSheet ? go(perSheet.id) : null, cursor: perSheet ? 'pointer' : 'default', hoverBg: '#EFE3C8', title: perSheet ? 'Ver ' + perSheet.name.toLowerCase() : '' });
+    const free = avail - assigned;
+    stats.push({ name: free >= 0 ? 'Sin asignar' : 'Exceso', value: this.fmt(Math.abs(free)), ink: free >= 0 ? '#6E6656' : '#51000E', dot: '#E3D7BC', pct: avail > 0 ? this.pct(Math.abs(free) / avail * 100) + ' del disponible' : 'Añade ingresos',
+      onClick: null, cursor: 'default', hoverBg: '#FBF4E4', title: '' });
+
+    const denom = Math.max(avail, assigned, 1);
+    const bars = this.monthlySheets().map(s => ({ w: (this.sheetTotal(s.id, m) / denom * 100).toFixed(2) + '%', color: (ACC[s.accent] || ACC.ink).bg }));
+    if (per > 0) bars.push({ w: (per / denom * 100).toFixed(2) + '%', color: '#3A342A' });
+
+    // paid / pending
+    let paidSum = 0, pendSum = 0;
+    this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => this.entriesOf(g, m).forEach(e => { if (e.paid) paidSum += e.amount || 0; else pendSum += e.amount || 0; })));
+
+    // investor metrics
+    const rate = inc > 0 ? this.sheetTotal('savings', m) / inc * 100 : 0;
+    let cushionPool = 0;
+    this.gs('savings').forEach(g => { if (/emergenc|colch/i.test(g.category)) g.entries.forEach(e => { if (e.date <= m) cushionPool += e.amount || 0; }); });
+    let spend3 = 0, n3 = 0;
+    for (let i = 0; i < 3; i++) { const k = shift(m, -i); const t = this.sheetTotal('fixed', k) + this.sheetTotal('variable', k) + this.allPeriodicTotal(k); if (t > 0) { spend3 += t; n3++; } }
+    const avgSpend = n3 ? spend3 / n3 : 0;
+    const cushionMonths = avgSpend > 0 ? cushionPool / avgSpend : 0;
+    const cushionGoal = this.d.cushionGoal === undefined ? 6 : this.d.cushionGoal;
+
+    // rows
+    const rows = this.gs(sheet.id).filter(g => this.entriesOf(g, m).length > 0).map(g => {
+      const es = this.entriesOf(g, m), total = es.reduce((s, e) => s + (e.amount || 0), 0);
+      const key = sheet.id + ':' + g.id, exp = !!this.state.expanded[key];
+      const target = g.targets[m] || 0, over = target > 0 && total > target;
+      const caps = [];
+      if (avail > 0) caps.push(this.pct(total / avail * 100) + ' del disponible');
+      if (target > 0) caps.push(over ? 'objetivo ' + this.fmt(target) + ' · te pasas ' + this.fmt(total - target) : 'objetivo ' + this.fmt(target));
+      else if (narrow || compact) caps.push('sin objetivo');
+      const allPaid = es.every(e => e.paid);
+      return {
+        id: g.id, category: g.category, caption: caps.join(' · '), capInk: over ? '#51000E' : '#A79C86',
+        onCat: (e) => { g.category = e.target.value; this.touch(); },
+        single: es.length === 1, merged: es.length > 1, count: es.length, chevron: exp ? '▲' : '▼',
+        amountStr: es.length === 1 ? this.ed('a' + es[0].id, this.num(total)) : this.fmt(total),
+        onAmt: (e) => { this.setEd('a' + es[0].id, e.target.value); es[0].amount = this.parse(e.target.value); this.touch(); },
+        onAmtBlur: () => this.clearEd('a' + es[0].id),
+        targetStr: this.ed('t' + g.id + m, target ? this.num(target) : ''),
+        onTarget: (e) => { this.setEd('t' + g.id + m, e.target.value); const v = this.parse(e.target.value); if (v) g.targets[m] = v; else delete g.targets[m]; this.touch(); },
+        onTargetBlur: () => this.clearEd('t' + g.id + m),
+        toggle: () => this.setState(s => ({ expanded: Object.assign({}, s.expanded, { [key]: !s.expanded[key] }) })),
+        expanded: exp,
+        subs: es.map((e, i) => ({
+          note: 'Importe ' + (i + 1) + (e.paid ? ' · pagado' : ''),
+          amountStr: this.ed('a' + e.id, this.num(e.amount)),
+          onAmt: (ev) => { this.setEd('a' + e.id, ev.target.value); e.amount = this.parse(ev.target.value); this.touch(); },
+          onBlur: () => this.clearEd('a' + e.id),
+          onDelete: () => { g.entries = g.entries.filter(x => x.id !== e.id); if (!g.entries.length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); }
+        })),
+        subDraft: this.state.subDraft[g.id] || '',
+        onSubDraft: (e) => this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: e.target.value }) })),
+        addSub: () => { const v = this.parse(this.state.subDraft[g.id]); if (!v) return; g.entries.push({ id: uid(), amount: v, date: m, paid: false }); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: '' }) })); this.touch(); },
+        onSubKey: (e) => { if (e.key === 'Enter') { const v = this.parse(this.state.subDraft[g.id]); if (v) { g.entries.push({ id: uid(), amount: v, date: m, paid: false }); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: '' }) })); this.touch(); } } },
+        paid: allPaid,
+        checkBg: allPaid ? acc.ink : 'transparent', checkInk: allPaid ? '#FFFBF2' : '#D6C9AC', checkBorder: allPaid ? acc.ink : '#DCCEB0',
+        togglePaid: () => { es.forEach(e => { e.paid = !allPaid; }); this.touch(); },
+        onDelete: () => { g.entries = g.entries.filter(e => e.date !== m); if (!g.entries.length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); }
+      };
+    });
+
+    const prows = sheet.kind !== 'periodic' ? [] : this.ps(sheet.id).map(p => {
+      const isDebt = p.freq === 'deuda', r = this.reserve(p, m), chg = this.isCharge(p, m);
+      let instLabel = '', caps = [], instInk = '#6E6656';
+      if (isDebt) {
+        const done = idx(m) - idx(p.inst.start) + 1;
+        const clamped = Math.max(0, Math.min(done, p.inst.total));
+        instLabel = clamped + '/' + p.inst.total;
+        const left = p.inst.total - clamped;
+        if (done > p.inst.total) { caps.push('Terminado · liberas ' + this.fmt(p.amount) + ' al mes'); instInk = '#14655A'; }
+        else if (left === 0) { caps.push('Última cuota este mes'); instInk = '#C0562A'; }
+        else { caps.push(left + ' cuotas restantes · acaba en ' + this.label(fromIdx(idx(p.inst.start) + p.inst.total - 1))); }
+        caps.push('pendiente ' + this.fmt(Math.max(0, left) * p.amount));
       } else {
-        const btn = document.createElement('button');
-        btn.className = 'amt-merged';
-        const key = tab+':'+group.id;
-        btn.innerHTML = formatEUR(total) + ' <span class="count-badge">' + group.entries.length + '</span> <span class="chevron">' + (expanded.has(key) ? '▲' : '▼') + '</span>';
-        btn.addEventListener('click', () => {
-          if (expanded.has(key)) expanded.delete(key); else expanded.add(key);
-          renderTab(tab);
-        });
-        tdAmt.appendChild(btn);
+        caps.push('Reserva mensual · cargo de ' + this.fmt(p.amount) + ' cada ' + (FREQ[p.freq] || 12) + ' meses');
+        if (chg) caps.push('el cargo real cae este mes; no se duplica');
       }
+      return {
+        category: p.category, caption: caps.join(' · '), capInk: chg || instInk === '#C0562A' ? '#C0562A' : '#A79C86',
+        onCat: (e) => { p.category = e.target.value; this.touch(); },
+        amountStr: this.ed('p' + p.id, this.num(p.amount)),
+        onAmt: (e) => { this.setEd('p' + p.id, e.target.value); p.amount = this.parse(e.target.value); this.touch(); },
+        onAmtBlur: () => this.clearEd('p' + p.id),
+        freq: p.freq,
+        onFreq: (e) => { p.freq = e.target.value; if (p.freq === 'deuda' && !p.inst) p.inst = { total: 12, start: m }; if (p.freq !== 'deuda' && !p.charge) p.charge = +m.split('-')[1]; this.touch(); },
+        isDebt: isDebt, isCyclic: !isDebt, instLabel: instLabel, instInk: instInk,
+        charge: String(p.charge || 1),
+        onCharge: (e) => { p.charge = +e.target.value; this.touch(); },
+        quotaStr: r > 0 ? this.fmt(r) : '—', quotaInk: r > 0 ? '#1A1712' : '#C9BB9C',
+        onDelete: () => { this.d.prows[sheet.id] = this.ps(sheet.id).filter(x => x.id !== p.id); this.touch(); }
+      };
+    });
 
-      const tdDel = document.createElement('td');
-      tdDel.className = 'del';
-      const delBtn = document.createElement('button');
-      delBtn.className = 'del-btn';
-      delBtn.textContent = '×';
-      delBtn.setAttribute('aria-label','Eliminar categoría');
-      delBtn.addEventListener('click', () => deleteGroup(tab, group.id));
-      tdDel.appendChild(delBtn);
-
-      tr.appendChild(tdCat); tr.appendChild(tdAmt); tr.appendChild(tdDel);
-      body.appendChild(tr);
-
-      const key = tab+':'+group.id;
-      if (group.entries.length > 1 && expanded.has(key)){
-        const subTr = document.createElement('tr');
-        subTr.className = 'sub-row';
-        const subTd = document.createElement('td');
-        subTd.colSpan = 3;
-        const wrap = document.createElement('div');
-        wrap.className = 'sub-wrap';
-
-        group.entries.forEach(entry => {
-          const row = document.createElement('div');
-          row.className = 'sub-entry';
-          const dot = document.createElement('span'); dot.className = 'sub-dot';
-          const amtInput = document.createElement('input');
-          amtInput.inputMode = 'decimal';
-          amtInput.value = entry.amount ? entry.amount.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
-          amtInput.addEventListener('input', e => updateEntryAmount(tab, group.id, entry.id, e.target.value));
-          amtInput.addEventListener('blur', () => renderTab(tab));
-          const del = document.createElement('button');
-          del.className = 'del-btn'; del.textContent = '×';
-          del.addEventListener('click', () => deleteEntry(tab, group.id, entry.id));
-          row.appendChild(dot); row.appendChild(amtInput); row.appendChild(del);
-          wrap.appendChild(row);
-        });
-
-        const addRow = document.createElement('div');
-        addRow.className = 'sub-add';
-        const label = document.createElement('span'); label.textContent = 'Añadir otro importe:';
-        const input = document.createElement('input');
-        input.inputMode = 'decimal'; input.placeholder = '0,00';
-        const addBtn = document.createElement('button'); addBtn.textContent = 'Añadir';
-        function submitSub(){
-          if (!input.value) return;
-          group.entries.push({ id:newId(), amount: parseAmount(input.value), date: currentMonthKey() });
-          persist(tab); renderTab(tab); renderSummary();
+    // upcoming charges & expiries (next 4 months)
+    const upcoming = [];
+    this.d.sheets.filter(s => s.kind === 'periodic').forEach(s => this.ps(s.id).forEach(p => {
+      for (let i = 0; i < 4; i++) {
+        const k = shift(m, i);
+        if (p.freq === 'deuda') {
+          const last = fromIdx(idx(p.inst.start) + p.inst.total - 1);
+          if (k === last) upcoming.push(p.category + ': última cuota en ' + this.label(k) + ', liberas ' + this.fmt(p.amount) + ' al mes.');
+        } else if (this.isCharge(p, k)) {
+          upcoming.push(p.category + ': cargo de ' + this.fmt(p.amount) + ' en ' + this.label(k) + '.');
         }
-        addBtn.addEventListener('click', submitSub);
-        input.addEventListener('keydown', e => { if (e.key === 'Enter') submitSub(); });
-        addRow.appendChild(label); addRow.appendChild(input); addRow.appendChild(addBtn);
-        wrap.appendChild(addRow);
-
-        subTd.appendChild(wrap);
-        subTr.appendChild(subTd);
-        body.appendChild(subTr);
       }
-    });
-  }
-
-  TABS.forEach(tab => {
-    const catInput = document.getElementById('newCat-' + tab);
-    const amtInput = document.getElementById('newAmt-' + tab);
-    const btn = document.getElementById('addBtn-' + tab);
-    function submit(){
-      addOrMergeEntry(tab, catInput.value, amtInput.value);
-      catInput.value = ''; amtInput.value = '';
-      catInput.focus();
-    }
-    btn.addEventListener('click', submit);
-    catInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); amtInput.focus(); } });
-    amtInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); submit(); } });
-  });
-
-  // ---------- Summary ----------
-  function renderSummary(){
-    const income = incomeTotal();
-    const f = tabTotal('fixed'), v = tabTotal('variable'), s = tabTotal('savings');
-    const assigned = f + v + s;
-
-    document.getElementById('totalFixed').textContent = formatEUR(f);
-    document.getElementById('totalVariable').textContent = formatEUR(v);
-    document.getElementById('totalSavings').textContent = formatEUR(s);
-
-    const bar = document.getElementById('splitBar');
-    const note = document.getElementById('summaryNote');
-    const [barFixed, barVariable, barSavings, barUnassigned] = bar.children;
-
-    if (income <= 0){
-      document.getElementById('pctFixed').textContent = '—';
-      document.getElementById('pctVariable').textContent = '—';
-      document.getElementById('pctSavings').textContent = '—';
-      barFixed.style.width = '0%'; barVariable.style.width = '0%';
-      barSavings.style.width = '0%'; barUnassigned.style.width = '100%';
-      note.innerHTML = '<div class="hint-text">Añade tus ingresos arriba para ver qué porcentaje de tu presupuesto representa cada categoría.</div>';
-      return;
-    }
-
-    document.getElementById('pctFixed').textContent = (f/income*100).toFixed(1).replace('.',',') + '% del presupuesto';
-    document.getElementById('pctVariable').textContent = (v/income*100).toFixed(1).replace('.',',') + '% del presupuesto';
-    document.getElementById('pctSavings').textContent = (s/income*100).toFixed(1).replace('.',',') + '% del presupuesto';
-
-    if (assigned <= income){
-      const unassigned = income - assigned;
-      barFixed.style.width = (f/income*100) + '%';
-      barVariable.style.width = (v/income*100) + '%';
-      barSavings.style.width = (s/income*100) + '%';
-      barUnassigned.style.width = (unassigned/income*100) + '%';
-      note.innerHTML = unassigned > 0
-        ? '<div class="hint-text">Te quedan ' + formatEUR(unassigned) + ' sin asignar de tu presupuesto.</div>'
-        : '';
-    } else {
-      const over = assigned - income;
-      barFixed.style.width = (f/assigned*100) + '%';
-      barVariable.style.width = (v/assigned*100) + '%';
-      barSavings.style.width = (s/assigned*100) + '%';
-      barUnassigned.style.width = '0%';
-      note.innerHTML = '<div class="warning-text">Tus gastos y ahorros superan tu presupuesto en ' + formatEUR(over) + '.</div>';
-    }
-  }
-
-  // ---------- Monthly trend ----------
-  function computeMonthlyTrend(){
-    const buckets = {};
-    ['fixed','variable'].forEach(tab => {
-      state[tab].forEach(group => group.entries.forEach(entry => {
-        const key = entry.date || currentMonthKey();
-        if (!buckets[key]) buckets[key] = { fixed:0, variable:0 };
-        buckets[key][tab] += entry.amount || 0;
-      }));
-    });
-    return Object.keys(buckets).sort().map(key => ({
-      key, fixed:buckets[key].fixed, variable:buckets[key].variable,
-      total: buckets[key].fixed + buckets[key].variable
     }));
-  }
 
-  function monthLabel(key){
-    const [y,m] = key.split('-').map(Number);
-    const d = new Date(y, m-1, 1);
-    let label = d.toLocaleDateString('es-ES', { month:'short' }).replace('.','');
-    return label.charAt(0).toUpperCase() + label.slice(1);
-  }
-
-  function renderTrend(){
-    const wrap = document.getElementById('trendChartWrap');
-    const data = computeMonthlyTrend();
-    if (data.length === 0){
-      wrap.innerHTML = '<div class="hint-text" style="padding:24px 0;">Todavía no hay gastos registrados. Añade alguno en Gastos fijos o Gastos variables para empezar a ver tu tendencia.</div>';
-      return;
-    }
-    const maxTotal = Math.max(...data.map(d => d.total), 1);
-    const barW = 40, gap = 26, chartH = 150, padTop = 26, padBottom = 30, padLeft = 10;
-    const width = data.length * (barW + gap) + gap + padLeft;
-    const height = chartH + padTop + padBottom;
-    let svg = '<svg viewBox="0 0 ' + width + ' ' + height + '" width="100%" height="' + height + '" xmlns="http://www.w3.org/2000/svg">';
-    svg += '<line x1="' + padLeft + '" y1="' + (padTop+chartH) + '" x2="' + width + '" y2="' + (padTop+chartH) + '" style="stroke:var(--line);stroke-width:1"/>';
-    data.forEach((d, i) => {
-      const x = padLeft + gap + i*(barW+gap);
-      const fixedH = (d.fixed/maxTotal)*chartH;
-      const varH = (d.variable/maxTotal)*chartH;
-      const totalH = fixedH + varH;
-      const yTop = padTop + (chartH - totalH);
-      if (varH > 0) svg += '<rect x="'+x+'" y="'+yTop+'" width="'+barW+'" height="'+varH+'" rx="3" style="fill:var(--accent-variable)"/>';
-      if (fixedH > 0) svg += '<rect x="'+x+'" y="'+(yTop+varH)+'" width="'+barW+'" height="'+fixedH+'" rx="3" style="fill:var(--accent-fixed)"/>';
-      if (d.total === 0) svg += '<rect x="'+x+'" y="'+(padTop+chartH-2)+'" width="'+barW+'" height="2" style="fill:var(--surface-2)"/>';
-      if (d.total > 0){
-        svg += '<text x="'+(x+barW/2)+'" y="'+(yTop-7)+'" text-anchor="middle" font-size="10" style="fill:var(--ink-soft);font-family:\'IBM Plex Mono\',monospace">'+Math.round(d.total)+'€</text>';
-      }
-      svg += '<text x="'+(x+barW/2)+'" y="'+(padTop+chartH+18)+'" text-anchor="middle" font-size="11" style="fill:var(--ink-soft);font-family:\'Space Grotesk\',sans-serif">'+monthLabel(d.key)+'</text>';
+    // chart
+    const months = [];
+    for (let i = 5; i >= 0; i--) months.push(shift(m, -i));
+    const totals = months.map(k => this.assigned(k));
+    const max = Math.max.apply(null, totals.concat([1]));
+    const step = Math.pow(10, Math.floor(Math.log10(max))) / 2 || 100;
+    const top = Math.ceil(max / step) * step;
+    const X0 = 46, X1 = 604, Y0 = 22, Y1 = 182;
+    const px = (i) => X0 + i * ((X1 - X0) / Math.max(months.length - 1, 1));
+    const py = (v) => Y1 - (v / top) * (Y1 - Y0);
+    const linePath = totals.map((v, i) => (i ? 'L ' : 'M ') + px(i).toFixed(1) + ' ' + py(v).toFixed(1)).join(' ');
+    const avg = totals.map((v, i) => { let s = 0, n = 0; for (let j = Math.max(0, i - 2); j <= i; j++) { s += totals[j]; n++; } return s / n; });
+    const avgPath = avg.map((v, i) => (i ? 'L ' : 'M ') + px(i).toFixed(1) + ' ' + py(v).toFixed(1)).join(' ');
+    const chartPoints = months.map((k, i) => ({ x: px(i).toFixed(1), y: py(totals[i]).toFixed(1) }));
+    const chartGrid = [0, 0.25, 0.5, 0.75, 1].map(f => ({ y: (Y1 - f * (Y1 - Y0)).toFixed(1) }));
+    const pcX = (x) => (x / 620 * 100).toFixed(2) + '%', pcY = (y) => (y / 220 * 100).toFixed(2) + '%';
+    const chartLabels = [];
+    [0, 0.25, 0.5, 0.75, 1].forEach(f => {
+      const y = Y1 - f * (Y1 - Y0);
+      chartLabels.push({ left: pcX(40), top: pcY(y), transform: 'translate(-100%,-50%)', font: '400 9.5px/1 Outfit,sans-serif', color: '#A79C86', text: this.int(top * f) });
     });
-    svg += '</svg>';
-    wrap.innerHTML = svg;
-    if (data.length === 1){
-      wrap.innerHTML += '<div class="hint-text" style="padding-top:10px;">Solo hay datos de este mes. Sigue registrando tus gastos y aquí irá apareciendo la evolución mes a mes.</div>';
-    }
-  }
-
-  document.getElementById('trendIconBtn').addEventListener('click', () => {
-    renderTrend();
-    document.getElementById('trendModal').style.display = 'flex';
-  });
-  document.getElementById('closeTrendBtn').addEventListener('click', () => {
-    document.getElementById('trendModal').style.display = 'none';
-  });
-  document.getElementById('trendModal').addEventListener('click', e => {
-    if (e.target.id === 'trendModal') document.getElementById('trendModal').style.display = 'none';
-  });
-
-  // ---------- Tabs ----------
-  document.querySelectorAll('.tab').forEach(t => {
-    t.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === t));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+    months.forEach((k, i) => {
+      chartLabels.push({ left: pcX(px(i)), top: pcY(py(totals[i]) - 12), transform: 'translate(-50%,-50%)', font: '600 10px/1 Outfit,sans-serif', color: '#6E6656', text: this.int(totals[i]) + '€' });
+      chartLabels.push({ left: pcX(px(i)), top: pcY(206), transform: 'translate(-50%,-50%)', font: '400 10px/1 Jost,sans-serif', color: '#8A8069', text: this.short(k) });
     });
-  });
 
-  // ---------- Reset ----------
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    if (!confirm('¿Borrar todos los datos guardados en este dispositivo? Esta acción no se puede deshacer.')) return;
-    state = { income:[{id:newId(), label:'Ingreso principal', amount:0}], fixed:[], variable:[], savings:[] };
-    TABS.forEach(t => persist(t)); persist('income');
-    renderIncome(); TABS.forEach(renderTab); renderSummary();
-  });
+    // donut of active month
+    const segs = this.monthlySheets().map(s => ({ v: this.sheetTotal(s.id, m), color: (ACC[s.accent] || ACC.ink).bg }));
+    if (per > 0) segs.push({ v: per, color: '#3A342A' });
+    if (free > 0) segs.push({ v: free, color: '#E3D7BC' });
+    const dTotal = segs.reduce((s, x) => s + x.v, 0) || 1;
+    let a0 = -Math.PI / 2;
+    const donut = segs.filter(s => s.v > 0).map(s => { const a1 = a0 + (s.v / dTotal) * Math.PI * 2; const path = this.arc(90, 90, 84, a0, a1); a0 = a1; return { path: path, color: s.color }; });
 
-  // ---------- Init ----------
-  loadAll();
-  renderIncome();
-  TABS.forEach(renderTab);
-  renderSummary();
-  setSaveState('saved');
-})();
+    // top categories, 3-month average
+    const bucket = {};
+    this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => {
+      let t = 0; for (let i = 0; i < 3; i++) t += this.groupTotal(g, shift(m, -i));
+      if (t > 0) bucket[g.category] = { v: (bucket[g.category] ? bucket[g.category].v : 0) + t / 3, color: (ACC[s.accent] || ACC.ink).bg };
+    }));
+    const topList = Object.keys(bucket).map(k => ({ name: k, v: bucket[k].v, color: bucket[k].color })).sort((a, b) => b.v - a.v).slice(0, 6);
+    const topMax = topList.length ? topList[0].v : 1;
+    const topCats = topList.map(t => ({ name: t.name, value: this.fmt(t.v) + '/mes', w: (t.v / topMax * 100).toFixed(1) + '%', color: t.color }));
+
+    // ---- Importación ----
+    const imp = this.state.imp;
+    const impBody = imp.rows.slice(imp.header ? 1 : 0);
+    const impMovements = impBody.map(r => {
+      const dateRaw = (r[imp.map.date] || '').trim();
+      const concept = (r[imp.map.concept] || '').replace(/\s+/g, ' ').trim();
+      const amount = this.toAmount(r[imp.map.amount]);
+      return { dateRaw: dateRaw, month: this.toMonth(dateRaw), concept: concept, amount: amount };
+    }).filter(mv => mv.concept && mv.amount !== 0);
+
+    // ---- Previsión ----
+    if (!this.d.forecast) this.d.forecast = {};
+    const fcYears = this.yearList();
+    const FIELDS = [
+      { key: 'income', name: 'Ingresos', dot: '#C0562A', ink: '#1A1712' },
+      { key: 'fixed', name: 'Gastos fijos', dot: '#BDE0FF', ink: '#1A1712' },
+      { key: 'variable', name: 'Gastos variables', dot: '#51000E', ink: '#1A1712' },
+      { key: 'savings', name: 'Ahorro', dot: '#14655A', ink: '#1A1712' },
+      { key: 'periodic', name: 'Anuales y periódicos', dot: '#3A342A', ink: '#1A1712' }
+    ];
+    const fcRows = FIELDS.map(f => ({
+      name: f.name, dot: f.dot, ink: f.ink, bg: '#FBF4E4', font: '400 14px/1.2 Jost,sans-serif',
+      cells: fcYears.map(y => {
+        const real = this.isRealCell(y, f.key), stored = (this.d.forecast[y] || {})[f.key];
+        return {
+          editable: true, readonly: false,
+          value: this.ed('fc' + y + f.key, stored !== undefined && stored !== null && stored !== '' ? this.num(this.parse(stored)) : this.num(this.yearAuto(y)[f.key])),
+          font: '600 14px/1.2 Outfit,sans-serif', ink: real ? '#1A1712' : '#8A6A55',
+          onChange: (e) => { this.setEd('fc' + y + f.key, e.target.value); if (!this.d.forecast[y]) this.d.forecast[y] = { real: {} }; this.d.forecast[y][f.key] = e.target.value; this.touch(); },
+          onBlur: () => this.clearEd('fc' + y + f.key),
+          realBg: real ? '#1A1712' : 'transparent', realBorder: real ? '#1A1712' : '#A79C86',
+          realTitle: real ? 'Cifra real; pulsa para marcarla como previsión' : 'Previsión; pulsa para marcarla como real',
+          toggleReal: () => { if (!this.d.forecast[y]) this.d.forecast[y] = { real: {} }; if (!this.d.forecast[y].real) this.d.forecast[y].real = {}; this.d.forecast[y].real[f.key] = !real; this.touch(); }
+        };
+      })
+    }));
+    let accBal = 0;
+    const balances = fcYears.map(y => {
+      const b = this.yearVal(y, 'income') - this.yearVal(y, 'fixed') - this.yearVal(y, 'variable') - this.yearVal(y, 'savings') - this.yearVal(y, 'periodic');
+      accBal += b;
+      return { b: b, acc: accBal };
+    });
+    fcRows.push({ name: 'Saldo del año', dot: '#D5C4A1', ink: '#1A1712', bg: '#FFFFFF', font: '500 14px/1.2 Jost,sans-serif',
+      cells: balances.map(x => ({ editable: false, readonly: true, value: this.fmt(x.b), font: '800 15px/1.1 Outfit,sans-serif', ink: x.b >= 0 ? '#14655A' : '#51000E' })) });
+    fcRows.push({ name: 'Saldo acumulado', dot: '#1A1712', ink: '#1A1712', bg: '#FFFFFF', font: '500 14px/1.2 Jost,sans-serif',
+      cells: balances.map(x => ({ editable: false, readonly: true, value: this.fmt(x.acc), font: '800 15px/1.1 Outfit,sans-serif', ink: x.acc >= 0 ? '#14655A' : '#51000E' })) });
+
+    // ---- Inversión ----
+    const inv = this.inv();
+    const INV_C = { indexado: '#17537F', monetario: '#14655A', acciones: '#C0562A', otro: '#8A8069' };
+    const INV_N = { indexado: 'Fondo indexado', monetario: 'Fondo monetario', acciones: 'Acciones', otro: 'Otro' };
+    const invested = (inv.holdings || []).reduce((s, h) => s + (h.invested || 0), 0);
+    const invValue = (inv.holdings || []).reduce((s, h) => s + (h.value || 0), 0);
+    const invGain = invValue - invested;
+    const unit = Math.max(1, inv.unit || 500);
+    const invBoxes = [];
+    (inv.holdings || []).forEach(h => {
+      const n = Math.round((h.invested || 0) / unit);
+      for (let i = 0; i < Math.min(n, 400); i++) invBoxes.push({ bg: INV_C[h.type] || INV_C.otro, border: INV_C[h.type] || INV_C.otro, title: h.name + ' · ' + this.fmt(unit) });
+    });
+    const gainBoxes = Math.round(Math.max(0, invGain) / unit);
+    for (let i = 0; i < Math.min(gainBoxes, 200); i++) invBoxes.push({ bg: 'transparent', border: '#14655A', title: 'Beneficio · ' + this.fmt(unit) });
+    const byType = {};
+    (inv.holdings || []).forEach(h => { byType[h.type] = (byType[h.type] || 0) + (h.invested || 0); });
+    const invLegend = Object.keys(byType).map(t => ({ bg: INV_C[t] || INV_C.otro, border: INV_C[t] || INV_C.otro, label: (INV_N[t] || 'Otro') + ' · ' + this.fmt(byType[t]) }));
+    if (invGain > 0) invLegend.push({ bg: 'transparent', border: '#14655A', label: 'Beneficio · ' + this.fmt(invGain) });
+    const invStats = [
+      { name: 'Invertido', value: this.fmt(invested), ink: '#1A1712', note: (inv.holdings || []).length + ' productos' },
+      { name: 'Valor actual', value: this.fmt(invValue), ink: '#1A1712', note: Math.round(invValue / unit) + ' cajas de ' + this.fmt(unit) },
+      { name: 'Beneficio', value: (invGain >= 0 ? '+ ' : '− ') + this.fmt(Math.abs(invGain)), ink: invGain >= 0 ? '#14655A' : '#51000E', note: invested > 0 ? this.pct(invGain / invested * 100) + ' sobre lo invertido' : '—' },
+      { name: 'Aportado este mes', value: this.fmt(this.sheetTotal('savings', m)), ink: '#14655A', note: 'desde la pestaña Ahorros' }
+    ];
+
+    // ---- Carta al banco ----
+    if (!this.d.letter) this.d.letter = { name: '', dni: '', address: '', city: '', bank: '', job: '', seniority: '', amount: '', term: '25', property: '' };
+    const lt = this.d.letter, ltAmount = this.parse(lt.amount);
+    let ltIncSum = 0, ltIncN = 0, ltVarSum = 0, ltVarN2 = 0, ltSaveSum = 0, ltBalSum = 0, ltN = 0;
+    for (let i = 0; i < 6; i++) {
+      const k = shift(m, -i), inck = this.incomeTotal(k), ass = this.assigned(k);
+      if (inck === 0 && ass === 0) continue;
+      if (inck > 0) { ltIncSum += inck; ltIncN++; }
+      ltVarSum += this.sheetTotal('variable', k); ltVarN2++;
+      ltSaveSum += this.sheetTotal('savings', k);
+      ltBalSum += inck - ass;
+      ltN++;
+    }
+    const ltIncome = ltIncN ? ltIncSum / ltIncN : 0;
+    const ltVarAvg = ltVarN2 ? ltVarSum / ltVarN2 : 0;
+    const ltVarN = ltVarN2;
+    const ltSaveAvg = ltN ? ltSaveSum / ltN : 0;
+    const ltBalanceAvg = ltN ? ltBalSum / ltN : 0;
+    const ltFixed = this.sheetTotal('fixed', m);
+    let ltDebtQuota = 0, ltDebtLeft = 0;
+    this.d.sheets.filter(s => s.kind === 'periodic').forEach(s => this.ps(s.id).forEach(p => {
+      if (p.freq !== 'deuda' || !p.inst) return;
+      const done = idx(m) - idx(p.inst.start) + 1;
+      if (done < 1 || done > p.inst.total) return;
+      ltDebtQuota += p.amount || 0;
+      ltDebtLeft += Math.max(0, p.inst.total - done) * (p.amount || 0);
+    }));
+    const ltPrevYear = String(new Date().getFullYear() - 1);
+    const pa = this.yearAuto(ltPrevYear);
+    const paBal = this.yearVal(ltPrevYear, 'income') - this.yearVal(ltPrevYear, 'fixed') - this.yearVal(ltPrevYear, 'variable') - this.yearVal(ltPrevYear, 'savings') - this.yearVal(ltPrevYear, 'periodic');
+    const ltPrevClose = pa.income > 0
+      ? 'ingresos ' + this.fmt(this.yearVal(ltPrevYear, 'income')) + ', gastos ' + this.fmt(this.yearVal(ltPrevYear, 'fixed') + this.yearVal(ltPrevYear, 'variable') + this.yearVal(ltPrevYear, 'periodic')) + ', ahorro ' + this.fmt(this.yearVal(ltPrevYear, 'savings')) + ', saldo ' + this.fmt(paBal)
+      : 'sin datos completos del ejercicio';
+
+    const carryOn = !!this.d.carry[m];
+    const heads = sheet.kind === 'monthly'
+      ? [{ label: 'Categoría', align: 'left' }].concat(showTarget ? [{ label: 'Objetivo', align: 'right' }] : []).concat([{ label: 'Importe', align: 'right' }, { label: 'Pag.', align: 'center' }, { label: '', align: 'right' }])
+      : [{ label: 'Categoría', align: 'left' }, { label: 'Importe', align: 'right' }, { label: 'Frecuencia', align: 'left' }, { label: 'Cargo / cuotas', align: 'left' }, { label: 'Cuota mensual', align: 'right' }, { label: '', align: 'right' }];
+    const gridCols = sheet.kind === 'monthly'
+      ? (showTarget ? 'minmax(0,1fr) 112px 136px 46px 36px' : 'minmax(0,1fr) 128px 46px 36px')
+      : 'minmax(0,1fr) 116px 132px 150px 130px 36px';
+
+    return {
+      ready: true, monthLabel: this.label(m), monthShort: this.label(m),
+      prevMonth: () => { const k = shift(m, -1); this.ensureIncome(k); this.setState({ month: k, edits: {} }); },
+      nextMonth: () => { const k = shift(m, 1); this.ensureIncome(k); this.setState({ month: k, edits: {} }); },
+      goToday: () => { const k = this.thisMonth(); this.ensureIncome(k); this.setState({ month: k, edits: {} }); },
+      showToday: m !== this.thisMonth(), isFuture: m > this.thisMonth(),
+
+      incomeRows: (this.d.income[m] || []).map(r => ({
+        label: r.label, amountStr: this.ed('inc' + r.id, r.amount ? this.num(r.amount) : ''),
+        onLabel: (e) => { r.label = e.target.value; this.touch(); },
+        onAmount: (e) => { this.setEd('inc' + r.id, e.target.value); r.amount = this.parse(e.target.value); this.touch(); },
+        onBlur: () => this.clearEd('inc' + r.id),
+        canDelete: (this.d.income[m] || []).length > 1,
+        onDelete: () => { this.d.income[m] = this.d.income[m].filter(x => x.id !== r.id); this.touch(); }
+      })),
+      addIncome: () => { this.d.income[m].push({ id: uid(), label: 'Otra fuente', amount: 0 }); this.touch(); },
+      incomeTotalStr: this.fmt(inc),
+
+      carryOn: carryOn, toggleCarry: () => { this.d.carry[m] = !carryOn; this.touch(); },
+      carryBg: carryOn ? '#F5E0D2' : 'transparent', carryBorder: carryOn ? '#DFB79A' : '#DCCEB0',
+      carryInk: carryOn ? '#C0562A' : '#6E6656', carrySwitchBg: carryOn ? '#C0562A' : '#C9BB9C', carryKnobLeft: carryOn ? '12px' : '2px',
+      duplicatePrev: () => this.duplicate(), exportCsv: () => this.csv(),
+      toggleCompact: () => this.setState({ compact: !compact }), densityLabel: compact ? 'Densidad cómoda' : 'Densidad compacta',
+      showControlsTop: !narrow, showControlsInline: narrow,
+
+      stats: stats, statCols: narrow ? 'repeat(2,minmax(0,1fr))' : 'repeat(' + stats.length + ',minmax(0,1fr))',
+      bars: bars,
+      paidLine: 'Pagado ' + this.fmt(paidSum) + ' · pendiente ' + this.fmt(pendSum),
+      hasCarryNote: Math.abs(carry) > 0.004,
+      carryNote: carry >= 0 ? 'Disponible ' + this.fmt(avail) + ', incluye ' + this.fmt(carry) + ' de superávit arrastrado' : 'Disponible ' + this.fmt(avail) + ', con ' + this.fmt(Math.abs(carry)) + ' de déficit arrastrado',
+      hasOver: free < -0.004, overNote: 'Te pasas ' + this.fmt(Math.abs(free)) + ' del disponible de este mes',
+      hasAlerts: rows.some(r => r.capInk === '#51000E'), alertNote: 'Hay categorías por encima de su objetivo',
+      showInvestor: this.props.showMetrics !== false,
+      savingsRate: this.pct(rate),
+      cushionMonths: avgSpend > 0 ? cushionMonths.toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '—',
+      cushionInk: cushionGoal > 0 && cushionMonths >= cushionGoal ? '#14655A' : '#1A1712',
+      cushionTarget: this.ed('cush', cushionGoal ? String(cushionGoal).replace('.', ',') : ''),
+      onCushionTarget: (e) => { this.setEd('cush', e.target.value); this.d.cushionGoal = this.parse(e.target.value); this.touch(); },
+      onCushionBlur: () => this.clearEd('cush'),
+      cushionNote: '· ' + this.fmt(cushionPool) + ' acumulados sobre un gasto medio de ' + this.fmt(avgSpend) + '/mes',
+
+      tabs: this.d.sheets.map(s => {
+        const a = ACC[s.accent] || ACC.ink, on = s.id === sheet.id;
+        return { name: s.name, onClick: () => this.setState({ sheetId: s.id, edits: {}, draft: { cat: '', amt: '', freq: 'trimestral', charge: '3', inst: '36' } }),
+          bg: on ? '#FBF4E4' : '#E3D7BC', ink: on ? a.ink : '#8A8069', shadow: on ? 'inset 0 3px 0 ' + a.ink : 'none',
+          showDelete: on && this.d.sheets.length > 1,
+          onDelete: (e) => {
+            e.stopPropagation();
+            if (!window.confirm('¿Eliminar la pestaña “' + s.name + '” y todas sus entradas?')) return;
+            this.d.sheets = this.d.sheets.filter(x => x.id !== s.id);
+            delete this.d.groups[s.id]; delete this.d.prows[s.id];
+            this.setState({ sheetId: this.d.sheets[0].id, edits: {} });
+            this.touch();
+          } };
+      }),
+      openNewTab: () => this.setState({ modal: 'tab' }),
+      accentInk: acc.ink, activeSheetName: sheet.name,
+      canDeleteSheet: !['fixed', 'variable', 'savings'].includes(sheet.id),
+      deleteSheet: () => { this.d.sheets = this.d.sheets.filter(s => s.id !== sheet.id); delete this.d.groups[sheet.id]; delete this.d.prows[sheet.id]; this.setState({ sheetId: this.d.sheets[0].id }); this.touch(); },
+
+      isMonthly: sheet.kind === 'monthly', isPeriodic: sheet.kind === 'periodic',
+      showTarget: showTarget, heads: heads, gridCols: gridCols, padCell: pad,
+      tableMinWidth: sheet.kind === 'periodic' ? '760px' : (showTarget ? '620px' : '360px'),
+      rows: rows, prows: prows,
+      isEmpty: sheet.kind === 'monthly' ? rows.length === 0 : prows.length === 0,
+      emptyText: sheet.kind === 'monthly' ? 'Sin entradas en ' + this.label(m) + '. Añade la primera abajo o duplica el mes anterior.' : 'Sin gastos periódicos. Añade seguros, cuotas o una deuda a plazos.',
+      periodicTotalStr: this.fmt(this.periodicTotal(sheet.id, m)) + '/mes',
+      suggestions: Array.from(new Set(SUGG.concat(this.d.sheets.filter(s => s.kind === 'monthly').flatMap(s => this.gs(s.id).map(g => g.category))))),
+      monthOptions: MONTHS.map((n, i) => ({ value: String(i + 1), label: n.charAt(0).toUpperCase() + n.slice(1) })),
+
+      draftCat: this.state.draft.cat, draftAmt: this.state.draft.amt,
+      draftPlaceholder: 'Categoría nueva o existente (se fusiona sola)',
+      draftAmtPlaceholder: this.state.draft.freq === 'deuda' ? 'Cuota mensual' : 'Importe del cargo',
+      onDraftCat: (e) => this.setState(s => ({ draft: Object.assign({}, s.draft, { cat: e.target.value }) })),
+      onDraftAmt: (e) => this.setState(s => ({ draft: Object.assign({}, s.draft, { amt: e.target.value }) })),
+      onDraftCatKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); const n = e.target.parentNode.querySelectorAll('input')[1]; if (n) n.focus(); } },
+      onDraftAmtKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.addOrMerge(sheet.id, this.state.draft.cat, this.state.draft.amt, m); this.setState(s => ({ draft: Object.assign({}, s.draft, { cat: '', amt: '' }) })); } },
+      addEntry: () => { this.addOrMerge(sheet.id, this.state.draft.cat, this.state.draft.amt, m); this.setState(s => ({ draft: Object.assign({}, s.draft, { cat: '', amt: '' }) })); },
+      draftFreq: this.state.draft.freq, draftIsDebt: this.state.draft.freq === 'deuda', draftIsCyclic: this.state.draft.freq !== 'deuda',
+      draftCharge: this.state.draft.charge, draftInst: this.state.draft.inst,
+      onDraftFreq: (e) => this.setState(s => ({ draft: Object.assign({}, s.draft, { freq: e.target.value }) })),
+      onDraftCharge: (e) => this.setState(s => ({ draft: Object.assign({}, s.draft, { charge: e.target.value }) })),
+      onDraftInst: (e) => this.setState(s => ({ draft: Object.assign({}, s.draft, { inst: e.target.value }) })),
+      addPeriodic: () => {
+        const d = this.state.draft, c = d.cat.trim(), a = this.parse(d.amt);
+        if (!c || !a) return;
+        const row = { id: uid(), category: c, amount: a, freq: d.freq };
+        if (d.freq === 'deuda') row.inst = { total: Math.max(1, parseInt(d.inst, 10) || 12), start: m }; else row.charge = parseInt(d.charge, 10) || 1;
+        this.ps(sheet.id).push(row);
+        this.setState(s => ({ draft: Object.assign({}, s.draft, { cat: '', amt: '' }) }));
+        this.touch();
+      },
+
+      openChart: () => this.setState({ modal: 'chart' }),
+      openCalc: () => this.setState({ modal: 'calc' }),
+      calcOpen: this.state.modal === 'calc',
+      calcGross: this.ed('cg', c.gross || ''), onCalcGross: (e) => { this.setEd('cg', e.target.value); c.gross = e.target.value; this.touch(); },
+      calcPagas: c.pagas || '12', onCalcPagas: (e) => { c.pagas = e.target.value; this.touch(); },
+      calcContract: c.contract || 'indefinido', onCalcContract: (e) => { c.contract = e.target.value; this.touch(); },
+      calcKids: c.kids || '', onCalcKids: (e) => { c.kids = e.target.value; this.touch(); },
+      calcKidsU3: c.kidsU3 || '', onCalcKidsU3: (e) => { c.kidsU3 = e.target.value; this.touch(); },
+      calcOverride: c.override || '', onCalcOverride: (e) => { c.override = e.target.value; this.touch(); },
+      calcRatePlaceholder: this.pct(sal.autoRate * 100).replace(' €', ''),
+      calcRows: [
+        { label: 'Salario base anual', note: sal.pagas + ' pagas de ' + this.fmt(sal.gross / sal.pagas) + ' en bruto', value: this.fmt(sal.gross), pad: '14px 16px', bg: '#FBF4E4', font: '400 14px/1.2 Jost,sans-serif', ink: '#1A1712', valueFont: '600 15px/1.2 Outfit,sans-serif', valueInk: '#1A1712' },
+        { label: 'Cotización a la Seguridad Social', note: this.pct(sal.ssRate * 100) + ' de cuota obrera, base tope 5.101,20 €/mes', value: '− ' + this.fmt(sal.ss), pad: '14px 16px', bg: '#FBF4E4', font: '400 14px/1.2 Jost,sans-serif', ink: '#1A1712', valueFont: '600 15px/1.2 Outfit,sans-serif', valueInk: '#17537F' },
+        { label: 'Retención de IRPF', note: sal.forced ? this.pct(sal.rate * 100) + ' forzado por ti' : this.pct(sal.rate * 100) + ' estimado · escala estatal + autonómica supletoria', value: '− ' + this.fmt(sal.irpf), pad: '14px 16px', bg: '#FBF4E4', font: '400 14px/1.2 Jost,sans-serif', ink: '#1A1712', valueFont: '600 15px/1.2 Outfit,sans-serif', valueInk: '#51000E' },
+        { label: 'Neto anual', note: 'Tipo efectivo total del ' + this.pct(sal.gross > 0 ? (sal.ss + sal.irpf) / sal.gross * 100 : 0), value: this.fmt(sal.netAnnual), pad: '16px', bg: '#FFFFFF', font: '500 15px/1.2 Jost,sans-serif', ink: '#1A1712', valueFont: '800 21px/1.1 Outfit,sans-serif', valueInk: '#1A1712' },
+        { label: 'Neto por nómina', note: sal.pagas + ' pagas al año', value: this.fmt(sal.perPaga), pad: '14px 16px', bg: '#FFFFFF', font: '400 14px/1.2 Jost,sans-serif', ink: '#6E6656', valueFont: '600 15px/1.2 Outfit,sans-serif', valueInk: '#1A1712' },
+        { label: 'Neto medio mensual', note: 'Neto anual repartido entre doce, la cifra que usa el presupuesto', value: this.fmt(sal.monthly), pad: '14px 16px', bg: '#FFFFFF', font: '400 14px/1.2 Jost,sans-serif', ink: '#6E6656', valueFont: '800 18px/1.1 Outfit,sans-serif', valueInk: '#C0562A' }
+      ],
+      calcSplit: (() => {
+        const net = sal.monthly;
+        const parts = this.monthlySheets().map(s => ({ name: s.name, v: this.sheetTotal(s.id, m), color: (ACC[s.accent] || ACC.ink).bg }));
+        if (per > 0) parts.push({ name: 'Anuales y periódicos (÷12)', v: per, color: '#3A342A' });
+        const rest = net - parts.reduce((t, p) => t + p.v, 0);
+        parts.push({ name: rest >= 0 ? 'Queda libre' : 'Por encima del neto', v: Math.abs(rest), color: rest >= 0 ? '#D5C4A1' : '#51000E' });
+        return parts.map(p => ({ name: p.name, value: this.fmt(p.v), pct: net > 0 ? this.pct(p.v / net * 100) : '—', w: net > 0 ? Math.min(100, p.v / net * 100).toFixed(1) + '%' : '0%', color: p.color }));
+      })(),
+      applyNet: () => { this.d.income[m] = [{ id: uid(), label: 'Nómina (neta)', amount: Math.round(sal.monthly * 100) / 100 }]; this.setState({ modal: null, edits: {} }); this.touch(); },
+
+      chartOpen: this.state.modal === 'chart', newTabOpen: this.state.modal === 'tab',
+      closeModal: () => this.setState({ modal: null }), stop: (e) => e.stopPropagation(),
+      linePath: linePath, avgPath: avgPath, chartPoints: chartPoints, chartGrid: chartGrid, chartLabels: chartLabels,
+      donut: donut, donutCenter: this.int(assigned) + '€',
+      topCats: topCats, upcoming: upcoming, hasUpcoming: upcoming.length > 0,
+
+      newTabName: this.state.newTab.name,
+      onNewTabName: (e) => this.setState(s => ({ newTab: Object.assign({}, s.newTab, { name: e.target.value }) })),
+      newTabKinds: [
+        { label: 'Mensual', kind: 'monthly' }, { label: 'Periódica', kind: 'periodic' }
+      ].map(k => ({ label: k.label, onClick: () => this.setState(s => ({ newTab: Object.assign({}, s.newTab, { kind: k.kind }) })),
+        bg: this.state.newTab.kind === k.kind ? '#1A1712' : 'transparent', ink: this.state.newTab.kind === k.kind ? '#EFE3C8' : '#6E6656', border: this.state.newTab.kind === k.kind ? '#1A1712' : '#DCCEB0' })),
+      newTabAccents: Object.keys(ACC).map(k => ({ name: ACC[k].name, color: ACC[k].bg,
+        border: this.state.newTab.accent === k ? '#1A1712' : 'transparent',
+        onClick: () => this.setState(s => ({ newTab: Object.assign({}, s.newTab, { accent: k }) })) })),
+      createTab: () => {
+        const nt = this.state.newTab, name = nt.name.trim() || (nt.kind === 'periodic' ? 'Periódicos' : 'Nueva hoja');
+        const id = 'sheet_' + uid();
+        this.d.sheets.push({ id: id, name: name, kind: nt.kind, accent: nt.accent });
+        if (nt.kind === 'periodic') this.d.prows[id] = []; else this.d.groups[id] = [];
+        this.setState({ modal: null, sheetId: id, newTab: { name: '', kind: 'monthly', accent: 'terracotta' } });
+        this.touch();
+      },
+
+      isMonth: this.state.view !== 'forecast' && this.state.view !== 'invest',
+      isForecast: this.state.view === 'forecast', isInvest: this.state.view === 'invest',
+      views: [{ id: 'month', name: 'Mes' }, { id: 'forecast', name: 'Previsión' }, { id: 'invest', name: 'Inversión' }].map(v => {
+        const on = (this.state.view || 'month') === v.id;
+        return { name: v.name, ink: on ? '#1A1712' : '#A79C86', line: on ? '#1A1712' : 'transparent', onClick: () => this.setState({ view: v.id, edits: {} }) };
+      }),
+      openImport: () => this.setState({ modal: 'import' }),
+      openLetter: () => this.setState({ modal: 'letter' }),
+      importOpen: this.state.modal === 'import', letterOpen: this.state.modal === 'letter',
+      impStep0: imp.step === 0, impStep1: imp.step === 1, impStep2: imp.step === 2, impStep3: imp.step === 3,
+      impIntro: ['Pega o arrastra el CSV que te descarga tu banco. Nada se sube a internet.',
+        'Comprueba que las columnas están bien emparejadas.',
+        'Lo reconocido entra directo. Solo te pregunto por lo dudoso.',
+        'Importación terminada.'][imp.step],
+      impText: imp.text,
+      onImpText: (e) => this.setImp({ text: e.target.value }),
+      dropBorder: '#D5C4A1', dropBg: '#FBF4E4',
+      onDragOver: (e) => { e.preventDefault(); },
+      onDrop: (e) => {
+        e.preventDefault();
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => this.setImp({ text: String(r.result || '') });
+        r.readAsText(f, 'utf-8');
+      },
+      parseImport: () => {
+        const rows = this.splitRows(imp.text);
+        if (rows.length < 2) { window.alert('No encuentro filas de movimientos. Pega el contenido del CSV con su cabecera.'); return; }
+        const g = this.guessMap(rows);
+        this.setImp({ rows: rows, header: g.header, map: { date: g.date, concept: g.concept, amount: g.amount }, step: 1 });
+      },
+      impColumns: ((imp.rows[0] || []).map((h, i) => ({ value: String(i), label: imp.header ? (h || 'Columna ' + (i + 1)) : 'Columna ' + (i + 1) }))),
+      impMapFields: [
+        { key: 'date', label: 'Columna de fecha' },
+        { key: 'concept', label: 'Columna de concepto' },
+        { key: 'amount', label: 'Columna de importe' }
+      ].map(f => ({ label: f.label, value: String(imp.map[f.key]),
+        onChange: (e) => this.setImp({ map: Object.assign({}, imp.map, { [f.key]: +e.target.value }) }) })),
+      impPreview: impMovements.slice(0, 6).map(mv => ({ date: mv.dateRaw, concept: mv.concept, amount: this.fmt(mv.amount),
+        amountInk: mv.amount < 0 ? '#51000E' : '#14655A', ink: '#1A1712' })),
+      impCountText: impMovements.length + ' movimientos legibles de ' + Math.max(0, imp.rows.length - (imp.header ? 1 : 0)) + ' filas',
+      backImport: () => this.setImp({ step: Math.max(0, imp.step - 1) }),
+      classifyImport: () => {
+        const seen = new Set(this.d.imported || []);
+        const auto = [], pending = [], dupes = [], transfers = [];
+        impMovements.forEach(mv => {
+          if (seen.has(this.fingerprint(mv))) { dupes.push(mv); return; }
+          if (this.isTransfer(mv.concept)) { transfers.push(mv); return; }
+          if (mv.amount > 0) { auto.push(Object.assign({}, mv, { target: 'income' })); return; }
+          const c = this.classifyOne(mv.concept);
+          if (c) auto.push(Object.assign({}, mv, { target: 'expense', sheet: c.sheet, category: c.category, why: c.why }));
+          else pending.push(Object.assign({}, mv, { sheet: 'variable', category: '', skip: false }));
+        });
+        this.setImp({ step: 2, auto: auto, pending: pending, dupes: dupes, transfers: transfers });
+      },
+      impSummary: [
+        { label: 'Reconocidos', value: String((imp.auto || []).length), ink: '#14655A' },
+        { label: 'Por revisar', value: String((imp.pending || []).length), ink: '#C0562A' },
+        { label: 'Duplicados', value: String((imp.dupes || []).length), ink: '#8A8069' },
+        { label: 'Traspasos', value: String((imp.transfers || []).length), ink: '#8A8069' }
+      ],
+      impHasPending: (imp.pending || []).length > 0,
+      impSheetOptions: this.monthlySheets().map(s => ({ value: s.id, label: s.name })).concat([{ value: 'income', label: 'Ingresos' }]),
+      impPending: (imp.pending || []).map((p, i) => ({
+        concept: p.concept, amount: this.fmt(p.amount), amountInk: p.amount < 0 ? '#51000E' : '#14655A',
+        note: p.month ? 'Se anotará en ' + this.label(p.month) : 'Sin fecha reconocible; irá al mes activo',
+        sheet: p.sheet, category: p.category,
+        onSheet: (e) => this.updPending(i, { sheet: e.target.value }),
+        onCategory: (e) => this.updPending(i, { category: e.target.value }),
+        onSkip: () => this.updPending(i, { skip: !p.skip }),
+        skipLabel: p.skip ? 'Descartado' : 'Descartar',
+        skipBg: p.skip ? '#51000E' : 'transparent', skipInk: p.skip ? '#FFFFFF' : '#6E6656'
+      })),
+      impApplyNote: (imp.dupes || []).length > 0 || (imp.transfers || []).length > 0
+        ? 'Los duplicados y traspasos entre tus cuentas se quedan fuera.'
+        : 'Se anotará cada movimiento en el mes de su fecha.',
+      impApplyLabel: 'Importar ' + ((imp.auto || []).length + (imp.pending || []).filter(p => !p.skip && p.category.trim()).length) + ' movimientos',
+      applyImport: () => {
+        const fps = (this.d.imported || []).slice();
+        let nExp = 0, nInc = 0;
+        const put = (mv, sheet, cat) => {
+          const mk = mv.month || m;
+          this.ensureIncome(mk);
+          if (sheet === 'income') {
+            this.d.income[mk].push({ id: uid(), label: cat || mv.concept.slice(0, 32), amount: Math.abs(mv.amount) });
+            nInc++;
+          } else {
+            const list = this.gs(sheet);
+            let g = list.find(x => x.category.trim().toLowerCase() === cat.trim().toLowerCase());
+            if (!g) { g = { id: uid(), category: cat, targets: {}, entries: [] }; list.push(g); }
+            g.entries.push({ id: uid(), amount: Math.abs(mv.amount), date: mk, paid: true });
+            nExp++;
+          }
+          fps.push(this.fingerprint(mv));
+        };
+        (imp.auto || []).forEach(mv => put(mv, mv.target === 'income' ? 'income' : mv.sheet, mv.target === 'income' ? mv.concept.slice(0, 32) : mv.category));
+        if (!this.d.rules) this.d.rules = {};
+        (imp.pending || []).forEach(p => {
+          if (p.skip || !p.category.trim()) return;
+          put(p, p.sheet, p.category.trim());
+          const key = p.concept.toLowerCase().replace(/[0-9]/g, '').trim().split(/\s+/).slice(0, 2).join(' ');
+          if (key.length > 3) this.d.rules[key] = { sheet: p.sheet, category: p.category.trim() };
+        });
+        this.d.imported = fps.slice(-4000);
+        this.setImp({ step: 3, report: { nExp: nExp, nInc: nInc, rules: Object.keys(this.d.rules).length } });
+        this.touch();
+      },
+      impDoneTitle: imp.report ? (imp.report.nExp + imp.report.nInc) + ' movimientos importados' : 'Listo',
+      impDoneLines: imp.report ? [
+        imp.report.nExp + ' gastos repartidos en sus pestañas y meses.',
+        imp.report.nInc + ' ingresos añadidos a la caja de Ingresos.',
+        (imp.dupes || []).length + ' duplicados y ' + (imp.transfers || []).length + ' traspasos descartados.',
+        'Tienes ' + imp.report.rules + ' reglas de categorización guardadas para la próxima vez.'
+      ] : [],
+      resetImport: () => this.setImp({ step: 0, text: '', rows: [], auto: [], pending: [], dupes: [], transfers: [], report: null }),
+
+      fcYears: fcYears.map(y => ({ year: y, ink: y === String(new Date().getFullYear()) ? '#C0562A' : '#1A1712',
+        note: y < String(new Date().getFullYear()) ? 'cerrado' : (y === String(new Date().getFullYear()) ? 'en curso' : 'previsión'),
+        canRemove: this.yearAuto(y).income === 0 && this.yearAuto(y).fixed === 0,
+        onRemove: () => { delete this.d.forecast[y]; this.touch(); } })),
+      fcCols: 'minmax(200px,1fr) repeat(' + fcYears.length + ',minmax(130px,1fr))',
+      fcMinWidth: (240 + fcYears.length * 140) + 'px',
+      fcRows: fcRows,
+      addYear: () => {
+        const last = fcYears[fcYears.length - 1] || String(new Date().getFullYear());
+        const next = String(+last + 1);
+        if (!this.d.forecast) this.d.forecast = {};
+        if (!this.d.forecast[next]) this.d.forecast[next] = { real: {} };
+        this.touch();
+      },
+
+      unitStr: this.fmt(inv.unit || 500), unitValue: this.ed('unit', this.num(inv.unit || 500)),
+      onUnit: (e) => { this.setEd('unit', e.target.value); inv.unit = Math.max(1, this.parse(e.target.value)); this.touch(); },
+      onUnitBlur: () => this.clearEd('unit'),
+      invStats: invStats, invStatCols: narrow ? 'repeat(2,minmax(0,1fr))' : 'repeat(' + invStats.length + ',minmax(0,1fr))',
+      invBoxes: invBoxes, invLegend: invLegend,
+      invHeads: [{ label: 'Producto', align: 'left' }, { label: 'Tipo', align: 'left' }, { label: 'Invertido', align: 'right' }, { label: 'Valor actual', align: 'right' }, { label: 'Beneficio', align: 'right' }, { label: '', align: 'right' }],
+      invCols: 'minmax(0,1fr) 160px 130px 130px 140px 36px',
+      invRows: (inv.holdings || []).map(h => {
+        const gain = (h.value || 0) - (h.invested || 0);
+        return { name: h.name, type: h.type,
+          onName: (e) => { h.name = e.target.value; this.touch(); },
+          onType: (e) => { h.type = e.target.value; this.touch(); },
+          investedStr: this.ed('hi' + h.id, this.num(h.invested)),
+          onInvested: (e) => { this.setEd('hi' + h.id, e.target.value); h.invested = this.parse(e.target.value); this.touch(); },
+          onInvestedBlur: () => this.clearEd('hi' + h.id),
+          valueStr: this.ed('hv' + h.id, this.num(h.value)),
+          onValue: (e) => { this.setEd('hv' + h.id, e.target.value); h.value = this.parse(e.target.value); this.touch(); },
+          onValueBlur: () => this.clearEd('hv' + h.id),
+          gainStr: (gain >= 0 ? '+' : '−') + ' ' + this.fmt(Math.abs(gain)) + (h.invested ? ' · ' + this.pct(gain / h.invested * 100) : ''),
+          gainInk: gain >= 0 ? '#14655A' : '#51000E',
+          onDelete: () => { inv.holdings = inv.holdings.filter(x => x.id !== h.id); this.touch(); } };
+      }),
+      invDraftName: this.state.invDraft.name, invDraftType: this.state.invDraft.type,
+      invDraftInvested: this.state.invDraft.invested, invDraftValue: this.state.invDraft.value,
+      onInvDraftName: (e) => this.setState(s => ({ invDraft: Object.assign({}, s.invDraft, { name: e.target.value }) })),
+      onInvDraftType: (e) => this.setState(s => ({ invDraft: Object.assign({}, s.invDraft, { type: e.target.value }) })),
+      onInvDraftInvested: (e) => this.setState(s => ({ invDraft: Object.assign({}, s.invDraft, { invested: e.target.value }) })),
+      onInvDraftValue: (e) => this.setState(s => ({ invDraft: Object.assign({}, s.invDraft, { value: e.target.value }) })),
+      addHolding: () => {
+        const d = this.state.invDraft, invested = this.parse(d.invested);
+        if (!d.name.trim() || !invested) return;
+        inv.holdings.push({ id: uid(), name: d.name.trim(), type: d.type, invested: invested, value: this.parse(d.value) || invested });
+        this.setState({ invDraft: { name: '', type: 'indexado', invested: '', value: '' } });
+        this.touch();
+      },
+
+      letterFields: [
+        { k: 'name', label: 'Nombre y apellidos', ph: 'Nombre completo' },
+        { k: 'dni', label: 'DNI / NIE', ph: '00000000X' },
+        { k: 'address', label: 'Domicilio', ph: 'Calle y número' },
+        { k: 'city', label: 'Localidad', ph: 'Ciudad' },
+        { k: 'bank', label: 'Entidad', ph: 'Nombre del banco' },
+        { k: 'job', label: 'Puesto y empresa', ph: 'Puesto en Empresa S.L.' },
+        { k: 'seniority', label: 'Antigüedad', ph: '4 años' },
+        { k: 'amount', label: 'Importe solicitado', ph: '180.000' },
+        { k: 'term', label: 'Plazo en años', ph: '25' },
+        { k: 'property', label: 'Inmueble', ph: 'Vivienda habitual en Ciudad' }
+      ].map(f => ({ label: f.label, placeholder: f.ph, value: lt[f.k] || '',
+        onChange: (e) => { lt[f.k] = e.target.value; this.touch(); } })),
+      ltHeaderName: lt.name || 'Nombre y apellidos',
+      ltHeaderMeta: [lt.dni ? 'DNI ' + lt.dni : 'DNI', lt.address, lt.city].filter(Boolean).join(' · '),
+      ltBankLine: 'A la atención del departamento de riesgos de ' + (lt.bank || 'la entidad'),
+      ltDateLine: (lt.city ? lt.city + ', ' : '') + new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }),
+      ltSubject: 'Asunto: solicitud de préstamo hipotecario' + (ltAmount ? ' por importe de ' + this.fmt(ltAmount) : ''),
+      ltParagraphs: [
+        'Muy señores míos:',
+        'Por medio de la presente les solicito el estudio de una operación de préstamo hipotecario' + (ltAmount ? ' por un importe de ' + this.fmt(ltAmount) : '') + ' a un plazo de ' + (lt.term || '25') + ' años, destinado a la adquisición de ' + (lt.property || 'mi vivienda habitual') + '.',
+        'Mi situación laboral es ' + (lt.job ? 'de ' + lt.job : 'estable') + (lt.seniority ? ', con una antigüedad de ' + lt.seniority : '') + '. Mis ingresos netos verificables ascienden a ' + this.fmt(ltIncome) + ' mensuales, acreditables mediante nóminas y declaración de la renta.',
+        'A continuación detallo mi situación económica actual, elaborada a partir del control mensual de mis ingresos y gastos:'
+      ],
+      ltFigures: [
+        { label: 'Ingresos netos mensuales', value: this.fmt(ltIncome) },
+        { label: 'Total de gastos fijos mensuales', value: this.fmt(ltFixed) },
+        { label: 'Media de gastos variables mensuales', value: this.fmt(ltVarAvg) + ' (media de ' + ltVarN + ' meses)' },
+        { label: 'Gastos a plazos comprometidos', value: ltDebtQuota > 0 ? this.fmt(ltDebtQuota) + '/mes · ' + this.fmt(ltDebtLeft) + ' pendientes' : 'Sin deudas a plazos' },
+        { label: 'Ratio de endeudamiento sobre ingresos', value: ltIncome > 0 ? this.pct(ltDebtQuota / ltIncome * 100) : '—' },
+        { label: 'Capacidad de ahorro mensual', value: this.fmt(ltSaveAvg) + (ltIncome > 0 ? ' · ' + this.pct(ltSaveAvg / ltIncome * 100) + ' de los ingresos' : '') },
+        { label: 'Saldo medio mensual disponible', value: this.fmt(ltBalanceAvg) },
+        { label: 'Fondo de emergencia acumulado', value: this.fmt(cushionPool) + (avgSpend > 0 ? ' · ' + cushionMonths.toLocaleString('es-ES', { maximumFractionDigits: 1 }) + ' meses de gasto' : '') },
+        { label: 'Cierre del ejercicio ' + ltPrevYear, value: ltPrevClose }
+      ],
+      ltHasFunds: (inv.holdings || []).length > 0,
+      ltFunds: (inv.holdings || []).map(h => ({ label: h.name + ' (' + ({ indexado: 'fondo indexado', monetario: 'fondo monetario', acciones: 'acciones', otro: 'otros' }[h.type] || 'otros') + ')',
+        value: this.fmt(h.value || 0) + ' · aportado ' + this.fmt(h.invested || 0) })).concat(
+        (inv.holdings || []).length ? [{ label: 'Valor total de la cartera', value: this.fmt(invValue) }] : []),
+      ltClosing: [
+        'Quedo a su disposición para aportar la documentación que precisen: nóminas, vida laboral, declaración de la renta, extractos bancarios y justificantes de la cartera de inversión.',
+        'Agradeciendo de antemano su atención, les saluda atentamente,'
+      ],
+      ltSignName: lt.name || 'Nombre y apellidos',
+      ltSignDni: lt.dni ? 'DNI ' + lt.dni : '',
+      downloadLetter: () => {
+        const L = [];
+        L.push(lt.name || 'Nombre y apellidos');
+        L.push([lt.dni ? 'DNI ' + lt.dni : '', lt.address, lt.city].filter(Boolean).join(' · '));
+        L.push('');
+        L.push('A la atención del departamento de riesgos de ' + (lt.bank || 'la entidad'));
+        L.push((lt.city ? lt.city + ', ' : '') + new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }));
+        L.push('');
+        L.push('Asunto: solicitud de préstamo hipotecario' + (ltAmount ? ' por importe de ' + this.fmt(ltAmount) : ''));
+        L.push('');
+        L.push('Muy señores míos:');
+        L.push('');
+        L.push('Por medio de la presente les solicito el estudio de una operación de préstamo hipotecario' + (ltAmount ? ' por un importe de ' + this.fmt(ltAmount) : '') + ' a un plazo de ' + (lt.term || '25') + ' años, destinado a la adquisición de ' + (lt.property || 'mi vivienda habitual') + '.');
+        L.push('');
+        L.push('Mi situación laboral es ' + (lt.job ? 'de ' + lt.job : 'estable') + (lt.seniority ? ', con una antigüedad de ' + lt.seniority : '') + '. Mis ingresos netos verificables ascienden a ' + this.fmt(ltIncome) + ' mensuales, acreditables mediante nóminas y declaración de la renta.');
+        L.push('');
+        L.push('SITUACIÓN ECONÓMICA');
+        L.push('Ingresos netos mensuales: ' + this.fmt(ltIncome));
+        L.push('Total de gastos fijos mensuales: ' + this.fmt(ltFixed));
+        L.push('Media de gastos variables mensuales: ' + this.fmt(ltVarAvg) + ' (media de ' + ltVarN + ' meses)');
+        L.push('Gastos a plazos comprometidos: ' + (ltDebtQuota > 0 ? this.fmt(ltDebtQuota) + '/mes, ' + this.fmt(ltDebtLeft) + ' pendientes' : 'sin deudas a plazos'));
+        L.push('Ratio de endeudamiento sobre ingresos: ' + (ltIncome > 0 ? this.pct(ltDebtQuota / ltIncome * 100) : '—'));
+        L.push('Capacidad de ahorro mensual: ' + this.fmt(ltSaveAvg));
+        L.push('Saldo medio mensual disponible: ' + this.fmt(ltBalanceAvg));
+        L.push('Fondo de emergencia acumulado: ' + this.fmt(cushionPool));
+        L.push('Cierre del ejercicio ' + ltPrevYear + ': ' + ltPrevClose);
+        if ((inv.holdings || []).length) {
+          L.push('');
+          L.push('CARTERA DE INVERSIÓN');
+          (inv.holdings || []).forEach(h => L.push('- ' + h.name + ': ' + this.fmt(h.value || 0) + ' (aportado ' + this.fmt(h.invested || 0) + ')'));
+          L.push('Valor total de la cartera: ' + this.fmt(invValue));
+        }
+        L.push('');
+        L.push('Quedo a su disposición para aportar la documentación que precisen: nóminas, vida laboral, declaración de la renta, extractos bancarios y justificantes de la cartera de inversión.');
+        L.push('');
+        L.push('Agradeciendo de antemano su atención, les saluda atentamente,');
+        L.push('');
+        L.push('');
+        L.push(lt.name || 'Nombre y apellidos');
+        if (lt.dni) L.push('DNI ' + lt.dni);
+        const blob = new Blob(['\ufeff' + L.join('\n')], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'carta-hipoteca.txt'; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      },
+
+      saveText: 'Guardado en este dispositivo',
+      reset: () => { if (!window.confirm('¿Borrar todos los datos guardados en este dispositivo?')) return; try { localStorage.removeItem(KEY); } catch (e) {} this.d = this.seed(); this.setState({ month: this.thisMonth(), sheetId: 'fixed', edits: {}, expanded: {} }); this.touch(); }
+    };
+  }
+}
+
 </script>
 </body>
 </html>
