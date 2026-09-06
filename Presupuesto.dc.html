@@ -12,262 +12,322 @@
 <x-dc>
 <helmet data-dc-atomics>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Jost:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Jost:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;padding:0}
-  body{background:#F7F1E7;color:#2C2622;font-family:Jost,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:#F9FAFB;color:#111827;font-family:Outfit,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   *{box-sizing:border-box}
   input,select,button{font-family:inherit}
-  a{color:#C0562A;text-decoration:none}
-  a:hover{color:#5B1230}
-  ::selection{background:#E7C98A}
+  a{color:#00A896;text-decoration:none}
+  a:hover{color:#00786B}
+  ::selection{background:#CFF3ED}
   @keyframes ov{from{opacity:0}to{opacity:1}}
   @keyframes card{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 </style>
 </helmet>
-<div style="min-height:100vh;padding:0 0 72px">
-<div style="position:sticky;top:0;z-index:45;background:#5B1230">
-  <div style="max-width:1060px;margin:0 auto;padding:11px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
-    <sc-for list="{{ views }}" as="v" hint-placeholder-count="3">
-      <span onClick="{{ v.onClick }}" style="flex:none;font:500 10px/1 Jost,sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:{{ v.ink }};background:{{ v.bg }};border:1px solid {{ v.bd }};padding:11px 14px;cursor:pointer;white-space:nowrap">{{ v.name }}</span>
-    </sc-for>
-    <div style="flex:none;margin-left:auto;display:flex;gap:1px">
-      <button onClick="{{ onUndo }}" disabled="{{ !canUndo }}" title="Deshacer (Ctrl+Z)" style="border:1px solid rgba(247,241,231,0.38);background:transparent;color:{{ undoInk }};padding:11px 13px;cursor:{{ undoCursor }};font-size:14px;line-height:1">↺</button>
-      <button onClick="{{ onRedo }}" disabled="{{ !canRedo }}" title="Rehacer (Ctrl+Y)" style="border:1px solid rgba(247,241,231,0.38);border-left:none;background:transparent;color:{{ redoInk }};padding:11px 13px;cursor:{{ redoCursor }};font-size:14px;line-height:1">↻</button>
-    </div>
-    <div style="position:relative;flex:none">
-      <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:9px;border:1px solid {{ menuBd }};background:{{ menuBg }};color:{{ menuInk }};font:500 10px/1 Jost,sans-serif;letter-spacing:0.16em;text-transform:uppercase;padding:11px 14px;cursor:pointer">
-        <span style="display:flex;flex-direction:column;gap:3px">
-          <span style="width:13px;height:1px;background:currentColor;display:block"></span>
-          <span style="width:13px;height:1px;background:currentColor;display:block"></span>
-          <span style="width:13px;height:1px;background:currentColor;display:block"></span>
-        </span>
-        Menú
-      </button>
-      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;top:calc(100% + 10px);right:0;width:max-content;min-width:240px;max-width:min(300px,calc(100vw - 40px));background:#FDFAF3;border:1px solid #5B1230;box-shadow:0 16px 34px rgba(44,38,34,0.18);z-index:50;animation:card .14s ease">
-          <sc-for list="{{ menuItems }}" as="mi" hint-placeholder-count="6">
-            <div onClick="{{ mi.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 15px;border-bottom:1px solid #E7DCC2;cursor:pointer" style-hover="background:#F3E7DA">
-              <span style="font:400 13.5px/1.2 Jost,sans-serif;color:#2C2622">{{ mi.label }}</span>
-              <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:{{ mi.noteInk }};white-space:nowrap">{{ mi.note }}</span>
-            </div>
-          </sc-for>
-        </div>
-      </sc-if>
+<div style="min-height:100vh;display:flex;align-items:flex-start;background:#F9FAFB">
+<aside style="flex:none;width:260px;min-height:100vh;background:#FFFFFF;border-right:1px solid #E5E7EB;padding:24px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:32px;height:32px;border-radius:8px;background:#00C8B3;flex:none"></div>
+    <div style="display:flex;flex-direction:column">
+      <span style="font:800 18px/1.2 Outfit,sans-serif;color:#111827">Presupuesto</span>
+      <span style="font:600 11px/1.2 Outfit,sans-serif;color:#6B7280;letter-spacing:0.04em">AL DETALLE</span>
     </div>
   </div>
-</div>
+
+  <nav style="display:flex;flex-direction:column;gap:6px">
+    <sc-for list="{{ views }}" as="v" hint-placeholder-count="5">
+      <div onClick="{{ v.onClick }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;background:{{ v.bg }};cursor:pointer" style-hover="background:rgba(0,200,179,0.06)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex:none;color:{{ v.ink }}">
+          <sc-if value="{{ v.isLayout }}" hint-placeholder-val="{{ true }}">
+            <rect x="1.5" y="1.5" width="15" height="15" rx="2" stroke="currentColor" stroke-width="1.6"></rect>
+            <line x1="1.5" y1="7" x2="16.5" y2="7" stroke="currentColor" stroke-width="1.6"></line>
+            <line x1="7" y1="16.5" x2="7" y2="7" stroke="currentColor" stroke-width="1.6"></line>
+          </sc-if>
+          <sc-if value="{{ v.isClipboard }}" hint-placeholder-val="{{ false }}">
+            <rect x="3" y="2.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.6"></rect>
+            <rect x="6.5" y="1" width="5" height="3" rx="0.8" stroke="currentColor" stroke-width="1.6"></rect>
+            <line x1="6" y1="9" x2="12" y2="9" stroke="currentColor" stroke-width="1.4"></line>
+            <line x1="6" y1="12.5" x2="12" y2="12.5" stroke="currentColor" stroke-width="1.4"></line>
+          </sc-if>
+          <sc-if value="{{ v.isDollar }}" hint-placeholder-val="{{ false }}">
+            <line x1="9" y1="1" x2="9" y2="17" stroke="currentColor" stroke-width="1.6"></line>
+            <path d="M12.5 4.5H7.2a2.4 2.4 0 0 0 0 4.8h3.6a2.4 2.4 0 0 1 0 4.8H5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+          </sc-if>
+          <sc-if value="{{ v.isBars }}" hint-placeholder-val="{{ false }}">
+            <line x1="13.5" y1="15.5" x2="13.5" y2="7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line>
+            <line x1="9" y1="15.5" x2="9" y2="3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line>
+            <line x1="4.5" y1="15.5" x2="4.5" y2="10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line>
+          </sc-if>
+          <sc-if value="{{ v.isTrend }}" hint-placeholder-val="{{ false }}">
+            <polyline points="1.5,13.5 6.5,8.5 10,12 16.5,4.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            <polyline points="11.5,4.5 16.5,4.5 16.5,9.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </sc-if>
+        </svg>
+        <span style="font:{{ v.weight }} 14px/1 Outfit,sans-serif;color:{{ v.ink }}">{{ v.name }}</span>
+      </div>
+    </sc-for>
+  </nav>
+
+  <div style="height:1px;background:#E5E7EB"></div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start">
+      <div style="width:40px;height:40px;border-radius:8px;background:rgba(0,200,179,0.1);flex:none;display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color:#00A896">
+          <polyline points="2,15.5 7.5,9.5 11.5,13.5 18,5.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          <polyline points="13,5.5 18,5.5 18,10.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        </svg>
+      </div>
+      <div style="min-width:0">
+        <div style="font:700 11px/1.3 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280">Tasa de ahorro mes</div>
+        <div style="margin-top:4px;font:800 17px/1.3 Outfit,sans-serif;color:#111827">{{ savingsRate }} <span style="font:500 12.5px/1.3 Outfit,sans-serif;color:#6B7280">de los ingresos totales</span></div>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start">
+      <div style="width:40px;height:40px;border-radius:8px;background:rgba(107,114,128,0.07);flex:none;display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color:#6B7280">
+          <path d="M10 2 L17 5v5c0 4.5-3 7.2-7 8.5C6 17.2 3 14.5 3 10V5z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+      <div style="min-width:0">
+        <div style="font:700 11px/1.3 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280">Colchón de emergencia</div>
+        <div style="margin-top:4px;font:800 17px/1.3 Outfit,sans-serif;color:{{ cushionInk }}">{{ cushionMonths }} <span style="font:500 12.5px/1.3 Outfit,sans-serif;color:#6B7280">meses de</span> <input value="{{ cushionTarget }}" onChange="{{ onCushionTarget }}" onBlur="{{ onCushionBlur }}" inputMode="decimal" placeholder="6" style="width:26px;border:none;border-bottom:1px solid #E5E7EB;background:transparent;padding:0;font:700 14px/1 Outfit,sans-serif;text-align:center;color:#111827;outline:none" style-focus="border-color:#00A896"></input></div>
+        <div style="margin-top:3px;font:400 10.5px/1.4 Outfit,sans-serif;color:#9CA3AF">{{ cushionNote }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1"></div>
+
+  <div style="position:relative">
+    <button onClick="{{ toggleMenu }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #E5E7EB;background:#F9FAFB;color:#374151;font:600 12.5px/1 Outfit,sans-serif;padding:10px 12px;border-radius:8px;cursor:pointer">
+      <span>Más herramientas</span>
+      <span style="display:flex;gap:2px">
+        <span style="width:3px;height:3px;border-radius:50%;background:currentColor;display:block"></span>
+        <span style="width:3px;height:3px;border-radius:50%;background:currentColor;display:block"></span>
+        <span style="width:3px;height:3px;border-radius:50%;background:currentColor;display:block"></span>
+      </span>
+    </button>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;bottom:calc(100% + 8px);left:0;width:236px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 16px 34px rgba(17,24,39,0.14);z-index:50;animation:card .14s ease;overflow:hidden">
+        <sc-for list="{{ menuItems }}" as="mi" hint-placeholder-count="6">
+          <div onClick="{{ mi.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 14px;border-bottom:1px solid #F3F4F6;cursor:pointer" style-hover="background:#F9FAFB">
+            <span style="font:400 13px/1.2 Outfit,sans-serif;color:#111827">{{ mi.label }}</span>
+            <span style="font:600 9.5px/1 Outfit,sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:{{ mi.noteInk }};white-space:nowrap">{{ mi.note }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button onClick="{{ onUndo }}" disabled="{{ !canUndo }}" title="Deshacer (Ctrl+Z)" style="flex:1;border:1px solid #E5E7EB;background:#FFFFFF;color:{{ undoInk }};padding:8px;border-radius:8px;cursor:{{ undoCursor }};font-size:13px;line-height:1">↺ Deshacer</button>
+    <button onClick="{{ onRedo }}" disabled="{{ !canRedo }}" title="Rehacer (Ctrl+Y)" style="flex:1;border:1px solid #E5E7EB;background:#FFFFFF;color:{{ redoInk }};padding:8px;border-radius:8px;cursor:{{ redoCursor }};font-size:13px;line-height:1">↻ Rehacer</button>
+  </div>
+</aside>
 <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
   <div onClick="{{ closeMenu }}" style="position:fixed;inset:0;z-index:40"></div>
 </sc-if>
-<sc-if value="{{ anyRowMenuOpen }}" hint-placeholder-val="{{ false }}">
-  <div onClick="{{ closeRowMenu }}" style="position:fixed;inset:0;z-index:38"></div>
-</sc-if>
-<div style="max-width:1060px;margin:0 auto;padding:38px 20px 0">
+<main style="flex:1;min-width:0;padding:30px 40px 40px;min-height:100vh">
+
 
   <sc-if value="{{ isMonth }}" hint-placeholder-val="{{ true }}">
-  <div>
-  <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:space-between">
-    <div style="min-width:260px;flex:1">
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
-        <span style="width:7px;height:7px;background:#5B1230;display:inline-block"></span>
-        <span style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.2em;text-transform:uppercase;color:#5B1230">Las cuentas del mes</span>
+  <div style="display:flex;flex-direction:column;gap:24px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div>
+        <h1 style="margin:0;font:800 24px/1.2 Outfit,sans-serif;color:#111827">Vista general</h1>
+        <p style="margin:4px 0 0;font:400 14px/1.4 Outfit,sans-serif;color:#6B7280">Gestión y previsión detallada de finanzas personales.</p>
       </div>
-      <div style="display:flex;align-items:center;gap:14px">
-        <h1 style="margin:0;font:600 54px/0.95 'Bodoni Moda',Georgia,serif;letter-spacing:-0.01em;color:#5B1230">Presupuesto <span style="font-style:italic;font-weight:400;color:#C0562A">al detalle</span></h1>
+      <div style="display:flex;gap:12px;align-items:center">
+        <button onClick="{{ exportCsv }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E5E7EB;background:#FFFFFF;color:#111827;font:600 13px/1 Outfit,sans-serif;padding:10px 16px;border-radius:8px;cursor:pointer" style-hover="background:#F9FAFB">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5v9M4.5 7l3.5 3.5L11.5 7M2 13.5h12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Exportar CSV
+        </button>
+        <button onClick="{{ openNewMovement }}" style="display:flex;align-items:center;gap:8px;border:none;background:#111827;color:#FFFFFF;font:600 13px/1 Outfit,sans-serif;padding:10px 16px;border-radius:8px;cursor:pointer" style-hover="background:#1F2937">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></line><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></line></svg>
+          Nuevo Movimiento
+        </button>
       </div>
     </div>
-    <div style="background:#F3E7DA;border:1px solid #D9BEA4;padding:16px 18px 14px;min-width:300px;max-width:380px;flex:1">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
-        <span style="font:500 10.5px/1 Jost,sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:#C0562A">Ingresos</span>
-        <span style="font:300 11px/1 Jost,sans-serif;color:#A87F62">{{ monthShort }}</span>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:20px 24px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+        <span style="font:700 11px/1 Outfit,sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#6B7280">Ingresos de {{ monthShort }}</span>
+        <span style="font:800 18px/1 Outfit,sans-serif;color:#111827">{{ incomeTotalStr }}</span>
       </div>
       <sc-for list="{{ incomeRows }}" as="r" hint-placeholder-count="2">
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) 104px 22px;align-items:center;gap:6px;margin-bottom:6px">
-          <input value="{{ r.label }}" onChange="{{ r.onLabel }}" placeholder="Fuente de ingreso" style="border:none;background:#FFFFFF;padding:9px 10px;font:400 13.5px/1.2 Jost,sans-serif;color:#2C2622;outline:none;min-width:0" style-focus="background:#fff"></input>
-          <input value="{{ r.amountStr }}" onChange="{{ r.onAmount }}" onBlur="{{ r.onBlur }}" inputMode="decimal" placeholder="0,00" style="border:none;background:#FFFFFF;padding:9px 10px;font:600 13.5px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#2C2622;outline:none" style-focus="background:#fff"></input>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 22px;align-items:center;gap:8px;margin-bottom:8px">
+          <input value="{{ r.label }}" onChange="{{ r.onLabel }}" placeholder="Fuente de ingreso" style="border:1px solid #E5E7EB;border-radius:6px;background:#F9FAFB;padding:9px 10px;font:400 13.5px/1.2 Outfit,sans-serif;color:#111827;outline:none;min-width:0" style-focus="border-color:#00A896;background:#fff"></input>
+          <input value="{{ r.amountStr }}" onChange="{{ r.onAmount }}" onBlur="{{ r.onBlur }}" inputMode="decimal" placeholder="0,00" style="border:1px solid #E5E7EB;border-radius:6px;background:#F9FAFB;padding:9px 10px;font:600 13.5px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#111827;outline:none" style-focus="border-color:#00A896;background:#fff"></input>
           <sc-if value="{{ r.canDelete }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ r.onDelete }}" style="border:none;background:none;color:#C29C86;cursor:pointer;font-size:15px;padding:0;line-height:1" style-hover="color:#5B1230">×</button>
+            <button onClick="{{ r.onDelete }}" style="border:none;background:none;color:#9CA3AF;cursor:pointer;font-size:15px;padding:0;line-height:1" style-hover="color:#EF4444">×</button>
           </sc-if>
         </div>
       </sc-for>
-      <button onClick="{{ addIncome }}" style="border:none;background:none;color:#C0562A;font:400 12.5px/1 Jost,sans-serif;cursor:pointer;padding:6px 0 10px;text-decoration:underline">+ Añadir otra fuente</button>
-      <div style="border-top:1px solid #D9BEA4;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline">
-        <span style="font:300 12px/1 Jost,sans-serif;color:#8A6A55">Total del mes</span>
-        <span style="font:800 20px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#C0562A">{{ incomeTotalStr }}</span>
-      </div>
+      <button onClick="{{ addIncome }}" style="border:none;background:none;color:#00A896;font:600 12.5px/1 Outfit,sans-serif;cursor:pointer;padding:4px 0">+ Añadir otra fuente</button>
     </div>
-  </div>
 
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:40px 0 0;padding:0 0 16px;border-bottom:1px solid #DCCFBB">
-    <div style="display:flex;align-items:center;gap:12px">
-      <button onClick="{{ prevMonth }}" aria-label="Mes anterior" style="width:30px;height:30px;border-radius:50%;border:1px solid #DCCFBB;background:transparent;color:#6B6055;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="border-color:#2C2622;color:#2C2622">‹</button>
-      <span style="font:500 23px/1 'Bodoni Moda',Georgia,serif;min-width:168px;text-align:center;text-transform:capitalize">{{ monthLabel }}</span>
-      <button onClick="{{ nextMonth }}" aria-label="Mes siguiente" style="width:30px;height:30px;border-radius:50%;border:1px solid #DCCFBB;background:transparent;color:#6B6055;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="border-color:#2C2622;color:#2C2622">›</button>
-      <sc-if value="{{ showToday }}" hint-placeholder-val="{{ false }}">
-        <button onClick="{{ goToday }}" style="border:1px solid #DCCFBB;background:transparent;color:#6B6055;font:400 11px/1 Jost,sans-serif;letter-spacing:0.06em;text-transform:uppercase;padding:7px 11px;border-radius:20px;cursor:pointer" style-hover="border-color:#2C2622;color:#2C2622">Hoy</button>
-      </sc-if>
-      <sc-if value="{{ isFuture }}" hint-placeholder-val="{{ false }}">
-        <span style="font:400 10.5px/1 Jost,sans-serif;letter-spacing:0.1em;text-transform:uppercase;color:#9C9184;border:1px dashed #CFC2AE;padding:6px 9px">Previsión</span>
-      </sc-if>
-    </div>
-    <div style="flex:1"></div>
-  </div>
-
-  <div style="margin-top:26px;border:1px solid #2C2622">
-    <div style="background:#5B1230;color:#F7F1E7;padding:18px 22px 20px">
-      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 28px">
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:#E8D5D9">Disponible</span>
-          <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums">{{ availStr }}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:#E8D5D9">Gastado</span>
-          <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ gastadoRealInk }}">{{ gastadoRealStr }}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:#E8D5D9">Previsión</span>
-          <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums">{{ previsionStr }}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:#E8D5D9">Diferencia</span>
-          <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ previsionDiffInk }}">{{ previsionDiffStr }}</span>
-        </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px">
+        <span style="font:600 12px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280">Previsión mensual</span>
+        <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#111827">{{ previsionStr }}</span>
       </div>
-      <div style="height:5px;background:rgba(247,241,231,0.22);margin-top:14px;overflow:hidden">
-        <div style="height:100%;width:{{ previsionPct }};background:{{ previsionBarColor }}"></div>
+      <div style="width:1px;height:40px;background:#E5E7EB;flex:none"></div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px">
+        <span style="font:600 12px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280">Gastado real</span>
+        <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#111827">{{ gastadoRealStr }}</span>
+      </div>
+      <div style="width:1px;height:40px;background:#E5E7EB;flex:none"></div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px">
+        <span style="font:600 12px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280">Diferencia disponible</span>
+        <span style="font:800 24px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ previsionDiffInk }}">{{ previsionDiffStr }}</span>
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:{{ statCols }};gap:1px;background:#DCCFBB">
-      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
-        <div onClick="{{ s.onClick }}" title="{{ s.title }}" style="background:#FDFAF3;padding:12px 14px 13px;cursor:{{ s.cursor }}" style-hover="background:{{ s.hoverBg }}">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
-            <span style="width:6px;height:6px;flex:none;background:{{ s.dot }};display:inline-block"></span>
-            <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.1em;text-transform:uppercase;color:#6B6055">{{ s.name }}</span>
+    <div style="display:grid;grid-template-columns:{{ statCols }};gap:16px">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="5">
+        <div onClick="{{ s.onClick }}" title="{{ s.title }}" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:{{ s.cursor }};box-shadow:0 2px 2px rgba(0,0,0,0.02)" style-hover="background:{{ s.hoverBg }}">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="width:8px;height:8px;border-radius:4px;flex:none;background:{{ s.dot }};display:inline-block"></span>
+              <span style="font:700 11px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280;white-space:nowrap">{{ s.name }}</span>
+            </div>
+            <span style="font:500 11px/1 Outfit,sans-serif;color:#9CA3AF;white-space:nowrap">{{ s.pctLabel }}</span>
           </div>
-          <div style="font:800 19px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;color:{{ s.ink }}">{{ s.value }}</div>
-          <div style="height:3px;background:#EFE7D8;margin-top:7px;overflow:hidden"><div style="height:100%;width:{{ s.barPct }};background:{{ s.dot }}"></div></div>
+          <div style="font:700 22px/1 Outfit,sans-serif;color:#111827">{{ s.value }}</div>
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;background:{{ s.statusBg }};align-self:flex-start">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex:none;color:{{ s.statusInk }}">
+              <sc-if value="{{ s.statusMint }}" hint-placeholder-val="{{ true }}">
+                <polyline points="2,6.2 4.6,9 10,3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              </sc-if>
+              <sc-if value="{{ !s.statusMint }}" hint-placeholder-val="{{ false }}">
+                <path d="M6 1 L11 10.5 H1 Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"></path>
+                <line x1="6" y1="4.5" x2="6" y2="7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></line>
+                <circle cx="6" cy="8.7" r="0.6" fill="currentColor"></circle>
+              </sc-if>
+            </svg>
+            <span style="font:600 11px/1 Outfit,sans-serif;color:{{ s.statusInk }};white-space:nowrap">{{ s.statusLabel }}</span>
+          </div>
         </div>
       </sc-for>
     </div>
 
-    <div style="display:flex;height:7px;background:#B5A691;overflow:hidden" title="{{ paidLine }}">
-      <sc-for list="{{ bars }}" as="b" hint-placeholder-count="3">
-        <div style="height:100%;width:{{ b.w }};background:{{ b.color }}"></div>
-      </sc-for>
+    <div style="display:flex;flex-wrap:wrap;gap:18px;font:400 12px/1.5 Outfit,sans-serif;color:#6B7280">
+      <sc-if value="{{ hasCarryNote }}" hint-placeholder-val="{{ false }}">
+        <span style="color:#00A896">{{ carryNote }}</span>
+      </sc-if>
+      <sc-if value="{{ hasOver }}" hint-placeholder-val="{{ false }}">
+        <span style="font:600 11.5px/1 Outfit,sans-serif;background:rgba(239,68,68,0.07);border:1px solid #EF4444;border-radius:999px;padding:6px 11px;color:#EF4444">{{ overNote }}</span>
+      </sc-if>
+      <sc-if value="{{ hasAlerts }}" hint-placeholder-val="{{ false }}">
+        <span style="color:#EF4444">{{ alertNote }}</span>
+      </sc-if>
     </div>
-  </div>
 
-  <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font:400 12px/1.5 Jost,sans-serif;color:#6B6055">
-    <sc-if value="{{ hasCarryNote }}" hint-placeholder-val="{{ false }}">
-      <span style="color:#C0562A">{{ carryNote }}</span>
-    </sc-if>
-    <sc-if value="{{ hasOver }}" hint-placeholder-val="{{ false }}">
-      <span style="font:600 11.5px/1 Jost,sans-serif;background:#F6DADE;border:1px solid #5B1230;border-radius:999px;padding:6px 11px;color:#5B1230">{{ overNote }}</span>
-    </sc-if>
-    <sc-if value="{{ hasAlerts }}" hint-placeholder-val="{{ false }}">
-      <span style="color:#5B1230">{{ alertNote }}</span>
-    </sc-if>
-  </div>
-
-  <sc-if value="{{ showInvestor }}" hint-placeholder-val="{{ true }}">
-    <div style="display:flex;flex-wrap:wrap;gap:0;margin-top:24px;border-top:1px solid #DCCFBB;border-bottom:1px solid #DCCFBB">
-      <div style="padding:14px 26px 14px 0;margin-right:26px;border-right:1px solid #DCCFBB">
-        <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9C9184">Tasa de ahorro</div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-top:7px">
-          <span style="font:800 20px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#2C2622">{{ savingsRate }}</span>
-          <span style="font:300 12px/1 Jost,sans-serif;color:#6B6055">de los ingresos del mes</span>
+  <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:24px;margin-top:24px;display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between">
+      <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px">
+        <span style="font:700 11px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280;white-space:nowrap">Mes de análisis</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onClick="{{ prevMonth }}" aria-label="Mes anterior" style="border:none;background:none;color:#111827;cursor:pointer;padding:0;line-height:1;display:flex">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="10,3 5,8 10,13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+          </button>
+          <span style="font:700 14px/1 Outfit,sans-serif;color:#111827;text-transform:capitalize;white-space:nowrap;min-width:120px;text-align:center">{{ monthLabel }}</span>
+          <button onClick="{{ nextMonth }}" aria-label="Mes siguiente" style="border:none;background:none;color:#111827;cursor:pointer;padding:0;line-height:1;display:flex">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="6,3 11,8 6,13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+          </button>
         </div>
-      </div>
-      <div style="padding:14px 26px 14px 0;margin-right:26px;border-right:1px solid #DCCFBB">
-        <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9C9184">Colchón de emergencia</div>
-        <div style="display:flex;align-items:baseline;gap:7px;margin-top:7px;flex-wrap:wrap">
-          <span style="font:800 20px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ cushionInk }}">{{ cushionMonths }}</span>
-          <span style="font:300 12px/1 Jost,sans-serif;color:#6B6055">meses ahorrados de</span>
-          <input value="{{ cushionTarget }}" onChange="{{ onCushionTarget }}" onBlur="{{ onCushionBlur }}" inputMode="decimal" placeholder="6" style="width:34px;border:none;border-bottom:1px solid #DCCFBB;background:transparent;padding:0 0 2px;font:800 16px/1 Outfit,sans-serif;text-align:center;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-          <span style="font:300 12px/1 Jost,sans-serif;color:#6B6055">{{ cushionNote }}</span>
-        </div>
-      </div>
-    </div>
-  </sc-if>
-
-  <div style="display:flex;align-items:flex-end;gap:4px;margin-top:44px;overflow-x:auto;padding:0 2px">
-    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
-      <div onClick="{{ t.onClick }}" style="flex:none;display:flex;align-items:center;gap:9px;font:500 13px/1 Jost,sans-serif;letter-spacing:0.01em;padding:12px 22px 11px;background:{{ t.bg }};color:{{ t.ink }};cursor:pointer;clip-path:polygon(7% 0, 93% 0, 100% 100%, 0% 100%);box-shadow:{{ t.shadow }}">
-        <span>{{ t.name }}</span>
-        <sc-if value="{{ t.showDelete }}" hint-placeholder-val="{{ false }}">
-          <span onClick="{{ t.onDelete }}" title="Eliminar pestaña" style="font:400 14px/1 Jost,sans-serif;color:#9C9184;padding:0 1px" style-hover="color:#5B1230">×</span>
+        <sc-if value="{{ showToday }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ goToday }}" style="border:1px solid #E5E7EB;background:transparent;color:#6B7280;font:600 10.5px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;padding:5px 9px;border-radius:20px;cursor:pointer" style-hover="border-color:#00A896;color:#00A896">Hoy</button>
+        </sc-if>
+        <sc-if value="{{ isFuture }}" hint-placeholder-val="{{ false }}">
+          <span style="font:600 10px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#9CA3AF;border:1px dashed #D1D5DB;padding:5px 8px;border-radius:6px">Previsión</span>
         </sc-if>
       </div>
-    </sc-for>
-    <button onClick="{{ openNewTab }}" title="Nueva pestaña" style="flex:none;font:400 15px/1 Jost,sans-serif;padding:11px 16px 10px;border:none;background:#E7DCCB;color:#6B6055;cursor:pointer;clip-path:polygon(14% 0, 86% 0, 100% 100%, 0% 100%)" style-hover="background:#2C2622;color:#F7F1E7">+</button>
-  </div>
 
-  <div style="background:#FDFAF3;border:1px solid #DCCFBB;border-top:2px solid {{ accentInk }}">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:8px;font:{{ t.weight }} 13px/1 Outfit,sans-serif;padding:8px 16px;background:{{ t.bg }};border:1px solid {{ t.bd }};color:{{ t.ink }};cursor:pointer;border-radius:6px">
+            <span>{{ t.name }}</span>
+            <sc-if value="{{ t.showDelete }}" hint-placeholder-val="{{ false }}">
+              <span onClick="{{ t.onDelete }}" title="Eliminar pestaña" style="font:400 14px/1 Outfit,sans-serif;color:#9CA3AF;padding:0 1px" style-hover="color:#EF4444">×</span>
+            </sc-if>
+          </div>
+        </sc-for>
+        <button onClick="{{ openNewTab }}" title="Nueva pestaña" style="font:400 15px/1 Outfit,sans-serif;padding:8px 12px;border:1px solid #E5E7EB;background:transparent;color:#6B7280;cursor:pointer;border-radius:6px" style-hover="background:#F9FAFB">+</button>
+      </div>
+    </div>
+
+  <div style="border:1px solid #E5E7EB;border-radius:12px;overflow:hidden">
     <div style="overflow-x:auto">
     <div style="min-width:{{ tableMinWidth }}">
 
-      <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;background:#F7F1E7;border-bottom:1px solid #DCCFBB">
+      <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;background:#F9FAFB;border-bottom:1px solid #E5E7EB">
         <sc-for list="{{ heads }}" as="h" hint-placeholder-count="5">
-          <div style="font:500 10px/1 Jost,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#8A8069;padding:11px 14px;text-align:{{ h.align }}">{{ h.label }}</div>
+          <div style="font:700 11px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#6B7280;padding:10px 16px;text-align:{{ h.align }}">{{ h.label }}</div>
         </sc-for>
       </div>
 
       <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ true }}">
         <div>
           <sc-for list="{{ rows }}" as="row" hint-placeholder-count="5">
-            <div style="border-bottom:1px solid #E7DCC2">
+            <div style="border-bottom:1px solid #E5E7EB">
               <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center" title="{{ row.caption }}">
-                <div style="padding:{{ padCell }};min-width:0">
-                  <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:400 14px/1.2 Jost,sans-serif;color:#2C2622;outline:none;padding:0" style-focus="color:#5B1230"></input>
+                <div style="padding:12px 16px;min-width:0">
+                  <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:600 14px/1.2 Outfit,sans-serif;color:#111827;outline:none;padding:0" style-focus="color:#00A896"></input>
+                  <div style="font:400 12px/1.3 Outfit,sans-serif;color:#6B7280;margin-top:3px">{{ row.objectiveCaption }}</div>
                 </div>
                 <sc-if value="{{ showTarget }}" hint-placeholder-val="{{ true }}">
-                  <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:400 13px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8A8069;outline:none;padding:{{ padCell }}" style-focus="background:#F7F1E7;color:#2C2622"></input>
+                  <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:400 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#6B7280;outline:none;padding:12px 16px" style-focus="background:#F9FAFB;color:#111827"></input>
                 </sc-if>
-                <div style="padding:{{ padCell }};min-width:0">
+                <div style="padding:12px 16px;min-width:0">
                   <sc-if value="{{ row.single }}" hint-placeholder-val="{{ true }}">
-                    <input value="{{ row.amountStr }}" onChange="{{ row.onAmt }}" onBlur="{{ row.onAmtBlur }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:none;background:transparent;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#2C2622;outline:none;padding:0"></input>
+                    <input value="{{ row.amountStr }}" onChange="{{ row.onAmt }}" onBlur="{{ row.onAmtBlur }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:none;background:transparent;font:700 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#111827;outline:none;padding:0"></input>
                   </sc-if>
                   <sc-if value="{{ row.merged }}" hint-placeholder-val="{{ false }}">
-                    <button onClick="{{ row.toggle }}" style="width:100%;border:none;background:transparent;cursor:pointer;display:flex;justify-content:flex-end;align-items:center;gap:7px;padding:0;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#2C2622">
+                    <button onClick="{{ row.toggle }}" style="width:100%;border:none;background:transparent;cursor:pointer;display:flex;justify-content:flex-end;align-items:center;gap:7px;padding:0;font:700 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:#111827">
                       {{ row.amountStr }}
-                      <span style="font:500 10px/1 Jost,sans-serif;color:#6B6055;background:#E7DCCB;border-radius:10px;padding:3px 7px">{{ row.count }}</span>
+                      <span style="font:600 10px/1 Outfit,sans-serif;color:#6B7280;background:#F3F4F6;border-radius:10px;padding:3px 7px">{{ row.count }}</span>
                     </button>
                   </sc-if>
                   <sc-if value="{{ row.emptyEntries }}" hint-placeholder-val="{{ false }}">
-                    <button onClick="{{ row.toggle }}" style="width:100%;text-align:right;border:none;background:transparent;cursor:pointer;font:400 13px/1.2 Outfit,sans-serif;color:#B5A691;padding:0">—</button>
+                    <button onClick="{{ row.toggle }}" style="width:100%;text-align:right;border:none;background:transparent;cursor:pointer;font:400 13px/1.2 Outfit,sans-serif;color:#9CA3AF;padding:0">—</button>
                   </sc-if>
                   <sc-if value="{{ row.hasTarget }}" hint-placeholder-val="{{ false }}">
-                    <div style="height:2px;background:#EFE7D8;margin-top:6px;overflow:hidden"><div style="height:100%;width:{{ row.barPct }};background:{{ row.barColor }}"></div></div>
+                    <div style="height:2px;background:#F3F4F6;margin-top:6px;overflow:hidden"><div style="height:100%;width:{{ row.barPct }};background:{{ row.barColor }}"></div></div>
                   </sc-if>
                 </div>
-                <button onClick="{{ row.togglePaid }}" title="Marcar como pagado" style="width:20px;height:20px;margin:0 auto;border:1px solid {{ row.checkBorder }};background:{{ row.checkBg }};color:{{ row.checkInk }};cursor:pointer;font-size:10px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center">✓</button>
-                <div style="position:relative">
-                  <button onClick="{{ row.toggleMenu }}" style="width:100%;border:none;background:transparent;cursor:pointer;color:#9C9184;font-size:15px;line-height:1;padding:8px 4px" style-hover="color:#2C2622">⋯</button>
-                  <sc-if value="{{ row.menuOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="position:absolute;top:calc(100% + 2px);right:0;z-index:39;min-width:172px;background:#FFFFFF;border:1px solid #2C2622;box-shadow:0 10px 24px rgba(44,38,34,0.16)">
-                      <button onClick="{{ row.toggle }}" style="display:block;width:100%;text-align:left;border:none;background:none;color:#2C2622;font:400 12.5px/1 Jost,sans-serif;padding:10px 12px;cursor:pointer;border-bottom:1px solid #E7DCC2" style-hover="background:#F7F1E7">Ver / añadir líneas</button>
-                      <button onClick="{{ row.menuDelete }}" style="display:block;width:100%;text-align:left;border:none;background:none;color:#5B1230;font:400 12.5px/1 Jost,sans-serif;padding:10px 12px;cursor:pointer" style-hover="background:#F6DADE">Eliminar categoría</button>
-                    </div>
-                  </sc-if>
+                <div style="display:flex;justify-content:center;padding:12px 8px">
+                  <button onClick="{{ row.togglePaid }}" title="Cambiar estado" style="display:flex;align-items:center;gap:5px;padding:4px 9px;border:none;border-radius:6px;background:{{ row.statusBg }};cursor:{{ row.statusCursor }}">
+                    <span style="width:5px;height:5px;border-radius:50%;background:{{ row.statusInk }};flex:none"></span>
+                    <span style="font:700 10.5px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:{{ row.statusInk }};white-space:nowrap">{{ row.statusLabel }}</span>
+                  </button>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;padding:12px 16px">
+                  <button onClick="{{ row.toggle }}" title="Ver / añadir líneas" style="border:none;background:none;color:#9CA3AF;cursor:pointer;padding:0;line-height:1;display:flex" style-hover="color:#111827">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M11 2.3a1.4 1.4 0 0 1 2 2L4.8 12.5l-2.6.6.6-2.6z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"></path></svg>
+                  </button>
+                  <button onClick="{{ row.onDelete }}" title="Eliminar categoría" style="border:none;background:none;color:#9CA3AF;cursor:pointer;padding:0;line-height:1;display:flex" style-hover="color:#EF4444">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M6 4.5V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M12.5 4.5 12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1L3.5 4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </button>
                 </div>
               </div>
               <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
-                <div style="background:#F7F1E7;border-top:1px dashed #DCCFBB;padding:10px 14px 12px 28px">
+                <div style="background:#F9FAFB;border-top:1px dashed #E5E7EB;padding:10px 16px 12px 28px">
                   <sc-for list="{{ row.subs }}" as="s" hint-placeholder-count="2">
                     <div style="display:flex;align-items:center;gap:10px;padding:5px 0">
-                      <span style="width:4px;height:4px;border-radius:50%;background:#CFC2AE;flex:none"></span>
-                      <input value="{{ s.titleVal }}" onChange="{{ s.onTitle }}" onBlur="{{ s.onTitleBlur }}" placeholder="Título (ej. Mercadona)" style="flex:1;min-width:0;border:none;background:transparent;font:300 11.5px/1 Jost,sans-serif;color:#5C5545;outline:none;padding:6px 0" style-focus="color:#2C2622"></input>
-                      <span style="font:500 9.5px/1 Jost,sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#14655A">{{ s.paidNote }}</span>
-                      <input value="{{ s.amountStr }}" onChange="{{ s.onAmt }}" onBlur="{{ s.onBlur }}" inputMode="decimal" style="width:112px;border:none;background:#FFFFFF;padding:7px 10px;font:600 13px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#2C2622;outline:none" style-focus="background:#fff"></input>
-                      <button onClick="{{ s.onDelete }}" style="border:none;background:none;color:#CFC2AE;cursor:pointer;font-size:14px;line-height:1;padding:4px" style-hover="color:#5B1230">×</button>
+                      <span style="width:4px;height:4px;border-radius:50%;background:#D1D5DB;flex:none"></span>
+                      <input value="{{ s.titleVal }}" onChange="{{ s.onTitle }}" onBlur="{{ s.onTitleBlur }}" placeholder="Título (ej. Mercadona)" style="flex:1;min-width:0;border:none;background:transparent;font:400 12px/1 Outfit,sans-serif;color:#374151;outline:none;padding:6px 0" style-focus="color:#111827"></input>
+                      <span style="font:600 9.5px/1 Outfit,sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#00A896">{{ s.paidNote }}</span>
+                      <input value="{{ s.amountStr }}" onChange="{{ s.onAmt }}" onBlur="{{ s.onBlur }}" inputMode="decimal" style="width:112px;border:none;background:#FFFFFF;padding:7px 10px;font:600 13px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#111827;outline:none" style-focus="background:#fff"></input>
+                      <button onClick="{{ s.onDelete }}" style="border:none;background:none;color:#D1D5DB;cursor:pointer;font-size:14px;line-height:1;padding:4px" style-hover="color:#EF4444">×</button>
                     </div>
                   </sc-for>
                   <div style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
-                    <input value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #DCCFBB;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 Jost,sans-serif;color:#2C2622;outline:none;margin-left:14px" style-focus="border-color:#2C2622"></input>
-                    <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #DCCFBB;background:#FFFFFF;padding:6px 10px;font:600 13px/1.2 Outfit,sans-serif;text-align:right;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-                    <button onClick="{{ row.addSub }}" style="border:none;background:#E7DCCB;color:#2C2622;font:400 12px/1 Jost,sans-serif;padding:7px 10px;cursor:pointer" style-hover="background:#2C2622;color:#F7F1E7">Añadir importe</button>
+                    <input value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 Outfit,sans-serif;color:#111827;outline:none;margin-left:14px" style-focus="border-color:#00A896"></input>
+                    <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:600 13px/1.2 Outfit,sans-serif;text-align:right;color:#111827;outline:none" style-focus="border-color:#00A896"></input>
+                    <button onClick="{{ row.addSub }}" style="border:none;background:#111827;color:#FFFFFF;font:600 12px/1 Outfit,sans-serif;padding:7px 12px;border-radius:6px;cursor:pointer" style-hover="background:#1F2937">Añadir importe</button>
                   </div>
                 </div>
               </sc-if>
@@ -279,16 +339,16 @@
       <sc-if value="{{ isPeriodic }}" hint-placeholder-val="{{ false }}">
         <div>
           <sc-for list="{{ prows }}" as="p" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;border-bottom:1px solid #E7DCC2">
-              <div style="padding:{{ padCell }};min-width:0">
-                <input value="{{ p.category }}" onChange="{{ p.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:400 14.5px/1.2 Jost,sans-serif;color:#2C2622;outline:none;padding:0" style-focus="color:#5B1230"></input>
-                <div style="font:300 11px/1.3 Jost,sans-serif;color:{{ p.capInk }};margin-top:5px">{{ p.caption }}</div>
+            <div style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;border-bottom:1px solid #E5E7EB">
+              <div style="padding:12px 16px;min-width:0">
+                <input value="{{ p.category }}" onChange="{{ p.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:600 14px/1.2 Outfit,sans-serif;color:#111827;outline:none;padding:0" style-focus="color:#00A896"></input>
+                <div style="font:400 12px/1.3 Outfit,sans-serif;color:{{ p.capInk }};margin-top:3px">{{ p.caption }}</div>
                 <sc-if value="{{ p.hasPend }}" hint-placeholder-val="{{ false }}">
-                  <span style="display:inline-block;margin-top:7px;font:600 11px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;background:#F6DADE;border:1px solid #5B1230;border-radius:999px;padding:5px 10px;color:#5B1230">{{ p.pendBadge }}</span>
+                  <span style="display:inline-block;margin-top:7px;font:600 11px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;background:rgba(239,68,68,0.07);border:1px solid #EF4444;border-radius:999px;padding:5px 10px;color:#EF4444">{{ p.pendBadge }}</span>
                 </sc-if>
               </div>
-              <input value="{{ p.amountStr }}" onChange="{{ p.onAmt }}" onBlur="{{ p.onAmtBlur }}" inputMode="decimal" style="width:100%;border:none;background:transparent;font:800 15px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#2C2622;outline:none;padding:14px" style-focus="background:#F7F1E7"></input>
-              <select value="{{ p.freq }}" onChange="{{ p.onFreq }}" style="width:100%;border:none;background:transparent;font:400 13px/1.2 Jost,sans-serif;color:#2C2622;outline:none;padding:13px 12px;cursor:pointer" style-focus="background:#F7F1E7">
+              <input value="{{ p.amountStr }}" onChange="{{ p.onAmt }}" onBlur="{{ p.onAmtBlur }}" inputMode="decimal" style="width:100%;border:none;background:transparent;font:700 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#111827;outline:none;padding:12px 16px" style-focus="background:#F9FAFB"></input>
+              <select value="{{ p.freq }}" onChange="{{ p.onFreq }}" style="width:100%;border:none;background:transparent;font:400 13px/1.2 Outfit,sans-serif;color:#111827;outline:none;padding:12px;cursor:pointer" style-focus="background:#F9FAFB">
                 <option value="trimestral">Trimestral</option>
                 <option value="semestral">Semestral</option>
                 <option value="anual">Anual</option>
@@ -296,52 +356,52 @@
               </select>
               <div style="padding:0 10px">
                 <sc-if value="{{ p.isDebt }}" hint-placeholder-val="{{ false }}">
-                  <span style="font:800 11.5px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.instInk }};border:1px solid {{ p.instInk }};border-radius:999px;padding:5px 10px;display:inline-block">{{ p.instLabel }}</span>
+                  <span style="font:700 11.5px/1 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.instInk }};border:1px solid {{ p.instInk }};border-radius:999px;padding:5px 10px;display:inline-block">{{ p.instLabel }}</span>
                 </sc-if>
                 <sc-if value="{{ p.isCyclic }}" hint-placeholder-val="{{ true }}">
-                  <select value="{{ p.charge }}" onChange="{{ p.onCharge }}" style="width:100%;border:none;background:transparent;font:400 12.5px/1.2 Jost,sans-serif;color:#6B6055;outline:none;padding:13px 4px;cursor:pointer" style-focus="background:#F7F1E7">
+                  <select value="{{ p.charge }}" onChange="{{ p.onCharge }}" style="width:100%;border:none;background:transparent;font:400 12.5px/1.2 Outfit,sans-serif;color:#6B7280;outline:none;padding:12px 4px;cursor:pointer" style-focus="background:#F9FAFB">
                     <sc-for list="{{ monthOptions }}" as="mo" hint-placeholder-count="12">
                       <option value="{{ mo.value }}">{{ mo.label }}</option>
                     </sc-for>
                   </select>
                 </sc-if>
               </div>
-              <div style="text-align:right;padding:14px;font:600 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.quotaInk }}">{{ p.quotaStr }}</div>
-              <button onClick="{{ p.onDelete }}" style="border:none;background:none;color:#CFC2AE;cursor:pointer;font-size:16px;line-height:1;padding:8px" style-hover="color:#5B1230">×</button>
+              <div style="text-align:right;padding:12px 16px;font:600 14px/1.2 Outfit,sans-serif;font-variant-numeric:tabular-nums;color:{{ p.quotaInk }}">{{ p.quotaStr }}</div>
+              <button onClick="{{ p.onDelete }}" style="border:none;background:none;color:#D1D5DB;cursor:pointer;font-size:16px;line-height:1;padding:8px" style-hover="color:#EF4444">×</button>
             </div>
           </sc-for>
         </div>
       </sc-if>
 
       <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:34px 16px;text-align:center;font:300 13.5px/1.5 Jost,sans-serif;color:#9C9184">{{ emptyText }}</div>
+        <div style="padding:34px 16px;text-align:center;font:400 13.5px/1.5 Outfit,sans-serif;color:#9CA3AF">{{ emptyText }}</div>
       </sc-if>
 
       <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ true }}">
-        <div style="background:#F7F1E7;border-top:1px solid #DCCFBB">
+        <div style="background:#F9FAFB;border-top:1px dashed #D1D5DB">
           <sc-if value="{{ !draftFormOpen }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ openDraftForm }}" style="display:block;width:100%;text-align:left;border:none;background:transparent;color:#6B6055;font:500 12.5px/1 Jost,sans-serif;padding:12px 14px;cursor:pointer" style-hover="color:#2C2622;background:#F3ECDC">+ Nuevo gasto</button>
+            <button onClick="{{ openDraftForm }}" style="display:block;width:100%;text-align:left;border:none;background:transparent;color:#9CA3AF;font:500 13px/1 Outfit,sans-serif;padding:14px 16px;cursor:pointer" style-hover="color:#111827;background:#F3F4F6">+ Título nueva categoría</button>
           </sc-if>
           <sc-if value="{{ draftTargetOnly }}" hint-placeholder-val="{{ false }}">
             <sc-if value="{{ draftFormOpen }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px">
-                <input value="{{ draftCat }}" onChange="{{ onDraftCat }}" list="cat-suggest" placeholder="Categoría nueva (solo objetivo, sin gasto aún)" style="flex:1;min-width:180px;border:1px solid #DCCFBB;background:#FFFFFF;padding:9px 11px;font:400 13.5px/1.2 Jost,sans-serif;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-                <input value="{{ draftTargetVal }}" onChange="{{ onDraftTargetVal }}" inputMode="decimal" placeholder="Objetivo mensual" style="width:140px;border:1px solid #DCCFBB;background:#FFFFFF;padding:9px 11px;font:600 13.5px/1.2 Outfit,sans-serif;text-align:right;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-                <button onClick="{{ addTargetOnlyEntry }}" style="border:none;background:{{ accentInk }};color:#FFFFFF;font:500 12.5px/1 Jost,sans-serif;padding:10px 16px;cursor:pointer">Crear categoría</button>
-                <button onClick="{{ toggleDraftTargetOnly }}" style="border:none;background:none;color:#8A8069;font:300 11.5px/1 Jost,sans-serif;text-decoration:underline;cursor:pointer;padding:6px 0" style-hover="color:#5B1230">Volver a añadir un gasto</button>
-                <button onClick="{{ closeDraftForm }}" title="Cerrar" style="margin-left:auto;border:none;background:none;color:#B5A691;font-size:15px;line-height:1;cursor:pointer;padding:6px" style-hover="color:#5B1230">×</button>
+                <input value="{{ draftCat }}" onChange="{{ onDraftCat }}" list="cat-suggest" placeholder="Categoría nueva (solo objetivo, sin gasto aún)" style="flex:1;min-width:180px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:9px 11px;font:400 13.5px/1.2 Outfit,sans-serif;color:#111827;outline:none" style-focus="border-color:#00A896"></input>
+                <input value="{{ draftTargetVal }}" onChange="{{ onDraftTargetVal }}" inputMode="decimal" placeholder="Objetivo mensual" style="width:140px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:9px 11px;font:600 13.5px/1.2 Outfit,sans-serif;text-align:right;color:#111827;outline:none" style-focus="border-color:#00A896"></input>
+                <button onClick="{{ addTargetOnlyEntry }}" style="border:none;border-radius:6px;background:#111827;color:#FFFFFF;font:600 12.5px/1 Outfit,sans-serif;padding:10px 16px;cursor:pointer">Crear categoría</button>
+                <button onClick="{{ toggleDraftTargetOnly }}" style="border:none;background:none;color:#6B7280;font:400 11.5px/1 Outfit,sans-serif;text-decoration:underline;cursor:pointer;padding:6px 0" style-hover="color:#111827">Volver a añadir un gasto</button>
+                <button onClick="{{ closeDraftForm }}" title="Cerrar" style="margin-left:auto;border:none;background:none;color:#9CA3AF;font-size:15px;line-height:1;cursor:pointer;padding:6px" style-hover="color:#EF4444">×</button>
               </div>
             </sc-if>
           </sc-if>
           <sc-if value="{{ draftExpenseMode }}" hint-placeholder-val="{{ true }}">
             <sc-if value="{{ draftFormOpen }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px">
-                <input value="{{ draftCat }}" onChange="{{ onDraftCat }}" onKeyDown="{{ onDraftCatKey }}" list="cat-suggest" placeholder="{{ draftPlaceholder }}" style="flex:1;min-width:160px;border:1px solid #DCCFBB;background:#FFFFFF;padding:9px 11px;font:400 13.5px/1.2 Jost,sans-serif;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-                <input value="{{ draftTitle }}" onChange="{{ onDraftTitle }}" placeholder="{{ draftTitlePlaceholder }}" style="width:150px;border:1px solid #DCCFBB;background:#FFFFFF;padding:9px 11px;font:400 13px/1.2 Jost,sans-serif;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-                <input value="{{ draftAmt }}" onChange="{{ onDraftAmt }}" onKeyDown="{{ onDraftAmtKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #DCCFBB;background:#FFFFFF;padding:9px 11px;font:600 13.5px/1.2 Outfit,sans-serif;text-align:right;color:#2C2622;outline:none" style-focus="border-color:#2C2622"></input>
-                <button onClick="{{ addEntry }}" style="border:none;background:{{ accentInk }};color:#FFFFFF;font:500 12.5px/1 Jost,sans-serif;padding:10px 16px;cursor:pointer">Añadir</button>
-                <button onClick="{{ toggleDraftTargetOnly }}" style="border:none;background:none;color:#8A8069;font:300 11.5px/1 Jost,sans-serif;text-decoration:underline;cursor:pointer;padding:6px 0" style-hover="color:#5B1230">+ Solo objetivo</button>
-                <button onClick="{{ closeDraftForm }}" title="Cerrar" style="margin-left:auto;border:none;background:none;color:#B5A691;font-size:15px;line-height:1;cursor:pointer;padding:6px" style-hover="color:#5B1230">×</button>
+                <input value="{{ draftCat }}" onChange="{{ onDraftCat }}" onKeyDown="{{ onDraftCatKey }}" list="cat-suggest" placeholder="{{ draftPlaceholder }}" style="flex:1;min-width:160px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:9px 11px;font:400 13.5px/1.2 Outfit,sans-serif;color:#111827;outline:none" style-focus="border-color:#00A896"></input>
+                <input value="{{ draftTitle }}" onChange="{{ onDraftTitle }}" placeholder="{{ draftTitlePlaceholder }}" style="width:150px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:9px 11px;font:400 13px/1.2 Outfit,sans-serif;color:#111827;outline:none" style-focus="border-color:#00A896"></input>
+                <input value="{{ draftAmt }}" onChange="{{ onDraftAmt }}" onKeyDown="{{ onDraftAmtKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #E5E7EB;border-radius:6px;background:#FFFFFF;padding:9px 11px;font:600 13.5px/1.2 Outfit,sans-serif;text-align:right;color:#111827;outline:none" style-focus="border-color:#00A896"></input>
+                <button onClick="{{ addEntry }}" style="border:none;border-radius:6px;background:#111827;color:#FFFFFF;font:600 12.5px/1 Outfit,sans-serif;padding:10px 16px;cursor:pointer">Añadir</button>
+                <button onClick="{{ toggleDraftTargetOnly }}" style="border:none;background:none;color:#6B7280;font:400 11.5px/1 Outfit,sans-serif;text-decoration:underline;cursor:pointer;padding:6px 0" style-hover="color:#111827">+ Solo objetivo</button>
+                <button onClick="{{ closeDraftForm }}" title="Cerrar" style="margin-left:auto;border:none;background:none;color:#9CA3AF;font-size:15px;line-height:1;cursor:pointer;padding:6px" style-hover="color:#EF4444">×</button>
               </div>
             </sc-if>
           </sc-if>
@@ -379,6 +439,7 @@
     </div>
   </div>
 
+  </div>
   </div>
   </sc-if>
 
@@ -716,9 +777,9 @@
   </div>
   </sc-if>
 
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:34px;padding-top:16px;border-top:1px solid #DCCFBB;font:300 11.5px/1 Jost,sans-serif;color:#9C9184">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:34px;padding-top:16px;border-top:1px solid #E5E7EB;font:400 11.5px/1 Outfit,sans-serif;color:#9CA3AF">
     <span>{{ saveText }}</span>
-    <button onClick="{{ reset }}" style="border:none;background:none;color:#9C9184;font:300 11.5px/1 Jost,sans-serif;text-decoration:underline;cursor:pointer;padding:0" style-hover="color:#5B1230">Borrar todos los datos</button>
+    <button onClick="{{ reset }}" style="border:none;background:none;color:#9CA3AF;font:400 11.5px/1 Outfit,sans-serif;text-decoration:underline;cursor:pointer;padding:0" style-hover="color:#EF4444">Borrar todos los datos</button>
   </div>
 
   <datalist id="cat-suggest">
@@ -727,7 +788,7 @@
     </sc-for>
   </datalist>
 
-</div>
+</main>
 </div>
 
 <sc-if value="{{ chartOpen }}" hint-placeholder-val="{{ false }}">
@@ -1700,23 +1761,38 @@ class Component extends DCLogic {
       const t = this.sheetTotal(s.id, m), a = ACC[s.accent] || ACC.ink;
       const pctNum = avail > 0 ? (t / avail * 100) : 0;
       const pctText = avail > 0 ? this.pct(pctNum) + ' del disponible' : 'sin ingresos registrados';
-      return { name: s.name, value: this.fmt(t), ink: a.ink, dot: a.dot, barPct: Math.min(100, pctNum).toFixed(1) + '%',
-        onClick: go(s.id), cursor: 'pointer', hoverBg: '#F7F1E7', title: 'Ver ' + s.name.toLowerCase() + ' · ' + pctText };
+      const sumTgt = this.gs(s.id).reduce((tt, g) => tt + (g.targets[m] || 0), 0);
+      const FIG_DOT = { fixed: '#FFC107', variable: '#F44336', savings: '#00C8B3' };
+      let statusLabel, statusMint;
+      if (s.id === 'savings') { statusMint = sumTgt === 0 || t >= sumTgt; statusLabel = sumTgt === 0 ? 'Sin objetivo' : (t >= sumTgt ? 'Objetivo cumplido' : 'Por debajo del objetivo'); }
+      else { statusMint = sumTgt === 0 || t <= sumTgt; statusLabel = sumTgt === 0 ? 'Sin objetivo' : (t <= sumTgt ? 'Dentro de presupuesto' : 'Fuera de presupuesto'); }
+      return { name: s.name, value: this.fmt(t), ink: a.ink, dot: FIG_DOT[s.id] || a.dot, barPct: Math.min(100, pctNum).toFixed(1) + '%',
+        pctLabel: avail > 0 ? this.pct(pctNum) : '—',
+        statusLabel: statusLabel, statusMint: statusMint,
+        statusIcon: statusMint ? 'check' : 'alert',
+        statusBg: statusMint ? 'transparent' : 'rgba(239,68,68,0.07)', statusInk: statusMint ? '#00A896' : '#EF4444',
+        onClick: go(s.id), cursor: 'pointer', hoverBg: '#F9FAFB', title: 'Ver ' + s.name.toLowerCase() + ' · ' + pctText };
     });
     const per = this.allPeriodicTotal(m);
     const perSheet = this.d.sheets.find(s => s.kind === 'periodic');
     if (per > 0) {
       const pctNum = avail > 0 ? (per / avail * 100) : 0;
-      stats.push({ name: 'Reserva periódicos', value: this.fmt(per), ink: '#2C2622', dot: '#2C2622', barPct: Math.min(100, pctNum).toFixed(1) + '%',
-        onClick: perSheet ? go(perSheet.id) : null, cursor: perSheet ? 'pointer' : 'default', hoverBg: '#F7F1E7',
+      stats.push({ name: 'Reserva periódica', value: this.fmt(per), ink: '#111827', dot: '#2196F3', barPct: Math.min(100, pctNum).toFixed(1) + '%',
+        pctLabel: avail > 0 ? this.pct(pctNum) : '—',
+        statusLabel: 'Aportación al día', statusMint: true, statusIcon: 'check', statusBg: 'transparent', statusInk: '#00A896',
+        onClick: perSheet ? go(perSheet.id) : null, cursor: perSheet ? 'pointer' : 'default', hoverBg: '#F9FAFB',
         title: (perSheet ? 'Ver ' + perSheet.name.toLowerCase() : '') + (avail > 0 ? ' · ' + this.pct(pctNum) + ' del disponible' : '') });
     }
     const free = avail - assigned;
     {
       const pctNum = avail > 0 ? (Math.abs(free) / avail * 100) : 0;
-      stats.push({ name: free >= 0 ? 'Sin asignar' : 'Exceso', value: this.fmt(Math.abs(free)), ink: free >= 0 ? '#6B6055' : '#5B1230', dot: '#B5A691', barPct: Math.min(100, pctNum).toFixed(1) + '%',
+      stats.push({ name: free >= 0 ? 'Sin asignar' : 'Exceso', value: this.fmt(Math.abs(free)), ink: '#111827', dot: '#9E9E9E', barPct: Math.min(100, pctNum).toFixed(1) + '%',
+        pctLabel: avail > 0 ? this.pct(pctNum) : '—',
+        statusLabel: free >= 0 ? 'Remanente seguro' : 'Presupuesto excedido', statusMint: free >= 0, statusIcon: free >= 0 ? 'check' : 'alert',
+        statusBg: free >= 0 ? 'transparent' : 'rgba(239,68,68,0.07)', statusInk: free >= 0 ? '#00A896' : '#EF4444',
         onClick: null, cursor: 'default', hoverBg: '#FDFAF3', title: avail > 0 ? this.pct(pctNum) + ' del disponible' : 'Añade ingresos para calcularlo' });
     }
+
 
     const denom = Math.max(avail, assigned, 1);
     const bars = this.monthlySheets().map(s => ({ w: (this.sheetTotal(s.id, m) / denom * 100).toFixed(2) + '%', color: (ACC[s.accent] || ACC.ink).bg }));
@@ -1748,11 +1824,16 @@ class Component extends DCLogic {
       if (es.length === 0) caps.push('sin gastos todavía');
       const allPaid = es.length > 0 && es.every(e => e.paid);
       const subDraft = this.state.subDraft[g.id] || { amt: '', title: '' };
-      const menuOpen = this.state.rowMenu === key;
-      const doToggle = () => this.setState(s => ({ expanded: Object.assign({}, s.expanded, { [key]: !s.expanded[key] }), rowMenu: null }));
-      const doDelete = () => { g.entries = g.entries.filter(e => e.date !== m); delete g.targets[m]; if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.setState({ rowMenu: null }); this.touch(); };
+      const doToggle = () => this.setState(s => ({ expanded: Object.assign({}, s.expanded, { [key]: !s.expanded[key] }) }));
+      const doDelete = () => { g.entries = g.entries.filter(e => e.date !== m); delete g.targets[m]; if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); };
+      const statusLabel = es.length === 0 ? 'Sin gasto' : (allPaid ? 'Pagado' : 'Pendiente');
+      const statusMint = es.length === 0 ? null : allPaid;
       return {
         id: g.id, category: g.category, caption: caps.join(' · '), capInk: over ? '#5B1230' : '#9C9184',
+        objectiveCaption: target > 0 ? 'Objetivo ' + this.fmt(target) : 'Sin objetivo',
+        statusLabel: statusLabel, statusMint: statusMint, statusClickable: es.length > 0, statusCursor: es.length > 0 ? 'pointer' : 'default',
+        statusBg: statusMint === true ? 'transparent' : 'rgba(156,163,175,0.08)',
+        statusInk: statusMint === true ? '#00A896' : '#6B7280',
         onCat: (e) => { g.category = e.target.value; this.touch(); },
         single: es.length === 1, merged: es.length > 1, emptyEntries: es.length === 0, count: es.length,
         chevron: exp ? '▲' : '▼',
@@ -1765,8 +1846,6 @@ class Component extends DCLogic {
         onTarget: (e) => { this.setEd('t' + g.id + m, e.target.value); const v = this.parse(e.target.value); if (v) g.targets[m] = v; else delete g.targets[m]; this.touch(); },
         onTargetBlur: () => this.clearEd('t' + g.id + m),
         toggle: doToggle, expanded: exp,
-        menuOpen: menuOpen, toggleMenu: () => this.setState(s => ({ rowMenu: s.rowMenu === key ? null : key })),
-        menuDelete: doDelete,
         subs: es.map((e) => ({
           titleVal: this.ed('ti' + e.id, e.title || ''),
           onTitle: (ev) => { this.setEd('ti' + e.id, ev.target.value); e.title = ev.target.value; this.touch(); },
@@ -2028,10 +2107,10 @@ class Component extends DCLogic {
 
     const carryOn = !!this.d.carry[m];
     const heads = sheet.kind === 'monthly'
-      ? [{ label: 'Categoría', align: 'left' }].concat(showTarget ? [{ label: 'Objetivo', align: 'right' }] : []).concat([{ label: 'Importe', align: 'right' }, { label: 'Pag.', align: 'center' }, { label: '', align: 'right' }])
+      ? [{ label: 'Categoría', align: 'left' }].concat(showTarget ? [{ label: 'Objetivo', align: 'right' }] : []).concat([{ label: 'Importe gastado', align: 'right' }, { label: 'Estado', align: 'center' }, { label: 'Acciones', align: 'right' }])
       : [{ label: 'Categoría', align: 'left' }, { label: 'Importe', align: 'right' }, { label: 'Frecuencia', align: 'left' }, { label: 'Cargo / cuotas', align: 'left' }, { label: 'Cuota mensual', align: 'right' }, { label: '', align: 'right' }];
     const gridCols = sheet.kind === 'monthly'
-      ? (showTarget ? 'minmax(0,1fr) 108px 128px 40px 34px' : 'minmax(0,1fr) 124px 40px 34px')
+      ? (showTarget ? 'minmax(0,1fr) 120px 120px 110px 64px' : 'minmax(0,1fr) 120px 110px 64px')
       : 'minmax(0,1fr) 116px 132px 150px 130px 36px';
 
     return {
@@ -2063,7 +2142,6 @@ class Component extends DCLogic {
       undoInk: (this._undo && this._undo.length) ? '#F7F1E7' : '#8A5A6E', redoInk: (this._redo && this._redo.length) ? '#F7F1E7' : '#8A5A6E',
       undoCursor: (this._undo && this._undo.length) ? 'pointer' : 'default', redoCursor: (this._redo && this._redo.length) ? 'pointer' : 'default',
       menuOpen: this.state.menu === true,
-      anyRowMenuOpen: this.state.rowMenu !== null, closeRowMenu: () => this.setState({ rowMenu: null }),
       toggleMenu: () => this.setState({ menu: !this.state.menu }),
       closeMenu: () => this.setState({ menu: false }),
       menuBd: this.state.menu ? '#F7F1E7' : 'rgba(247,241,231,0.38)',
@@ -2106,9 +2184,9 @@ class Component extends DCLogic {
       cushionNote: '· ' + this.fmt(cushionPool) + ' acumulados sobre un gasto medio de ' + this.fmt(avgSpend) + '/mes',
 
       tabs: this.monthlySheets().map(s => {
-        const a = ACC[s.accent] || ACC.ink, on = s.id === sheet.id;
+        const on = s.id === sheet.id;
         return { name: s.name, onClick: () => this.setState({ sheetId: s.id, edits: {}, draft: { cat: '', amt: '', title: '', target: '', freq: 'trimestral', charge: '3', inst: '36' } }),
-          bg: on ? '#FDFAF3' : '#E7DCCB', ink: on ? a.ink : '#8A8069', shadow: on ? 'inset 0 3px 0 ' + a.ink : 'none',
+          bg: on ? '#F9FAFB' : 'transparent', ink: on ? '#111827' : '#6B7280', bd: on ? '#9CA3AF' : 'transparent', weight: on ? '700' : '500',
           showDelete: on && this.monthlySheets().length > 1,
           onDelete: (e) => {
             e.stopPropagation();
@@ -2287,11 +2365,16 @@ class Component extends DCLogic {
       periodicSheetsView: periodicSheetsView, periodicGridCols: periodicGridCols,
       allPeriodicMonthlyStr: this.fmt(allPeriodicMonthly) + '/mes',
       hasPeriodicSheets: periodicSheetsView.length > 0,
-      views: [{ id: 'month', name: 'Mes' }, { id: 'periodics', name: 'Vencimientos' }, { id: 'cash', name: 'Efectivo' }, { id: 'forecast', name: 'Previsión' }, { id: 'invest', name: 'Inversión' }].map(v => {
+      views: [{ id: 'month', name: 'Inicio', icon: 'layout' }, { id: 'periodics', name: 'Vencimientos', icon: 'clipboard' }, { id: 'cash', name: 'Efectivo', icon: 'dollar' }, { id: 'forecast', name: 'Previsión', icon: 'bars' }, { id: 'invest', name: 'Inversión', icon: 'trend' }].map(v => {
         const on = (this.state.view || 'month') === v.id;
-        return { name: v.name, ink: on ? '#5B1230' : '#E8D5D9', bg: on ? '#F7F1E7' : 'transparent', bd: on ? '#F7F1E7' : 'rgba(247,241,231,0.38)', onClick: () => this.setState({ view: v.id, edits: {} }) };
+        return { id: v.id, name: v.name, icon: v.icon,
+          isLayout: v.icon === 'layout', isClipboard: v.icon === 'clipboard', isDollar: v.icon === 'dollar', isBars: v.icon === 'bars', isTrend: v.icon === 'trend',
+          ink: on ? '#00A896' : '#6B7280', weight: on ? '700' : '500', bg: on ? 'rgba(0,200,179,0.08)' : 'transparent',
+          onClick: () => this.setState({ view: v.id, edits: {} }) };
       }),
       openImport: () => this.setState({ modal: 'import' }),
+      exportCsv: () => this.csv(),
+      openNewMovement: () => this.setState({ view: 'month', sheetId: this.monthlySheets()[0] ? this.monthlySheets()[0].id : sheet.id, draftFormOpen: true, draftTargetOnly: false }),
       openLetter: () => this.setState({ modal: 'letter' }),
       importOpen: this.state.modal === 'import', letterOpen: this.state.modal === 'letter',
       impStep0: imp.step === 0, impStep1: imp.step === 1, impStep2: imp.step === 2, impStep3: imp.step === 3,
