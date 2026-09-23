@@ -50,6 +50,9 @@
     .m-fab{right:16px!important;bottom:16px!important;width:56px!important;height:56px!important}
     .m-sheet-ovl{align-items:flex-end!important;padding:0!important}
     .m-sheet{border-radius:18px 18px 0 0!important;max-height:94vh!important;padding:22px 16px 26px!important}
+    .m-exp{padding:10px 12px 14px 14px!important}
+    .m-subadd{flex-wrap:wrap!important}
+    .m-subadd > input:first-of-type{flex:1 1 100%!important;min-width:0!important}
     .m-authR{padding:28px 16px!important;min-height:100vh}
     .m-authCard{padding:26px 18px!important;border-radius:18px!important}
     main h1{font-size:26px!important}
@@ -379,6 +382,7 @@
 
   <div class="m-table" style="border:1px solid #D7D4E8;border-radius:12px;overflow:hidden">
 
+      <sc-if value="{{ showHeadRow }}" hint-placeholder-val="{{ true }}">
       <div class="m-head" style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;background:#F8F7F4;border-bottom:1px solid #D7D4E8;min-width:{{ tableMinW }}">
         <sc-for list="{{ heads }}" as="h" hint-placeholder-count="5">
           <sc-if value="{{ h.hideable }}" hint-placeholder-val="{{ false }}">
@@ -397,11 +401,13 @@
           </sc-if>
         </sc-for>
       </div>
+      </sc-if>
 
       <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ true }}">
         <div style="min-width:{{ tableMinW }}">
           <sc-for list="{{ rows }}" as="row" hint-placeholder-count="5">
             <div style="border-bottom:1px solid #D7D4E8">
+              <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
               <div class="m-row" style="display:grid;grid-template-columns:{{ gridCols }};align-items:center" title="{{ row.caption }}">
                 <div style="padding:12px 16px;min-width:0">
                   <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:600 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0" style-focus="color:#1E3A8A"></input>
@@ -462,8 +468,68 @@
                   </button>
                 </div>
               </div>
+              </sc-if>
+
+              <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:14px 14px 12px" title="{{ row.caption }}">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="flex:1;min-width:0;border:none;background:transparent;font:700 15px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
+                  <button onClick="{{ row.onDelete }}" title="Eliminar categoría" style="border:none;background:none;color:#C9C4BC;cursor:pointer;padding:4px;display:flex;flex:none">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M6 4.5V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M12.5 4.5 12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1L3.5 4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </button>
+                </div>
+
+                <div style="display:flex;align-items:flex-end;gap:14px;margin-top:10px">
+                  <div style="flex:1;min-width:0">
+                    <div style="font:700 9.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#A8A29A;margin-bottom:4px">Gastado</div>
+                    <sc-if value="{{ row.single }}" hint-placeholder-val="{{ true }}">
+                      <input value="{{ row.amountStr }}" onChange="{{ row.onAmt }}" onBlur="{{ row.onAmtBlur }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:none;background:transparent;font:900 20px/1 'Source Serif Pro',serif;font-variant-numeric:tabular-nums;color:#1E3A8A;outline:none;padding:0"></input>
+                    </sc-if>
+                    <sc-if value="{{ row.merged }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ row.toggle }}" style="border:none;background:transparent;cursor:pointer;display:flex;align-items:center;gap:7px;padding:0;font:900 20px/1 'Source Serif Pro',serif;font-variant-numeric:tabular-nums;color:#1E3A8A">
+                        {{ row.amountStr }}
+                        <span style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355;background:#F3EFE8;border-radius:10px;padding:3px 7px">{{ row.count }}</span>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{ row.emptyEntries }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ row.toggle }}" style="border:none;background:transparent;cursor:pointer;font:900 20px/1 'Source Serif Pro',serif;color:#C9C4BC;padding:0">—</button>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ narrowShowTarget }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:104px;flex:none">
+                      <div style="font:700 9.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#A8A29A;margin-bottom:4px;text-align:right">Presupuesto</div>
+                      <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:500 15px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none;padding:0"></input>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <sc-if value="{{ row.hasTarget }}" hint-placeholder-val="{{ false }}">
+                  <div style="height:6px;background:#EBEDF0;border-radius:3px;margin-top:10px;overflow:hidden"><div style="height:100%;width:{{ row.barPct }};background:{{ row.barColor }};border-radius:3px"></div></div>
+                </sc-if>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
+                  <sc-if value="{{ narrowShowTarget }}" hint-placeholder-val="{{ true }}">
+                    <span style="font:600 12px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ row.disponibleInk }}">Disponible {{ row.disponibleStr }}</span>
+                  </sc-if>
+                  <sc-if value="{{ !narrowShowTarget }}" hint-placeholder-val="{{ false }}">
+                    <span style="font:400 12px/1.3 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ row.objectiveCaption }}</span>
+                  </sc-if>
+                  <button onClick="{{ row.toggle }}" style="border:1px solid #D7D4E8;background:#FFFFFF;color:#1E3A8A;font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;flex:none">
+                    <sc-if value="{{ !row.expanded }}" hint-placeholder-val="{{ true }}">
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><line x1="8" y1="3" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line><line x1="3" y1="8" x2="13" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line></svg>
+                      <span>Detalle</span>
+                    </sc-if>
+                    <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><polyline points="4,10 8,6 12,10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                      <span>Cerrar</span>
+                    </sc-if>
+                  </button>
+                </div>
+              </div>
+              </sc-if>
+
               <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
-                <div style="background:#F8F7F4;border-top:1px dashed #D7D4E8;padding:10px 16px 12px 28px">
+                <div class="m-exp" style="background:#F8F7F4;border-top:1px dashed #D7D4E8;padding:10px 16px 12px 28px">
                   <sc-if value="{{ row.isSavingsSheet }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                       <span style="font:400 11.5px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355;white-space:nowrap">Vincular con:</span>
@@ -492,7 +558,7 @@
                       <button onClick="{{ s.onDelete }}" style="border:none;background:none;color:#E8E0D4;cursor:pointer;font-size:14px;line-height:1;padding:4px" style-hover="color:#A03B2A">×</button>
                     </div>
                   </sc-for>
-                  <div style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
+                  <div class="m-subadd" style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
                     <input value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;margin-left:14px" style-focus="border-color:#1E3A8A"></input>
                     <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
                     <button onClick="{{ row.addSub }}" style="border:none;background:#3D2B1F;color:#FFFFFF;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:7px 12px;border-radius:6px;cursor:pointer" style-hover="background:#1F2937">Añadir importe</button>
@@ -906,9 +972,11 @@
             <div style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                 <span style="font:700 14px/1.3 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ gc.name }}</span>
+                <sc-if value="{{ gc.isUserGoal }}" hint-placeholder-val="{{ true }}">
                 <button onClick="{{ gc.onDelete }}" title="Eliminar objetivo" style="border:none;background:none;color:#A8A29A;cursor:pointer;padding:2px;display:flex" style-hover="color:#A03B2A">
                   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M6 4.5V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M12.5 4.5 12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1L3.5 4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                 </button>
+                </sc-if>
               </div>
               <div style="font:400 11px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A">{{ gc.sourceLabel }}</div>
               <div style="display:flex;justify-content:space-between;align-items:baseline">
@@ -934,7 +1002,7 @@
           </sc-for>
         </div>
       </sc-if>
-      <sc-if value="{{ !hasGoals }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ !hasUserGoals }}" hint-placeholder-val="{{ true }}">
         <div style="background:#F8F7F4;border:1px dashed #D7D4E8;border-radius:16px;padding:20px;margin-bottom:16px">
           <p style="margin:0;font:400 13px/1.5 'Plus Jakarta Sans',sans-serif;color:#8B7355">Todavía no has definido ningún objetivo. Elige un tipo abajo y ponle nombre — te ayudamos a llevar la cuenta automáticamente.</p>
         </div>
@@ -2713,11 +2781,13 @@ class Component extends DCLogic {
     if (!this.state.ready || !this.d) return { ready: false, isMonthly: true, showTarget: true, gridCols: 'minmax(0,1fr) 108px 128px 40px 34px', statCols: 'repeat(4,1fr)', padCell: '11px 14px', tableMinWidth: '0',
       isAuthed: true, showSetup: false,
       monthShort: '', monthLabel: '', incomeTotalStr: '', paidLine: '', saveText: '', accentInk: '#3D2B1F', densityLabel: '', draftPlaceholder: '', draftAmtPlaceholder: '', emptyText: '', periodicTotalStr: '',
+      isNarrow: false, isWide: true, narrowShowTarget: false, showHeadRow: true,
       canUndo: false, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoInk: '#A8A29A', redoInk: '#A8A29A', undoCursor: 'default', redoCursor: 'default', views: [],
       previsionStr: '', gastadoRealStr: '', availStr: '', gastadoRealInk: '#3D2B1F', previsionDiffStr: '', previsionDiffInk: '#3D2B1F', previsionPct: '0%', previsionBarColor: '#1E3A8A', previsionOnTrack: true,
       distributeOpen: false, distHasSavers: false, distNoSavers: true, distRows: [], distShowPct: false,
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
       allocCards: [], hasAllocations: false,
+      goalCards: [], hasGoals: false, hasUserGoals: false,
       quickOpen: false, openQuick: () => {}, quickChips: [], hasQuickChips: false, quickSheetOptions: [], quickIsNewCat: false, quickDestNote: '', quickMonthLabel: '',
       menuOpen: false, menuItems: [], toggleMenu: () => {}, closeMenu: () => {}, navOpen: false, navOpenAttr: '0', toggleNav: () => {}, closeNav: () => {}, tableMinW: '0' };
 
@@ -3149,10 +3219,10 @@ class Component extends DCLogic {
           .concat(showTarget ? [mkHead(targetLabel, 'target')] : [])
           .concat([mkHead('Actual', 'actual')])
           .concat(showTarget ? [mkHead(extraLabel, 'extra')] : [])
-          .concat([{ label: 'Acciones', align: 'right', hideable: false }])
+          .concat([{ label: '', align: 'right', hideable: false }])
       : [{ label: 'Categoría', align: 'left' }, { label: 'Importe', align: 'right' }, { label: 'Frecuencia', align: 'left' }, { label: 'Cargo / cuotas', align: 'left' }, { label: 'Cuota mensual', align: 'right' }, { label: '', align: 'right' }];
     const colW = (hidden, w) => hidden ? '36px' : w;
-    const tableMinW = narrow ? (sheet.kind === 'monthly' ? (showTarget ? '440px' : '0') : '660px') : '0';
+    const tableMinW = narrow && sheet.kind !== 'monthly' ? '660px' : '0';
     const gridCols = narrow && sheet.kind === 'monthly' && showTarget
       ? 'minmax(118px,1fr) ' + colW(targetColHidden, '80px') + ' ' + colW(actualColHidden, '84px') + ' ' + colW(extraColHidden, '80px') + ' 62px'
       : sheet.kind === 'monthly'
@@ -3295,7 +3365,26 @@ class Component extends DCLogic {
       cushionAvancePct: cushionGoal > 0 ? Math.min(100, cushionMonths / cushionGoal * 100).toFixed(0) + '%' : '0%',
 
       // ---- Objetivos (definidos por el usuario, hasta 5) ----
-      goalCards: (this.d.goals || []).map(g => {
+      goalCards: [{
+        id: '__cushion__', name: 'Colchón de emergencia', kind: 'months', isBuiltIn: true, isUserGoal: false,
+        sourceLabel: 'Tu ahorro frente a un gasto medio de ' + this.fmt(avgSpend) + '/mes',
+        currentStr: (avgSpend > 0 ? cushionMonths.toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '0') + ' de ' + cushionGoal + ' meses',
+        targetStr: '',
+        pct: (cushionGoal > 0 ? Math.min(100, cushionMonths / cushionGoal * 100) : 0).toFixed(0) + '%',
+        barPct: (cushionGoal > 0 ? Math.min(100, cushionMonths / cushionGoal * 100) : 0).toFixed(1) + '%',
+        done: cushionGoal > 0 && cushionMonths >= cushionGoal,
+        etaLabel: (() => {
+          if (cushionGoal > 0 && cushionMonths >= cushionGoal) return 'Objetivo cumplido';
+          if (avgSpend <= 0) return 'Registra algún gasto para calcular cuántos meses cubres';
+          if (cushionThisMonthDelta <= 0) return 'Este mes no has aportado al colchón';
+          const falta = cushionGoal * avgSpend - cushionPool;
+          const nMeses = Math.ceil(falta / cushionThisMonthDelta);
+          if (nMeses > 120) return 'A este ritmo tardarías más de 10 años · ' + this.fmt(cushionThisMonthDelta) + '/mes';
+          return 'A este ritmo, ' + this.label(shift(m, nMeses)) + ' · ' + this.fmt(cushionThisMonthDelta) + '/mes';
+        })(),
+        hasEta: true,
+        onDelete: () => {}
+      }].concat((this.d.goals || []).map(g => {
         const p = this.goalProgress(g);
         let sourceLabel = 'Ahorro dedicado';
         if (g.type === 'income') sourceLabel = (g.incomeMode === 'percent' ? this.pct(g.incomeValue) : this.fmt(g.incomeValue)) + ' de cada ingreso';
@@ -3317,10 +3406,12 @@ class Component extends DCLogic {
           sourceLabel: sourceLabel,
           pct: p.pct.toFixed(0) + '%', barPct: p.pct.toFixed(1) + '%', done: p.done,
           etaLabel: this.goalPace(g).label, hasEta: !!this.goalPace(g).label,
+          isBuiltIn: false, isUserGoal: true,
           onDelete: () => { if (window.confirm('¿Eliminar el objetivo "' + g.name + '"?' + (g.type === 'savings' ? ' El dinero ahorrado seguirá en Ahorros, solo se deja de rastrear como objetivo.' : ''))) this.deleteGoal(g.id); }
         };
-      }),
-      hasGoals: (this.d.goals || []).length > 0,
+      })),
+      hasGoals: true,
+      hasUserGoals: (this.d.goals || []).length > 0,
       canAddGoal: (this.d.goals || []).length < 5,
       goalsCountLabel: (this.d.goals || []).length + ' de 5 objetivos',
 
@@ -3441,7 +3532,9 @@ class Component extends DCLogic {
       deleteSheet: () => { this.d.sheets = this.d.sheets.filter(s => s.id !== sheet.id); delete this.d.groups[sheet.id]; delete this.d.prows[sheet.id]; this.setState({ sheetId: this.d.sheets[0].id }); this.touch(); },
 
       isMonthly: sheet.kind === 'monthly', isPeriodic: sheet.kind === 'periodic',
+      showHeadRow: !(narrow && sheet.kind === 'monthly'),
       showTarget: showTarget, heads: heads, gridCols: gridCols, tableMinW: tableMinW, padCell: pad,
+      isNarrow: narrow, isWide: !narrow, narrowShowTarget: narrow && showTarget,
       targetColHidden: targetColHidden, actualColHidden: actualColHidden, extraColHidden: extraColHidden,
       tableMinWidth: sheet.kind === 'periodic' ? '760px' : (showTarget ? '620px' : '360px'),
       rows: rows, prows: prows,
