@@ -47,6 +47,9 @@
     .m-ovl{padding:10px!important}
     .m-dlg{padding:20px 16px 22px!important;max-height:92vh!important}
     .m-hide{display:none!important}
+    .m-fab{right:16px!important;bottom:16px!important;width:56px!important;height:56px!important}
+    .m-sheet-ovl{align-items:flex-end!important;padding:0!important}
+    .m-sheet{border-radius:18px 18px 0 0!important;max-height:94vh!important;padding:22px 16px 26px!important}
     .m-authR{padding:28px 16px!important;min-height:100vh}
     .m-authCard{padding:26px 18px!important;border-radius:18px!important}
     main h1{font-size:26px!important}
@@ -341,6 +344,23 @@
         <span style="color:#B4690E">{{ alertNote }}</span>
       </sc-if>
     </div>
+
+    <sc-if value="{{ hasAllocations }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ allocCards }}" as="al" hint-placeholder-count="1">
+          <div class="m-alloc" style="background:#FFFFFF;border:1px solid #1E3A8A;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:190px">
+              <div style="font:700 13.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">Aparta {{ al.amountStr }} para {{ al.name }}</div>
+              <div style="font:400 12px/1.4 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-top:3px">{{ al.rule }} · se añadirá a tu categoría de Ahorros</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex:none">
+              <button onClick="{{ al.onSkip }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;font:500 12px/1 'Plus Jakarta Sans',sans-serif;padding:10px 14px;border-radius:8px;cursor:pointer" style-hover="border-color:#8B7355">Este mes no</button>
+              <button onClick="{{ al.onApply }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:10px 16px;border-radius:8px;cursor:pointer" style-hover="background:#16296B">Apartar</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
 
   <div class="m-card" style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:16px;padding:24px;margin-top:24px;display:flex;flex-direction:column;gap:20px;min-height:520px">
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between">
@@ -903,6 +923,12 @@
               </sc-if>
               <sc-if value="{{ !gc.done }}" hint-placeholder-val="{{ true }}">
                 <span style="font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ gc.pct }} del objetivo</span>
+              </sc-if>
+              <sc-if value="{{ gc.hasEta }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:6px;background:#F8F7F4;border-radius:8px;padding:8px 10px;margin-top:2px">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex:none;color:#1E3A8A"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.3"></circle><polyline points="8,4.6 8,8 10.4,9.4" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <span style="font:500 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#4A3B35">{{ gc.etaLabel }}</span>
+                </div>
               </sc-if>
             </div>
           </sc-for>
@@ -1555,58 +1581,103 @@
   </div>
 </sc-if>
 
-<sc-if value="{{ distributeOpen }}" hint-placeholder-val="{{ false }}">
-  <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
-    <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #3D2B1F;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+<sc-if value="{{ isAuthed }}" hint-placeholder-val="{{ true }}">
+  <button onClick="{{ openQuick }}" title="Añadir movimiento" aria-label="Añadir movimiento" class="m-fab" style="position:fixed;right:24px;bottom:24px;width:58px;height:58px;border-radius:50%;border:none;background:#1E3A8A;color:#FFFFFF;box-shadow:0 8px 24px rgba(30,58,138,0.32);cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:#16296B">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></line><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></line></svg>
+  </button>
+</sc-if>
+
+<sc-if value="{{ quickOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="m-ovl m-sheet-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div class="m-dlg m-sheet" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:24px 26px 26px;animation:card .2s ease">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
         <div>
-          <h2 style="margin:0;font:600 28px/1.05 'Instrument Serif',serif;color:#3D2B1F">Distribuir exceso</h2>
-          <p style="margin:7px 0 0;font:300 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355;max-width:44ch">Reparte lo que te sobra este mes entre tus categorías de Ahorros, según los porcentajes que fijes abajo.</p>
+          <h2 style="margin:0;font:600 26px/1.05 'Instrument Serif',serif;color:#3D2B1F">Nuevo movimiento</h2>
+          <p style="margin:6px 0 0;font:300 12.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#8B7355">Gasto o ahorro, en {{ quickMonthLabel }}.</p>
         </div>
-        <button onClick="{{ closeModal }}" style="border:1px solid #3D2B1F;background:transparent;color:#3D2B1F;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0" style-hover="background:#3D2B1F;color:#FFFFFF">×</button>
+        <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0;flex:none">×</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:18px;border:1px solid #D7D4E8;border-radius:12px;padding:12px 16px">
+        <input value="{{ quickAmt }}" onChange="{{ onQuickAmt }}" onKeyDown="{{ onQuickKey }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;background:transparent;font:900 32px/1.1 'Source Serif Pro',serif;font-variant-numeric:tabular-nums;color:#1E3A8A;outline:none;padding:0"></input>
+        <span style="font:900 26px/1 'Source Serif Pro',serif;color:#A8A29A;flex:none">€</span>
+      </div>
+
+      <sc-if value="{{ hasQuickChips }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:16px">
+          <sc-for list="{{ quickChips }}" as="qc" hint-placeholder-count="6">
+            <button onClick="{{ qc.onClick }}" style="border:1px solid {{ qc.bd }};background:{{ qc.bg }};color:{{ qc.ink }};font:500 12.5px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:999px;cursor:pointer">{{ qc.name }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <input value="{{ quickCat }}" onChange="{{ onQuickCat }}" onKeyDown="{{ onQuickKey }}" list="cat-suggest" placeholder="Categoría" style="width:100%;margin-top:12px;border:1px solid #D7D4E8;border-radius:10px;background:#FFFFFF;padding:11px 12px;font:500 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+      <input value="{{ quickTitle }}" onChange="{{ onQuickTitle }}" onKeyDown="{{ onQuickKey }}" placeholder="Título (opcional)" style="width:100%;margin-top:8px;border:1px solid #D7D4E8;border-radius:10px;background:#FFFFFF;padding:11px 12px;font:400 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+
+      <p style="margin:12px 0 0;font:400 11.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ quickDestNote }}</p>
+      <sc-if value="{{ quickIsNewCat }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">
+          <sc-for list="{{ quickSheetOptions }}" as="qs" hint-placeholder-count="3">
+            <button onClick="{{ qs.onClick }}" style="border:1px solid {{ qs.bd }};background:{{ qs.bg }};color:{{ qs.ink }};font:500 12.5px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:8px;cursor:pointer">{{ qs.name }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <button onClick="{{ addQuick }}" style="width:100%;margin-top:20px;border:none;background:#1E3A8A;color:#FFFFFF;font:600 14px/1 'Plus Jakarta Sans',sans-serif;padding:15px 18px;border-radius:12px;cursor:pointer" style-hover="background:#16296B">Añadir</button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ distributeOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:500px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div>
+          <h2 style="margin:0;font:600 28px/1.05 'Instrument Serif',serif;color:#3D2B1F">Repartir {{ distTitleAmount }}</h2>
+          <p style="margin:7px 0 0;font:300 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355;max-width:44ch">Esto es lo que te sobra este mes. Dale destino antes de que se gaste solo.</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0;flex:none">×</button>
       </div>
 
       <sc-if value="{{ distHasSavers }}" hint-placeholder-val="{{ true }}">
         <div>
-          <label style="display:block;margin-top:20px">
-            <span style="display:block;font:500 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A8A29A;margin-bottom:7px">Importe a repartir</span>
-            <input value="{{ distAmountVal }}" onChange="{{ onDistAmount }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:1px solid #D7D4E8;background:#FFFFFF;padding:11px 12px;font:800 20px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#3D2B1F"></input>
-          </label>
-          <sc-if value="{{ distHasExcess }}" hint-placeholder-val="{{ false }}">
-            <p style="margin:8px 0 0;font:300 11.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#A8A29A">Sugerido a partir de lo que te queda sin asignar: {{ distSuggested }} €.</p>
+          <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ distRows }}" as="d" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #D7D4E8;border-radius:12px;flex-wrap:wrap">
+                <div style="flex:1;min-width:130px">
+                  <div style="font:600 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ d.name }}</div>
+                  <div style="font:400 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:{{ d.noteInk }};margin-top:3px">{{ d.note }}</div>
+                </div>
+                <input value="{{ d.amountVal }}" onChange="{{ d.onAmount }}" inputMode="decimal" placeholder="0,00" style="width:104px;flex:none;border:1px solid #D7D4E8;border-radius:8px;background:#FFFFFF;padding:9px 10px;font:700 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1E3A8A;outline:none" style-focus="border-color:#1E3A8A"></input>
+                <span style="font:400 13px/1 'Plus Jakarta Sans',sans-serif;color:#A8A29A;flex:none">€</span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin:12px 0 0;font:500 12px/1.4 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ distAssignedLabel }}</p>
+
+          <button onClick="{{ togglePctPanel }}" style="margin-top:14px;border:none;background:none;color:#8B7355;font:400 11.5px/1 'Plus Jakarta Sans',sans-serif;text-decoration:underline;cursor:pointer;padding:4px 0">{{ pctPanelLabel }}</button>
+          <sc-if value="{{ distShowPct }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px;border:1px solid #D7D4E8;border-radius:12px;overflow:hidden">
+              <div style="padding:10px 14px;background:#F8F7F4;border-bottom:1px solid #D7D4E8;font:500 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A8A29A">Reparto sugerido por defecto</div>
+              <sc-for list="{{ distRows }}" as="d" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #F3EFE8">
+                  <span style="flex:1;font:400 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ d.name }}</span>
+                  <input value="{{ d.pctVal }}" onChange="{{ d.onPct }}" onBlur="{{ d.onPctBlur }}" inputMode="decimal" placeholder="0" style="width:60px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:7px 8px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none"></input>
+                  <span style="font:400 13px/1 'Plus Jakarta Sans',sans-serif;color:#A8A29A">%</span>
+                </div>
+              </sc-for>
+            </div>
           </sc-if>
 
-          <div style="margin-top:20px;border:1px solid #D7D4E8">
-            <div style="padding:10px 14px;background:#F8F7F4;border-bottom:1px solid #D7D4E8;font:500 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A8A29A">Porcentaje por categoría de ahorro</div>
-            <sc-for list="{{ distSavers }}" as="d" hint-placeholder-count="3">
-              <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #E7DCC2">
-                <span style="flex:1;font:400 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ d.name }}</span>
-                <input value="{{ d.pctVal }}" onChange="{{ d.onPct }}" onBlur="{{ d.onPctBlur }}" inputMode="decimal" placeholder="0" style="width:64px;border:1px solid #D7D4E8;background:#FFFFFF;padding:7px 8px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#3D2B1F"></input>
-                <span style="font:400 13px/1 'Plus Jakarta Sans',sans-serif;color:#A8A29A">%</span>
-              </div>
-            </sc-for>
-          </div>
-          <p style="margin:8px 0 0;font:300 11.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#A8A29A">Suma actual: {{ distSumPct }}%. Si no suma 100%, se reparte de forma proporcional entre las categorías con porcentaje.</p>
-
-          <div style="margin-top:18px">
-            <div style="font:500 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#A8A29A;margin-bottom:10px">Vista previa del reparto</div>
-            <sc-for list="{{ distPreview }}" as="p" hint-placeholder-count="3">
-              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;font:400 13px/1.4 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;border-bottom:1px solid #F8F7F4">
-                <span>{{ p.name }}</span>
-                <span style="font:600 13px/1 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:#1E3A8A">+ {{ p.amountStr }}</span>
-              </div>
-            </sc-for>
-          </div>
-
           <div style="display:flex;gap:8px;margin-top:22px;justify-content:flex-end">
-            <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;font:400 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 16px;cursor:pointer">Cancelar</button>
-            <button onClick="{{ applyDistribution }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:500 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 18px;cursor:pointer">Repartir ahora</button>
+            <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;font:400 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 16px;border-radius:8px;cursor:pointer">Cancelar</button>
+            <button onClick="{{ applyDistribution }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 20px;border-radius:8px;cursor:pointer" style-hover="background:#16296B">Repartir</button>
           </div>
         </div>
       </sc-if>
 
       <sc-if value="{{ distNoSavers }}" hint-placeholder-val="{{ false }}">
-        <p style="margin:20px 0 0;font:300 13.5px/1.5 'Plus Jakarta Sans',sans-serif;color:#8B7355">Todavía no tienes categorías en la pestaña Ahorros. Crea alguna allí primero (por ejemplo “Fondo de emergencia” o “Vacaciones”) para poder repartir el exceso entre ellas.</p>
+        <p style="margin:20px 0 0;font:300 13.5px/1.5 'Plus Jakarta Sans',sans-serif;color:#8B7355">Todavía no tienes categorías de Ahorros. Crea un objetivo o una categoría en la pestaña Ahorros y podrás repartir aquí lo que te sobre.</p>
       </sc-if>
     </div>
   </div>
@@ -1815,7 +1886,8 @@ class Component extends DCLogic {
     imp: { step: 0, text: '', rows: [], header: true, map: { date: 0, concept: 1, amount: 2 }, pending: [], report: null },
     newTab: { name: '', kind: 'monthly', accent: 'terracotta' },
     periodicDraft: {}, cashDraft: { month: '', type: 'entrada', amount: '', note: '' },
-    distAmount: '', rowMenu: null, dupFrom: '', dupSheets: {}, hiddenCols: {}, hiddenViews: {}
+    distAmount: '', distAmounts: {}, distShowPct: false, rowMenu: null,
+    quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '', dupFrom: '', dupSheets: {}, hiddenCols: {}, hiddenViews: {}
   };
 
   componentDidMount() {
@@ -2216,6 +2288,27 @@ class Component extends DCLogic {
     this.touch();
   }
 
+  // En qué pestaña mensual vive ya una categoría (para no duplicarla al usar el alta rápida).
+  sheetOfCategory(cat) {
+    const c = (cat || '').trim().toLowerCase();
+    if (!c) return null;
+    const found = this.monthlySheets().find(sh => this.gs(sh.id).some(g => g.category.trim().toLowerCase() === c));
+    return found ? found.id : null;
+  }
+
+  // Categorías más usadas en los últimos meses, para ofrecerlas de un toque.
+  frequentCategories(limit) {
+    const since = shift(this.thisMonth(), -5);
+    const out = [];
+    this.monthlySheets().forEach(sh => {
+      this.gs(sh.id).forEach(g => {
+        const n = (g.entries || []).filter(e => e.date >= since).length;
+        out.push({ name: g.category, sheetId: sh.id, uses: n });
+      });
+    });
+    return out.sort((a, b) => b.uses - a.uses).slice(0, limit || 8);
+  }
+
   addTargetOnly(sheetId, cat, targetAmt, month) {
     const c = (cat || '').trim(), tgt = this.parse(targetAmt);
     if (!c || !tgt) return;
@@ -2289,7 +2382,11 @@ class Component extends DCLogic {
       goal.targetAmount = cfg.targetAmount; goal.groupId = groupId;
     } else if (cfg.type === 'income') {
       if (!(cfg.targetAmount > 0) || !(cfg.incomeValue > 0)) return false;
+      // El objetivo de ingresos también tiene su categoría en Ahorros: lo que aparta es dinero real.
+      const gidIncome = uid();
+      this.gs('savings').push({ id: gidIncome, category: trimmed, targets: {}, entries: [] });
       goal.targetAmount = cfg.targetAmount; goal.incomeMode = cfg.incomeMode; goal.incomeValue = cfg.incomeValue;
+      goal.groupId = gidIncome; goal.applied = {};
     } else if (cfg.type === 'investment') {
       if (!(cfg.targetAmount > 0) || !cfg.investRef) return false;
       goal.targetAmount = cfg.targetAmount; goal.investMode = cfg.investMode; goal.investRef = cfg.investRef;
@@ -2306,14 +2403,72 @@ class Component extends DCLogic {
     this.d.goals = this.d.goals.filter(g => g.id !== id);
     this.touch();
   }
+  // Lo que a este objetivo le corresponde de los ingresos de un mes concreto.
+  goalAllocationFor(goal, mk) {
+    if (!goal || goal.type !== 'income') return 0;
+    if (mk < (goal.createdAt || '')) return 0;
+    const rows = (this.d.income[mk] || []).filter(e => (e.amount || 0) > 0);
+    if (!rows.length) return 0;
+    const total = goal.incomeMode === 'percent'
+      ? rows.reduce((s, e) => s + (e.amount || 0) * goal.incomeValue / 100, 0)
+      : goal.incomeValue * rows.length;
+    return Math.round(total * 100) / 100;
+  }
+
+  // Objetivos de ingresos con aportación pendiente de apartar este mes.
+  pendingAllocations(mk) {
+    return (this.d.goals || []).filter(g => g.type === 'income' && !(g.applied || {})[mk] && this.goalAllocationFor(g, mk) > 0)
+      .map(g => ({ goal: g, amount: this.goalAllocationFor(g, mk) }));
+  }
+
+  applyAllocation(goalId, mk) {
+    const goal = (this.d.goals || []).find(g => g.id === goalId);
+    if (!goal || goal.type !== 'income') return false;
+    if ((goal.applied || {})[mk]) return false;
+    const amt = this.goalAllocationFor(goal, mk);
+    const group = this.gs('savings').find(g => g.id === goal.groupId);
+    if (!group || !(amt > 0)) return false;
+    group.entries.push({ id: uid(), amount: amt, date: mk, paid: false, title: 'Aportación automática' });
+    if (!goal.applied) goal.applied = {};
+    goal.applied[mk] = true;
+    this.touch();
+    return true;
+  }
+
+  skipAllocation(goalId, mk) {
+    const goal = (this.d.goals || []).find(g => g.id === goalId);
+    if (!goal) return;
+    if (!goal.applied) goal.applied = {};
+    goal.applied[mk] = true;
+    this.touch();
+  }
+
+  // A qué ritmo avanza el objetivo y cuándo se alcanzaría manteniéndolo.
+  goalPace(goal) {
+    const p = this.goalProgress(goal);
+    if (p.done) return { rate: 0, label: 'Objetivo cumplido' };
+    if (goal.type === 'investment') return { rate: 0, label: '' };
+    if (goal.type === 'expense') {
+      const left = Math.max(0, p.target - p.current);
+      return { rate: 0, label: left > 0 ? 'Si lo mantienes, cumplido en ' + this.label(shift(this.state.month, left)) : '' };
+    }
+    const group = this.gs('savings').find(g => g.id === goal.groupId);
+    if (!group || !group.entries.length) return { rate: 0, label: 'Aún sin aportaciones — añade la primera para estimar la fecha' };
+    const dates = group.entries.map(e => e.date).filter(Boolean).sort();
+    const elapsed = Math.max(1, idx(this.state.month) - idx(dates[0]) + 1);
+    const rate = p.current / elapsed;
+    const remaining = p.target - p.current;
+    if (!(rate > 0)) return { rate: 0, label: '' };
+    const need = Math.ceil(remaining / rate);
+    if (need > 120) return { rate: rate, label: 'A este ritmo tardarías más de 10 años · ' + this.fmt(rate) + '/mes' };
+    return { rate: rate, label: 'A este ritmo, ' + this.label(shift(this.state.month, need)) + ' · ' + this.fmt(rate) + '/mes' };
+  }
+
   goalProgress(goal) {
     if (goal.type === 'income') {
-      let current = 0;
-      Object.keys(this.d.income || {}).forEach(mk => {
-        (this.d.income[mk] || []).forEach(e => {
-          current += goal.incomeMode === 'percent' ? (e.amount || 0) * goal.incomeValue / 100 : goal.incomeValue;
-        });
-      });
+      // Progreso = lo realmente apartado en su categoría de Ahorros, no un cálculo sobre nóminas ya gastadas.
+      const groupInc = this.gs('savings').find(g => g.id === goal.groupId);
+      const current = groupInc ? this.allTimeTotal(groupInc) : 0;
       const pct = goal.targetAmount > 0 ? Math.min(100, current / goal.targetAmount * 100) : 0;
       return { current: current, target: goal.targetAmount, pct: pct, done: goal.targetAmount > 0 && current >= goal.targetAmount, kind: 'amount' };
     }
@@ -2560,8 +2715,10 @@ class Component extends DCLogic {
       monthShort: '', monthLabel: '', incomeTotalStr: '', paidLine: '', saveText: '', accentInk: '#3D2B1F', densityLabel: '', draftPlaceholder: '', draftAmtPlaceholder: '', emptyText: '', periodicTotalStr: '',
       canUndo: false, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoInk: '#A8A29A', redoInk: '#A8A29A', undoCursor: 'default', redoCursor: 'default', views: [],
       previsionStr: '', gastadoRealStr: '', availStr: '', gastadoRealInk: '#3D2B1F', previsionDiffStr: '', previsionDiffInk: '#3D2B1F', previsionPct: '0%', previsionBarColor: '#1E3A8A', previsionOnTrack: true,
-      distributeOpen: false, distHasSavers: false, distNoSavers: true, distSavers: [], distPreview: [],
+      distributeOpen: false, distHasSavers: false, distNoSavers: true, distRows: [], distShowPct: false,
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
+      allocCards: [], hasAllocations: false,
+      quickOpen: false, openQuick: () => {}, quickChips: [], hasQuickChips: false, quickSheetOptions: [], quickIsNewCat: false, quickDestNote: '', quickMonthLabel: '',
       menuOpen: false, menuItems: [], toggleMenu: () => {}, closeMenu: () => {}, navOpen: false, navOpenAttr: '0', toggleNav: () => {}, closeNav: () => {}, tableMinW: '0' };
 
     const m = this.state.month, narrow = this.state.w < 900, compact = this.state.compact;
@@ -2611,7 +2768,7 @@ class Component extends DCLogic {
       const isCarryDeficit = free < -0.004 && carry < -0.004 && assigned <= 0.004;
       stats.push({ name: free >= 0 ? 'Sin asignar' : (isCarryDeficit ? 'Déficit arrastrado' : 'Exceso'), value: this.fmt(Math.abs(free)), ink: '#3D2B1F', dot: '#EC4899', barPct: Math.min(100, pctNum).toFixed(1) + '%',
         pctLabel: avail > 0 ? this.pct(pctNum) : '—',
-        statusLabel: free >= 0 ? 'Remanente seguro' : (isCarryDeficit ? 'Viene del mes anterior' : 'Presupuesto excedido'), statusMint: free >= 0, statusIcon: free >= 0 ? 'check' : 'alert',
+        statusLabel: free > 0.004 ? 'Repartir ahora →' : (free >= 0 ? 'Remanente seguro' : (isCarryDeficit ? 'Viene del mes anterior' : 'Presupuesto excedido')), statusMint: free >= 0, statusIcon: free >= 0 ? 'check' : 'alert',
         statusBg: free >= 0 ? 'rgba(30,58,138,0.1)' : 'rgba(239,68,68,0.1)', statusInk: free >= 0 ? '#1E3A8A' : '#EF4444',
         onClick: free > 0.004 ? () => this.setState({ modal: 'distribute', distAmount: '' }) : null, cursor: free > 0.004 ? 'pointer' : 'default', hoverBg: '#FFFFFF', title: (avail > 0 ? this.pct(pctNum) + ' del disponible' : 'Añade ingresos para calcularlo') + (free > 0.004 ? ' · clic para repartir' : '') });
     }
@@ -2876,6 +3033,14 @@ class Component extends DCLogic {
     if (!this.d.distribution) this.d.distribution = { percentages: {} };
     if (!this.d.cash) this.d.cash = { entries: [] };
     if (!this.d.goals) this.d.goals = [];
+    // Objetivos de ingresos creados antes de que apartaran dinero real: les damos su categoría en Ahorros.
+    this.d.goals.forEach(g => {
+      if (g.type === 'income' && !g.groupId) {
+        const gid = uid();
+        this.gs('savings').push({ id: gid, category: g.name, targets: {}, entries: [] });
+        g.groupId = gid; g.applied = g.applied || {};
+      }
+    });
     const fcYears = this.yearList();
     const FIELDS = [
       { key: 'income', name: 'Ingresos', dot: '#1E3A8A', ink: '#3D2B1F' },
@@ -3094,6 +3259,15 @@ class Component extends DCLogic {
       previsionOnTrack: previsionDiff >= 0,
       bars: bars,
       paidLine: 'Pagado ' + this.fmt(paidSum) + ' · pendiente ' + this.fmt(pendSum),
+      allocCards: this.pendingAllocations(m).map(pa => ({
+        id: pa.goal.id, name: pa.goal.name, amountStr: this.fmt(pa.amount),
+        rule: pa.goal.incomeMode === 'percent'
+          ? this.num(pa.goal.incomeValue).replace(/,00$/, '') + '% de cada ingreso de ' + this.label(m)
+          : this.fmt(pa.goal.incomeValue) + ' por cada ingreso de ' + this.label(m),
+        onApply: () => { this.applyAllocation(pa.goal.id, m); },
+        onSkip: () => { this.skipAllocation(pa.goal.id, m); }
+      })),
+      hasAllocations: this.pendingAllocations(m).length > 0,
       hasCarryDeficitAlert: carry < -0.004 && assigned <= 0.004,
       carryDeficitNote: 'Empiezas ' + this.label(m) + ' con ' + this.fmt(Math.abs(carry)) + ' de déficit del mes anterior — todavía no has asignado nada este mes',
       hasCarryNote: Math.abs(carry) > 0.004 && !(carry < -0.004 && assigned <= 0.004),
@@ -3142,6 +3316,7 @@ class Component extends DCLogic {
           targetStr: p.kind === 'months' ? '' : this.fmt(p.target),
           sourceLabel: sourceLabel,
           pct: p.pct.toFixed(0) + '%', barPct: p.pct.toFixed(1) + '%', done: p.done,
+          etaLabel: this.goalPace(g).label, hasEta: !!this.goalPace(g).label,
           onDelete: () => { if (window.confirm('¿Eliminar el objetivo "' + g.name + '"?' + (g.type === 'savings' ? ' El dinero ahorrado seguirá en Ahorros, solo se deja de rastrear como objetivo.' : ''))) this.deleteGoal(g.id); }
         };
       }),
@@ -3336,45 +3511,121 @@ class Component extends DCLogic {
       })(),
       applyNet: () => { this.d.income[m] = [{ id: uid(), label: 'Nómina (neta)', amount: Math.round(sal.monthly * 100) / 100 }]; this.setState({ modal: null, edits: {} }); this.touch(); },
 
-      // ---- Distribuir exceso ----
+      // ---- Alta rápida ----
+      quickOpen: this.state.modal === 'quick',
+      openQuick: () => this.setState({ modal: 'quick', quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' }),
+      quickAmt: this.state.quickAmt,
+      onQuickAmt: (e) => this.setState({ quickAmt: e.target.value }),
+      quickCat: this.state.quickCat,
+      onQuickCat: (e) => this.setState({ quickCat: e.target.value }),
+      quickTitle: this.state.quickTitle,
+      onQuickTitle: (e) => this.setState({ quickTitle: e.target.value }),
+      quickMonthLabel: this.label(m),
+      quickChips: this.frequentCategories(8).map(fc => {
+        const on = this.state.quickCat.trim().toLowerCase() === fc.name.trim().toLowerCase();
+        return { name: fc.name,
+          bd: on ? '#1E3A8A' : '#D7D4E8', bg: on ? '#1E3A8A' : '#FFFFFF', ink: on ? '#FFFFFF' : '#4A3B35',
+          onClick: () => this.setState({ quickCat: fc.name, quickSheet: fc.sheetId }) };
+      }),
+      hasQuickChips: this.frequentCategories(8).length > 0,
+      quickSheetOptions: this.monthlySheets().map(sh => {
+        const known = this.sheetOfCategory(this.state.quickCat);
+        const active = known ? known === sh.id : (this.state.quickSheet || 'variable') === sh.id;
+        return { id: sh.id, name: sh.name,
+          bd: active ? '#1E3A8A' : '#D7D4E8', bg: active ? 'rgba(30,58,138,0.07)' : '#FFFFFF', ink: active ? '#1E3A8A' : '#8B7355',
+          onClick: () => this.setState({ quickSheet: sh.id }) };
+      }),
+      quickDestNote: (() => {
+        const known = this.sheetOfCategory(this.state.quickCat);
+        if (known) { const sh = this.d.sheets.find(x => x.id === known); return 'Se añade a ' + (sh ? sh.name : '') + ', donde ya tienes esa categoría.'; }
+        if (!this.state.quickCat.trim()) return 'Elige una categoría de las de arriba o escribe una nueva.';
+        return 'Categoría nueva. Elige en qué pestaña la creas:';
+      })(),
+      quickIsNewCat: !this.sheetOfCategory(this.state.quickCat) && !!this.state.quickCat.trim(),
+      addQuick: () => {
+        const cat = this.state.quickCat.trim(), amt = this.parse(this.state.quickAmt);
+        if (!cat || !(amt > 0)) { window.alert('Escribe un importe y una categoría.'); return; }
+        const target = this.sheetOfCategory(cat) || this.state.quickSheet || 'variable';
+        this.addOrMerge(target, cat, this.state.quickAmt, m, this.state.quickTitle);
+        this.setState({ modal: null, quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' });
+      },
+      onQuickKey: (e) => { if (e.key === 'Enter') { e.preventDefault();
+        const cat = this.state.quickCat.trim(), amt = this.parse(this.state.quickAmt);
+        if (!cat || !(amt > 0)) return;
+        const target = this.sheetOfCategory(cat) || this.state.quickSheet || 'variable';
+        this.addOrMerge(target, cat, this.state.quickAmt, m, this.state.quickTitle);
+        this.setState({ modal: null, quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' });
+      } },
+
+      // ---- Repartir lo que sobra ----
       distributeOpen: this.state.modal === 'distribute',
       distHasExcess: free > 0.004,
-      distNoExcessNote: 'No hay exceso sin asignar este mes. Cuando el disponible supere lo asignado, podrás repartir la diferencia aquí.',
-      distSuggested: this.fmt(Math.max(0, free)),
-      distAmountVal: this.state.distAmount !== '' ? this.state.distAmount : (free > 0 ? this.num(free) : ''),
-      onDistAmount: (e) => this.setState({ distAmount: e.target.value }),
+      distNoExcessNote: 'No hay nada sin asignar este mes. Cuando el disponible supere lo asignado, podrás repartir la diferencia aquí.',
+      distTitleAmount: this.fmt(Math.max(0, free)),
       distHasSavers: this.gs('savings').length > 0, distNoSavers: this.gs('savings').length === 0,
-      distSavers: this.gs('savings').map(g => {
-        const pct = (this.d.distribution.percentages[g.id] || 0);
-        return {
-          id: g.id, name: g.category, pctVal: this.ed('dp' + g.id, pct ? this.num(pct).replace(/,00$/, '') : ''),
-          onPct: (e) => { this.setEd('dp' + g.id, e.target.value); this.d.distribution.percentages[g.id] = this.parse(e.target.value); this.touch(); },
-          onPctBlur: () => this.clearEd('dp' + g.id)
-        };
-      }),
-      distSumPct: this.gs('savings').reduce((s, g) => s + (this.d.distribution.percentages[g.id] || 0), 0),
-      distPreview: (() => {
-        const amt = this.parse(this.state.distAmount !== '' ? this.state.distAmount : (free > 0 ? this.num(free) : '0'));
+      distShowPct: !!this.state.distShowPct,
+      togglePctPanel: () => this.setState(st => ({ distShowPct: !st.distShowPct })),
+      pctPanelLabel: this.state.distShowPct ? 'Ocultar porcentajes' : 'Ajustar porcentajes por defecto',
+      distRows: (() => {
         const savers = this.gs('savings');
-        const sumPct = savers.reduce((s, g) => s + (this.d.distribution.percentages[g.id] || 0), 0);
+        const sumPct = savers.reduce((t, g) => t + (this.d.distribution.percentages[g.id] || 0), 0);
+        const base = Math.max(0, free);
         return savers.map(g => {
           const pct = this.d.distribution.percentages[g.id] || 0;
           const share = sumPct > 0 ? pct / sumPct : (savers.length ? 1 / savers.length : 0);
-          return { name: g.category, amountStr: this.fmt(amt * share) };
+          const suggested = Math.round(base * share * 100) / 100;
+          const typed = this.state.distAmounts[g.id];
+          const val = typed !== undefined ? typed : (suggested > 0 ? this.num(suggested) : '');
+          const goal = (this.d.goals || []).find(go => go.groupId === g.id);
+          const saved = this.allTimeTotal(g);
+          const missing = goal && goal.targetAmount > 0 ? Math.max(0, goal.targetAmount - saved) : 0;
+          return {
+            id: g.id, name: g.category,
+            note: goal ? (missing > 0 ? 'Objetivo · faltan ' + this.fmt(missing) : 'Objetivo cumplido') : 'Ahorro sin objetivo',
+            noteInk: goal ? (missing > 0 ? '#1E3A8A' : '#10B981') : '#A8A29A',
+            amountVal: val,
+            onAmount: (e) => { const v = e.target.value; this.setState(st => ({ distAmounts: Object.assign({}, st.distAmounts, { [g.id]: v }) })); },
+            pctVal: this.ed('dp' + g.id, pct ? this.num(pct).replace(/,00$/, '') : ''),
+            onPct: (e) => { this.setEd('dp' + g.id, e.target.value); this.d.distribution.percentages[g.id] = this.parse(e.target.value); this.touch(); },
+            onPctBlur: () => this.clearEd('dp' + g.id)
+          };
         });
       })(),
-      applyDistribution: () => {
-        const amt = this.parse(this.state.distAmount !== '' ? this.state.distAmount : (free > 0 ? this.num(free) : '0'));
+      distAssignedLabel: (() => {
         const savers = this.gs('savings');
-        if (!savers.length || amt <= 0) return;
-        const sumPct = savers.reduce((s, g) => s + (this.d.distribution.percentages[g.id] || 0), 0);
+        const sumPct = savers.reduce((t, g) => t + (this.d.distribution.percentages[g.id] || 0), 0);
+        const base = Math.max(0, free);
+        let total = 0;
         savers.forEach(g => {
+          const typed = this.state.distAmounts[g.id];
+          if (typed !== undefined) { total += this.parse(typed); return; }
           const pct = this.d.distribution.percentages[g.id] || 0;
-          const share = sumPct > 0 ? pct / sumPct : (1 / savers.length);
-          const a = Math.round(amt * share * 100) / 100;
-          if (a > 0) g.entries.push({ id: uid(), amount: a, date: m, paid: false, title: 'Distribución de exceso' });
+          const share = sumPct > 0 ? pct / sumPct : (savers.length ? 1 / savers.length : 0);
+          total += Math.round(base * share * 100) / 100;
         });
-        this.setState({ modal: null, distAmount: '' });
+        const left = Math.max(0, free) - total;
+        return Math.abs(left) < 0.005 ? 'Repartes justo lo que sobra' :
+          (left > 0 ? 'Te quedan ' + this.fmt(left) + ' sin repartir' : 'Te pasas ' + this.fmt(-left) + ' de lo que sobra');
+      })(),
+      applyDistribution: () => {
+        const savers = this.gs('savings');
+        const sumPct = savers.reduce((t, g) => t + (this.d.distribution.percentages[g.id] || 0), 0);
+        const base = Math.max(0, free);
+        let n = 0;
+        savers.forEach(g => {
+          const typed = this.state.distAmounts[g.id];
+          let a;
+          if (typed !== undefined) a = this.parse(typed);
+          else {
+            const pct = this.d.distribution.percentages[g.id] || 0;
+            const share = sumPct > 0 ? pct / sumPct : (savers.length ? 1 / savers.length : 0);
+            a = base * share;
+          }
+          a = Math.round(a * 100) / 100;
+          if (a > 0) { g.entries.push({ id: uid(), amount: a, date: m, paid: false, title: 'Reparto del sobrante' }); n++; }
+        });
+        if (!n) return;
+        this.setState({ modal: null, distAmount: '', distAmounts: {} });
         this.touch();
       },
 
