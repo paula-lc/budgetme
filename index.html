@@ -35,8 +35,8 @@
     .m-layout{flex-direction:column!important;align-items:stretch!important}
     .m-leftnav{position:fixed!important;top:0!important;left:0;bottom:0;height:100vh;height:100dvh;width:86vw!important;max-width:320px;min-height:0!important;z-index:56;overflow-y:auto;transform:translateX(-105%);transition:transform .22s ease;box-shadow:0 0 40px rgba(17,24,39,0.18);padding:20px!important;gap:20px!important}
     .m-leftnav[data-open="1"]{transform:none}
-    .m-main{padding:18px 16px 28px!important;min-height:0!important;width:100%}
-    .right-sidebar{width:auto!important;padding:0 16px 32px!important}
+    .m-main{padding:18px 16px 96px!important;min-height:0!important;width:100%}
+    .right-sidebar{width:auto!important;padding:0 16px 96px!important}
     .m-card{padding:14px!important;min-height:0!important;margin-top:4px!important;gap:14px!important}
     .m-table{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
     .m-head > *,.m-row > *{padding-left:8px!important;padding-right:8px!important}
@@ -347,6 +347,82 @@
         <span style="color:#B4690E">{{ alertNote }}</span>
       </sc-if>
     </div>
+
+    <sc-if value="{{ hasWin }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:11px;background:rgba(16,185,129,0.07);border:1px solid #10B981;border-radius:14px;padding:14px 16px">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="flex:none;color:#0D7A56"><path d="M6 17h8M10 13v4M5 3h10v4a5 5 0 0 1-10 0V3ZM5 4H3v1.5A3.5 3.5 0 0 0 6 9M15 4h2v1.5A3.5 3.5 0 0 1 14 9" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <span style="font:600 13px/1.4 'Plus Jakarta Sans',sans-serif;color:#0D7A56">{{ winNote }}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showOnboarding }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FFFFFF;border:1px solid #1E3A8A;border-radius:16px;padding:22px 24px 24px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <h2 style="margin:0;font:600 24px/1.1 'Instrument Serif',serif;color:#3D2B1F">Empieza aquí</h2>
+          <span style="font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ obCountLabel }} hecho</span>
+        </div>
+        <p style="margin:6px 0 0;font:400 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355">Tres pasos y la app empieza a trabajar para ti.</p>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #F3EFE8">
+          <div style="display:flex;align-items:center;gap:9px">
+            <sc-if value="{{ obStepIncomeDone }}" hint-placeholder-val="{{ false }}">
+              <span style="width:20px;height:20px;border-radius:50%;background:#10B981;color:#FFFFFF;font:700 11px/20px 'Plus Jakarta Sans',sans-serif;text-align:center;flex:none">✓</span>
+            </sc-if>
+            <sc-if value="{{ obStepIncomePending }}" hint-placeholder-val="{{ true }}">
+              <span style="width:20px;height:20px;border-radius:50%;background:#1E3A8A;color:#FFFFFF;font:700 11px/20px 'Plus Jakarta Sans',sans-serif;text-align:center;flex:none">1</span>
+            </sc-if>
+            <span style="font:700 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">Cuánto ingresas al mes</span>
+          </div>
+          <sc-if value="{{ obStepIncomePending }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:8px;margin-top:10px;margin-left:29px;flex-wrap:wrap">
+              <input value="{{ obIncome }}" onChange="{{ onObIncome }}" onKeyDown="{{ onObIncomeKey }}" inputMode="decimal" placeholder="Tu nómina €" style="flex:1;min-width:150px;max-width:220px;border:1px solid #D7D4E8;border-radius:9px;background:#FFFFFF;padding:10px 12px;font:600 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+              <button onClick="{{ obSaveIncome }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 18px;border-radius:9px;cursor:pointer;flex:none" style-hover="background:#16296B">Guardar</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid #F3EFE8">
+          <div style="display:flex;align-items:center;gap:9px">
+            <sc-if value="{{ obStepCatsDone }}" hint-placeholder-val="{{ false }}">
+              <span style="width:20px;height:20px;border-radius:50%;background:#10B981;color:#FFFFFF;font:700 11px/20px 'Plus Jakarta Sans',sans-serif;text-align:center;flex:none">✓</span>
+            </sc-if>
+            <sc-if value="{{ obStepCatsPending }}" hint-placeholder-val="{{ true }}">
+              <span style="width:20px;height:20px;border-radius:50%;background:#1E3A8A;color:#FFFFFF;font:700 11px/20px 'Plus Jakarta Sans',sans-serif;text-align:center;flex:none">2</span>
+            </sc-if>
+            <span style="font:700 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">En qué gastas normalmente</span>
+          </div>
+          <div style="margin-left:29px;margin-top:10px">
+            <div style="display:flex;flex-wrap:wrap;gap:7px">
+              <sc-for list="{{ obChips }}" as="ob" hint-placeholder-count="8">
+                <button onClick="{{ ob.onClick }}" style="border:1px solid {{ ob.bd }};background:{{ ob.bg }};color:{{ ob.ink }};font:500 12.5px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:999px;cursor:pointer">{{ ob.name }}{{ ob.disabledNote }}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ obHasSelection }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ obAddSelected }}" style="margin-top:11px;border:none;background:#1E3A8A;color:#FFFFFF;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 18px;border-radius:9px;cursor:pointer" style-hover="background:#16296B">Añadir {{ obSelectedCount }} categorías</button>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid #F3EFE8">
+          <div style="display:flex;align-items:center;gap:9px">
+            <sc-if value="{{ obStepGoalDone }}" hint-placeholder-val="{{ false }}">
+              <span style="width:20px;height:20px;border-radius:50%;background:#10B981;color:#FFFFFF;font:700 11px/20px 'Plus Jakarta Sans',sans-serif;text-align:center;flex:none">✓</span>
+            </sc-if>
+            <sc-if value="{{ obStepGoalPending }}" hint-placeholder-val="{{ true }}">
+              <span style="width:20px;height:20px;border-radius:50%;background:#1E3A8A;color:#FFFFFF;font:700 11px/20px 'Plus Jakarta Sans',sans-serif;text-align:center;flex:none">3</span>
+            </sc-if>
+            <span style="font:700 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">Para qué ahorras</span>
+          </div>
+          <sc-if value="{{ obStepGoalPending }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-left:29px;margin-top:10px">
+              <button onClick="{{ obGoToGoals }}" style="border:1px solid #1E3A8A;background:transparent;color:#1E3A8A;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 18px;border-radius:9px;cursor:pointer" style-hover="background:rgba(30,58,138,0.06)">Crear mi primer objetivo →</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <button onClick="{{ obDismiss }}" style="margin-top:18px;border:none;background:none;color:#A8A29A;font:400 11.5px/1 'Plus Jakarta Sans',sans-serif;text-decoration:underline;cursor:pointer;padding:4px 0">No me lo enseñes más</button>
+      </div>
+    </sc-if>
 
     <sc-if value="{{ hasAllocations }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -1927,6 +2003,14 @@ const ACC = {
   terracotta:{ name: 'Azul',       ink: '#1E3A8A', bg: '#1E3A8A', dot: '#1E3A8A' },
   ink:       { name: 'Tinta',      ink: '#3D2B1F', bg: '#3D2B1F', dot: '#1E3A8A' }
 };
+const STARTERS = [
+  { name: 'Alquiler', sheet: 'fixed' }, { name: 'Factura de luz', sheet: 'fixed' },
+  { name: 'Internet', sheet: 'fixed' }, { name: 'Factura de móvil', sheet: 'fixed' },
+  { name: 'Seguro del coche', sheet: 'fixed' }, { name: 'Gimnasio', sheet: 'fixed' },
+  { name: 'Supermercado', sheet: 'variable' }, { name: 'Cena fuera', sheet: 'variable' },
+  { name: 'Ocio', sheet: 'variable' }, { name: 'Gasolina', sheet: 'variable' },
+  { name: 'Ropa', sheet: 'variable' }, { name: 'Farmacia', sheet: 'variable' }
+];
 const SUGG = ['Alquiler','Hipoteca','Comunidad','Factura de luz','Factura de agua','Internet','Factura de móvil','Seguro de salud','Seguro del hogar','Seguro del coche','Transporte (abono)','Gimnasio','Netflix','Spotify','Supermercado','Cena fuera','Ocio','Ropa','Gasolina','Farmacia','Regalos','Viajes','Peluquería','Imprevistos','Fondo de emergencia','Vacaciones','Inversión indexada','Jubilación','ITV','Préstamo personal'];
 const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
@@ -1955,7 +2039,8 @@ class Component extends DCLogic {
     newTab: { name: '', kind: 'monthly', accent: 'terracotta' },
     periodicDraft: {}, cashDraft: { month: '', type: 'entrada', amount: '', note: '' },
     distAmount: '', distAmounts: {}, distShowPct: false, rowMenu: null,
-    quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '', dupFrom: '', dupSheets: {}, hiddenCols: {}, hiddenViews: {}
+    quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '',
+    obIncome: '', obSelected: {}, dupFrom: '', dupSheets: {}, hiddenCols: {}, hiddenViews: {}
   };
 
   componentDidMount() {
@@ -2356,6 +2441,25 @@ class Component extends DCLogic {
     this.touch();
   }
 
+  hasAnyIncome() {
+    return Object.keys(this.d.income || {}).some(k => (this.d.income[k] || []).some(r => (r.amount || 0) > 0));
+  }
+  categoryCount() {
+    return this.monthlySheets().reduce((n, sh) => n + this.gs(sh.id).length, 0);
+  }
+  addStarterCategories(names) {
+    let n = 0;
+    names.forEach(nm => {
+      const st = STARTERS.find(x => x.name === nm);
+      if (!st) return;
+      if (this.sheetOfCategory(nm)) return;
+      this.gs(st.sheet).push({ id: uid(), category: nm, targets: {}, entries: [] });
+      n++;
+    });
+    if (n) this.touch();
+    return n;
+  }
+
   // En qué pestaña mensual vive ya una categoría (para no duplicarla al usar el alta rápida).
   sheetOfCategory(cat) {
     const c = (cat || '').trim().toLowerCase();
@@ -2509,6 +2613,52 @@ class Component extends DCLogic {
     if (!goal.applied) goal.applied = {};
     goal.applied[mk] = true;
     this.touch();
+  }
+
+  // Lo mejor que ha pasado este mes, si ha pasado algo: un solo mensaje.
+  monthWin(m, assigned) {
+
+        if (m > this.thisMonth()) return '';
+        const savedNow = this.sheetTotal('savings', m);
+        const monthHasData = this.incomeTotal(m) > 0 || assigned > 0;
+        if (!monthHasData) return '';
+
+        // Un objetivo que se ha completado con dinero de este mes.
+        const justDone = (this.d.goals || []).find(g => {
+          if (!this.goalProgress(g).done) return false;
+          if (g.type === 'expense' || g.type === 'investment') return false;
+          const grp = this.gs('savings').find(x => x.id === g.groupId);
+          return grp && (grp.entries || []).some(e => e.date === m);
+        });
+        if (justDone) return '¡Objetivo cumplido! Has completado «' + justDone.name + '» este mes.';
+
+        // Meses anteriores con datos, para comparar.
+        const prev = [];
+        for (let i = 1; i <= 24; i++) {
+          const k = shift(m, -i);
+          if (this.incomeTotal(k) > 0 || this.assigned(k) > 0) prev.push(k);
+        }
+
+        if (savedNow > 0 && prev.length >= 1) {
+          const best = Math.max.apply(null, prev.map(k => this.sheetTotal('savings', k)));
+          if (savedNow > best) return 'Tu mejor mes de ahorro hasta ahora: ' + this.fmt(savedNow) + '.';
+        }
+
+        // Racha de meses seguidos ahorrando.
+        let streak = 0, cur = m;
+        while (this.sheetTotal('savings', cur) > 0 && streak < 60) { streak++; cur = shift(cur, -1); }
+        if (streak >= 3) return 'Llevas ' + streak + ' meses seguidos ahorrando. No cortes la racha.';
+
+        // Cerrar dentro de presupuesto en todas las pestañas de gasto con objetivo.
+        const spendSheets = this.monthlySheets().filter(sh => sh.id !== 'savings');
+        const withTarget = spendSheets.filter(sh => this.gs(sh.id).reduce((t, g) => t + (g.targets[m] || 0), 0) > 0);
+        if (withTarget.length && withTarget.every(sh => this.sheetTotal(sh.id, m) <= this.gs(sh.id).reduce((t, g) => t + (g.targets[m] || 0), 0))) {
+          return 'Dentro de presupuesto en ' + withTarget.map(sh => sh.name.toLowerCase()).join(' y ') + '. Bien gestionado.';
+        }
+
+        if (streak === 2) return 'Dos meses seguidos ahorrando. Ya es una costumbre.';
+        return '';
+      
   }
 
   // A qué ritmo avanza el objetivo y cuándo se alcanzaría manteniéndolo.
@@ -2788,6 +2938,10 @@ class Component extends DCLogic {
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
       allocCards: [], hasAllocations: false,
       goalCards: [], hasGoals: false, hasUserGoals: false,
+      winNote: '', hasWin: false,
+      showOnboarding: false, obChips: [], obHasSelection: false, obCountLabel: '', obIncome: '',
+      obStepIncomeDone: false, obStepCatsDone: false, obStepGoalDone: false,
+      obStepIncomePending: true, obStepCatsPending: true, obStepGoalPending: true,
       quickOpen: false, openQuick: () => {}, quickChips: [], hasQuickChips: false, quickSheetOptions: [], quickIsNewCat: false, quickDestNote: '', quickMonthLabel: '',
       menuOpen: false, menuItems: [], toggleMenu: () => {}, closeMenu: () => {}, navOpen: false, navOpenAttr: '0', toggleNav: () => {}, closeNav: () => {}, tableMinW: '0' };
 
@@ -3229,6 +3383,7 @@ class Component extends DCLogic {
       ? (showTarget ? 'minmax(0,1fr) ' + colW(targetColHidden, '105px') + ' ' + colW(actualColHidden, '105px') + ' ' + colW(extraColHidden, '100px') + ' 60px' : 'minmax(0,1fr) ' + colW(actualColHidden, '120px') + ' 64px')
       : 'minmax(0,1fr) 116px 132px 150px 130px 36px';
 
+    const winNote = this.monthWin(m, assigned);
     return {
       ready: true, monthLabel: this.label(m), monthShort: this.label(m),
       prevMonth: () => { const k = shift(m, -1); this.ensureIncome(k); this.setState({ month: k, edits: {} }); },
@@ -3603,6 +3758,57 @@ class Component extends DCLogic {
         return parts.map(p => ({ name: p.name, value: this.fmt(p.v), pct: net > 0 ? this.pct(p.v / net * 100) : '—', w: net > 0 ? Math.min(100, p.v / net * 100).toFixed(1) + '%' : '0%', color: p.color }));
       })(),
       applyNet: () => { this.d.income[m] = [{ id: uid(), label: 'Nómina (neta)', amount: Math.round(sal.monthly * 100) / 100 }]; this.setState({ modal: null, edits: {} }); this.touch(); },
+
+      // ---- Un buen mes: lo que ha salido bien ----
+      winNote: winNote,
+      hasWin: !!winNote,
+      // ---- Primeros pasos ----
+      showOnboarding: (() => {
+        if (this.d.onboardingDone) return false;
+        return !(this.hasAnyIncome() && this.categoryCount() >= 2 && (this.d.goals || []).length > 0);
+      })(),
+      obStepIncomeDone: this.hasAnyIncome(),
+      obStepCatsDone: this.categoryCount() >= 2,
+      obStepGoalDone: (this.d.goals || []).length > 0,
+      obStepIncomePending: !this.hasAnyIncome(),
+      obStepCatsPending: this.categoryCount() < 2,
+      obStepGoalPending: (this.d.goals || []).length === 0,
+      obCountLabel: [this.hasAnyIncome(), this.categoryCount() >= 2, (this.d.goals || []).length > 0].filter(Boolean).length + ' de 3',
+      obIncome: this.state.obIncome,
+      onObIncome: (e) => this.setState({ obIncome: e.target.value }),
+      obSaveIncome: () => {
+        const a = this.parse(this.state.obIncome);
+        if (!(a > 0)) return;
+        this.d.income[m] = [{ id: uid(), label: 'Nómina', amount: a }];
+        this.setState({ obIncome: '' });
+        this.touch();
+      },
+      onObIncomeKey: (e) => { if (e.key === 'Enter') { e.preventDefault();
+        const a = this.parse(this.state.obIncome);
+        if (!(a > 0)) return;
+        this.d.income[m] = [{ id: uid(), label: 'Nómina', amount: a }];
+        this.setState({ obIncome: '' });
+        this.touch();
+      } },
+      obChips: STARTERS.map(st => {
+        const on = !!this.state.obSelected[st.name];
+        const already = !!this.sheetOfCategory(st.name);
+        return { name: st.name, disabledNote: already ? ' ✓' : '',
+          bd: already ? '#10B981' : (on ? '#1E3A8A' : '#D7D4E8'),
+          bg: already ? 'rgba(16,185,129,0.08)' : (on ? '#1E3A8A' : '#FFFFFF'),
+          ink: already ? '#0D7A56' : (on ? '#FFFFFF' : '#4A3B35'),
+          onClick: () => { if (already) return; this.setState(st2 => { const sel = Object.assign({}, st2.obSelected); if (sel[st.name]) delete sel[st.name]; else sel[st.name] = true; return { obSelected: sel }; }); } };
+      }),
+      obSelectedCount: Object.keys(this.state.obSelected).length,
+      obHasSelection: Object.keys(this.state.obSelected).length > 0,
+      obAddSelected: () => {
+        const names = Object.keys(this.state.obSelected);
+        if (!names.length) return;
+        this.addStarterCategories(names);
+        this.setState({ obSelected: {} });
+      },
+      obGoToGoals: () => this.setState({ view: 'achievements', navOpen: false }),
+      obDismiss: () => { this.d.onboardingDone = true; this.touch(); },
 
       // ---- Alta rápida ----
       quickOpen: this.state.modal === 'quick',
