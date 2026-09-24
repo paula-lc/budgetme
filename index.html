@@ -1103,10 +1103,19 @@
       <sc-if value="{{ hasGoals }}" hint-placeholder-val="{{ false }}">
         <div class="m-1col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
           <sc-for list="{{ goalCards }}" as="gc" hint-placeholder-count="2">
-            <div style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div data-goal-id="{{ gc.id }}" draggable="true" onDragStart="{{ gc.onDragStart }}" onDragEnd="{{ gc.onDragEnd }}" onDragOver="{{ gc.onDragOver }}" onDrop="{{ gc.onDrop }}" style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;opacity:{{ gc.cardOpacity }};outline:{{ gc.cardOutline }};outline-offset:-2px">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                <span style="font:700 14px/1.3 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ gc.name }}</span>
                 <sc-if value="{{ gc.isUserGoal }}" hint-placeholder-val="{{ true }}">
+                  <span draggable="true" onDragStart="{{ gc.onDragStart }}" onDragEnd="{{ gc.onDragEnd }}" onTouchStart="{{ gc.onTouchStart }}" onTouchMove="{{ gc.onTouchMove }}" onTouchEnd="{{ gc.onTouchEnd }}" title="Arrastra para cambiar la prioridad" style="flex:none;display:flex;align-items:center;gap:5px;color:#A8A29A;cursor:grab;touch-action:none;padding:4px 2px;margin:-4px 0" style-hover="color:#1E3A8A">
+                    <svg width="11" height="13" viewBox="0 0 12 14" fill="currentColor"><circle cx="3.5" cy="3" r="1.3"></circle><circle cx="8.5" cy="3" r="1.3"></circle><circle cx="3.5" cy="7" r="1.3"></circle><circle cx="8.5" cy="7" r="1.3"></circle><circle cx="3.5" cy="11" r="1.3"></circle><circle cx="8.5" cy="11" r="1.3"></circle></svg>
+                    <span style="font:800 11px/1 'Plus Jakarta Sans',sans-serif;color:#1E3A8A">{{ gc.rank }}</span>
+                  </span>
+                </sc-if>
+                <span style="flex:1;min-width:0;font:700 14px/1.3 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ gc.name }}</span>
+                <sc-if value="{{ gc.isUserGoal }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ gc.onEdit }}" title="Editar objetivo" style="border:none;background:none;color:#A8A29A;cursor:pointer;padding:2px;display:flex;flex:none" style-hover="color:#1E3A8A">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M11.5 2.5 13.5 4.5 5.5 12.5 2.8 13.2 3.5 10.5Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"></path></svg>
+                </button>
                 <button onClick="{{ gc.onDelete }}" title="Eliminar objetivo" style="border:none;background:none;color:#A8A29A;cursor:pointer;padding:2px;display:flex" style-hover="color:#A03B2A">
                   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M6 4.5V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M12.5 4.5 12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1L3.5 4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                 </button>
@@ -1217,7 +1226,7 @@
         </div>
       </sc-if>
       <sc-if value="{{ !canAddGoal }}" hint-placeholder-val="{{ false }}">
-        <p style="margin:0;font:400 12px/1.4 'Plus Jakarta Sans',sans-serif;color:#A8A29A">Has llegado al máximo de 5 objetivos. Elimina uno si quieres crear otro.</p>
+        <p style="margin:0;font:400 12px/1.4 'Plus Jakarta Sans',sans-serif;color:#A8A29A">Has llegado al máximo de 8 objetivos. Elimina uno si quieres crear otro.</p>
       </sc-if>
     </div>
 
@@ -1815,6 +1824,67 @@
   </div>
 </sc-if>
 
+<sc-if value="{{ editGoalOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:61;animation:ov .16s ease">
+    <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <h2 style="margin:0;font:600 26px/1.05 'Instrument Serif',serif;color:#3D2B1F">Editar objetivo</h2>
+        <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0;flex:none">×</button>
+      </div>
+
+      <label style="display:block;margin-top:18px">
+        <span style="display:block;font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-bottom:6px">Nombre</span>
+        <input value="{{ egName }}" onChange="{{ onEgName }}" onKeyDown="{{ onEgKey }}" style="width:100%;border:1px solid #D7D4E8;border-radius:9px;background:#FFFFFF;padding:11px 12px;font:500 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+      </label>
+
+      <label style="display:block;margin-top:12px">
+        <span style="display:block;font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-bottom:6px">{{ egAmountLabel }}</span>
+        <input value="{{ egAmount }}" onChange="{{ onEgAmount }}" onKeyDown="{{ onEgKey }}" inputMode="decimal" style="width:100%;border:1px solid #D7D4E8;border-radius:9px;background:#FFFFFF;padding:11px 12px;font:700 15px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1E3A8A;outline:none" style-focus="border-color:#1E3A8A"></input>
+      </label>
+
+      <sc-if value="{{ egIsAmount }}" hint-placeholder-val="{{ true }}">
+        <label style="display:block;margin-top:12px">
+          <span style="display:block;font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-bottom:6px">Ya tenía antes de empezar</span>
+          <input value="{{ egInitial }}" onChange="{{ onEgInitial }}" onKeyDown="{{ onEgKey }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:1px solid #D7D4E8;border-radius:9px;background:#FFFFFF;padding:11px 12px;font:400 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+        </label>
+      </sc-if>
+
+      <sc-if value="{{ egIsIncome }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px">
+          <span style="display:block;font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-bottom:6px">De cada ingreso</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button onClick="{{ setEgPct }}" style="border:1px solid {{ egPctBd }};background:{{ egPctBg }};color:{{ egPctInk }};font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:8px;cursor:pointer">%</button>
+            <button onClick="{{ setEgFixed }}" style="border:1px solid {{ egFixBd }};background:{{ egFixBg }};color:{{ egFixInk }};font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:8px;cursor:pointer">€ fijo</button>
+            <input value="{{ egIncomeValue }}" onChange="{{ onEgIncomeValue }}" onKeyDown="{{ onEgKey }}" inputMode="decimal" style="flex:1;min-width:90px;border:1px solid #D7D4E8;border-radius:9px;background:#FFFFFF;padding:10px 11px;font:600 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ egIsInvest }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px">
+          <span style="display:block;font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-bottom:6px">Cuenta por</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onClick="{{ setEgValue }}" style="border:1px solid {{ egValBd }};background:{{ egValBg }};color:{{ egValInk }};font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:8px;cursor:pointer">Valor actual</button>
+            <button onClick="{{ setEgContrib }}" style="border:1px solid {{ egConBd }};background:{{ egConBg }};color:{{ egConInk }};font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:8px;cursor:pointer">Lo aportado</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ egIsExpense }}" hint-placeholder-val="{{ false }}">
+        <label style="display:block;margin-top:12px">
+          <span style="display:block;font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-bottom:6px">Durante cuántos meses</span>
+          <input value="{{ egMonths }}" onChange="{{ onEgMonths }}" onKeyDown="{{ onEgKey }}" inputMode="numeric" style="width:100%;border:1px solid #D7D4E8;border-radius:9px;background:#FFFFFF;padding:11px 12px;font:600 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+        </label>
+      </sc-if>
+
+      <div style="display:flex;gap:8px;margin-top:22px;justify-content:flex-end">
+        <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;font:400 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 16px;border-radius:9px;cursor:pointer">Cancelar</button>
+        <button onClick="{{ saveGoalEdit }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 20px;border-radius:9px;cursor:pointer" style-hover="background:#16296B">Guardar</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ splitOpen }}" hint-placeholder-val="{{ false }}">
   <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
     <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
@@ -1920,7 +1990,24 @@
 
       <sc-if value="{{ distHasSavers }}" hint-placeholder-val="{{ true }}">
         <div>
-          <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+          <sc-if value="{{ hasCascade }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:18px;background:rgba(30,58,138,0.05);border:1px solid #1E3A8A;border-radius:12px;padding:14px 15px">
+              <div style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#1E3A8A">Por orden de prioridad</div>
+              <div style="display:flex;flex-direction:column;gap:5px;margin-top:9px">
+                <sc-for list="{{ cascadeRows }}" as="cr" hint-placeholder-count="2">
+                  <div style="display:flex;justify-content:space-between;gap:10px;font:500 12.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">
+                    <span>{{ cr.name }}</span>
+                    <span style="font-variant-numeric:tabular-nums;font-weight:700;color:#1E3A8A">+ {{ cr.amountStr }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font:400 11.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-top:8px">{{ cascadeLeftLabel }}</div>
+              <button onClick="{{ applyCascadeAction }}" style="width:100%;margin-top:11px;border:none;background:#1E3A8A;color:#FFFFFF;font:600 12.5px/1 'Plus Jakarta Sans',sans-serif;padding:11px 16px;border-radius:9px;cursor:pointer" style-hover="background:#16296B">Repartir por prioridad</button>
+            </div>
+            <div style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#A8A29A;margin-top:18px">O repártelo a mano</div>
+          </sc-if>
+
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{ distRows }}" as="d" hint-placeholder-count="3">
               <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #D7D4E8;border-radius:12px;flex-wrap:wrap">
                 <div style="flex:1;min-width:130px">
@@ -2181,6 +2268,8 @@ class Component extends DCLogic {
     distAmount: '', distAmounts: {}, distShowPct: false, rowMenu: null,
     quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '', sheetPctDraft: {},
     dragSub: null, dragOver: null, dragPos: null,
+    dragGoal: null, dragGoalOver: null,
+    editGoalId: null, egName: '', egAmount: '', egInitial: '', egIncomeMode: 'percent', egIncomeValue: '', egInvestMode: 'value', egMonths: '',
     obIncome: '', obSelected: {}, dupFrom: '', dupSheets: {}, hiddenCols: {}, hiddenViews: {}
   };
 
@@ -2489,7 +2578,14 @@ class Component extends DCLogic {
     }
     return last; // el más antiguo encontrado en la ventana, o null
   }
+  // ¿Ese mes tiene vida propia? Sin ingresos ni movimientos no cuenta para los logros:
+  // un presupuesto calculado (%, o la reserva de un cargo periódico) existe en todos los meses.
+  monthHasActivity(mk) {
+    if (this.incomeTotal(mk) > 0) return true;
+    return this.monthlySheets().some(sh => this.gs(sh.id).some(g => (g.entries || []).some(e => e.date === mk)));
+  }
   monthWithinBudget(mk) {
+    if (!this.monthHasActivity(mk)) return false;
     const fixedT = this.gs('fixed').reduce((s, g) => s + this.groupTarget(g, mk), 0);
     const varT = this.gs('variable').reduce((s, g) => s + this.groupTarget(g, mk), 0);
     const totalT = fixedT + varT;
@@ -2498,6 +2594,7 @@ class Component extends DCLogic {
     return totalS <= totalT;
   }
   monthSavingsGoalMet(mk) {
+    if (!this.monthHasActivity(mk)) return false;
     const savT = this.gs('savings').reduce((s, g) => s + this.groupTarget(g, mk), 0);
     if (savT <= 0) return false;
     return this.sheetTotal('savings', mk) >= savT;
@@ -2810,7 +2907,7 @@ class Component extends DCLogic {
 
   addGoal(cfg) {
     if (!this.d.goals) this.d.goals = [];
-    if (this.d.goals.length >= 5) return false;
+    if (this.d.goals.length >= 8) return false;
     const trimmed = (cfg.name || '').trim();
     if (!trimmed) return false;
     const goal = { id: uid(), name: trimmed, type: cfg.type, createdAt: this.thisMonth() };
@@ -2845,6 +2942,80 @@ class Component extends DCLogic {
     this.touch();
     return true;
   }
+  // El orden del array es la prioridad: el primero manda.
+  moveGoalTo(dragId, targetId) {
+    const list = this.d.goals || [];
+    const from = list.findIndex(g => g.id === dragId);
+    const to = list.findIndex(g => g.id === targetId);
+    if (from < 0 || to < 0 || from === to) return false;
+    const [item] = list.splice(from, 1);
+    list.splice(to, 0, item);
+    this.touch();
+    return true;
+  }
+  goalRemaining(goal) {
+    const p = this.goalProgress(goal);
+    if (p.kind !== 'amount') return 0;
+    return Math.max(0, p.target - p.current);
+  }
+  // Reparte un importe llenando los objetivos por orden de prioridad.
+  cascadePlan(amount) {
+    let left = Math.round(amount * 100) / 100;
+    const plan = [];
+    (this.d.goals || []).forEach(g => {
+      if (left <= 0.004) return;
+      if (!g.groupId) return;
+      const grp = this.gs('savings').find(x => x.id === g.groupId);
+      if (!grp) return;
+      const need = this.goalRemaining(g);
+      if (need <= 0.004) return;
+      const give = Math.min(need, left);
+      plan.push({ goalId: g.id, groupId: g.groupId, name: g.name, amount: Math.round(give * 100) / 100 });
+      left = Math.round((left - give) * 100) / 100;
+    });
+    return { plan: plan, left: left };
+  }
+  applyCascade(amount, month) {
+    const res = this.cascadePlan(amount);
+    if (!res.plan.length) return 0;
+    res.plan.forEach(it => {
+      const grp = this.gs('savings').find(x => x.id === it.groupId);
+      if (grp && it.amount > 0) grp.entries.push({ id: uid(), amount: it.amount, date: month, paid: false, title: 'Reparto por prioridad' });
+    });
+    this.touch();
+    return res.plan.length;
+  }
+  updateGoal(id, cfg) {
+    const g = (this.d.goals || []).find(x => x.id === id);
+    if (!g) return false;
+    const nm = (cfg.name || '').trim();
+    if (!nm) return false;
+    g.name = nm;
+    if (g.type === 'expense') {
+      if (!(cfg.limitAmount > 0) || !(cfg.monthsRequired > 0)) return false;
+      g.limitAmount = cfg.limitAmount; g.monthsRequired = Math.round(cfg.monthsRequired);
+    } else {
+      if (!(cfg.targetAmount > 0)) return false;
+      g.targetAmount = cfg.targetAmount;
+      if (cfg.initial > 0) g.initial = cfg.initial; else delete g.initial;
+      if (g.type === 'income') {
+        if (!(cfg.incomeValue > 0)) return false;
+        g.incomeMode = cfg.incomeMode; g.incomeValue = cfg.incomeValue;
+      }
+      if (g.type === 'investment') {
+        g.investMode = cfg.investMode;
+        if (cfg.investRef) g.investRef = cfg.investRef;
+      }
+    }
+    // Si el objetivo tiene su propia categoría de ahorro, el nombre va a la par.
+    if (g.groupId) {
+      const grp = this.gs('savings').find(x => x.id === g.groupId);
+      if (grp) grp.category = nm;
+    }
+    this.touch();
+    return true;
+  }
+
   deleteGoal(id) {
     if (!this.d.goals) return;
     this.d.goals = this.d.goals.filter(g => g.id !== id);
@@ -3210,11 +3381,11 @@ class Component extends DCLogic {
       isNarrow: false, isWide: true, narrowShowTarget: false, showHeadRow: true, countDown: true, countUp: false, toggleCountDown: () => {},
       canUndo: false, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoInk: '#A8A29A', redoInk: '#A8A29A', undoCursor: 'default', redoCursor: 'default', views: [],
       previsionStr: '', gastadoRealStr: '', availStr: '', gastadoRealInk: '#3D2B1F', previsionDiffStr: '', previsionDiffInk: '#3D2B1F', previsionPct: '0%', previsionBarColor: '#1E3A8A', previsionOnTrack: true,
-      distributeOpen: false, distHasSavers: false, distNoSavers: true, distRows: [], distShowPct: false,
+      distributeOpen: false, cascadeRows: [], hasCascade: false, cascadeLeftLabel: '', applyCascadeAction: () => {}, distHasSavers: false, distNoSavers: true, distRows: [], distShowPct: false,
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
       allocCards: [], hasAllocations: false,
       goalCards: [], hasGoals: false, hasUserGoals: false,
-      winNote: '', hasWin: false, hasProjection: false, projectionNote: '', projectionOver: false, projectionBd: '#D7D4E8', projectionBg: '#FFFFFF', projectionInk: '#4A3B35', projectionBarPct: '0%', projectionSpentPct: '0%', projectionSpentStr: '', projectionCommittedStr: '', projectionAvailStr: '', isDragging: false, hasDragGhost: false, dragName: '', dragGhostLeft: '0px', dragGhostTop: '0px', cancelDrag: () => {}, splitOpen: false, splitRows: [], splitSumLabel: '', splitSumInk: '#8B7355', splitIncomeStr: '', openSplit: () => {}, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
+      winNote: '', hasWin: false, editGoalOpen: false, egName: '', egAmount: '', egInitial: '', egIncomeValue: '', egMonths: '', egTitle: '', egIsExpense: false, egIsAmount: true, egIsIncome: false, egIsInvest: false, egAmountLabel: '', hasProjection: false, projectionNote: '', projectionOver: false, projectionBd: '#D7D4E8', projectionBg: '#FFFFFF', projectionInk: '#4A3B35', projectionBarPct: '0%', projectionSpentPct: '0%', projectionSpentStr: '', projectionCommittedStr: '', projectionAvailStr: '', isDragging: false, hasDragGhost: false, dragName: '', dragGhostLeft: '0px', dragGhostTop: '0px', cancelDrag: () => {}, splitOpen: false, splitRows: [], splitSumLabel: '', splitSumInk: '#8B7355', splitIncomeStr: '', openSplit: () => {}, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
       showOnboarding: false, obChips: [], obHasSelection: false, obCountLabel: '', obIncome: '',
       obStepIncomeDone: false, obStepCatsDone: false, obStepGoalDone: false,
       obStepIncomePending: true, obStepCatsPending: true, obStepGoalPending: true,
@@ -3310,7 +3481,8 @@ class Component extends DCLogic {
     const cushionPctTrend = cushionGoal > 0 ? (Math.min(100, cushionMonths / cushionGoal * 100) - Math.min(100, cushionMonthsPrev / cushionGoal * 100)) : 0;
     const goalsList = this.d.goals || [];
     const goalsWithProgress = goalsList.map(g => Object.assign({}, g, this.goalProgress(g)));
-    const bestGoal = goalsWithProgress.filter(g => !g.done).sort((a, b) => b.pct - a.pct)[0] || goalsWithProgress[0] || null;
+    // La prioridad la marca el orden que tú le das, no el porcentaje.
+    const bestGoal = goalsWithProgress.filter(g => !g.done)[0] || goalsWithProgress[0] || null;
     const cushionTierGoals = [Math.max(1, cushionGoal / 3), Math.max(2, cushionGoal * 2 / 3), cushionGoal];
     const cushionTier = cushionTierGoals.filter(t => cushionMonths + 0.001 >= t).length; // 0-3
     const cushionTierNames = ['Sin escudo', 'Escudo Básico', 'Escudo Reforzado', 'Escudo de Acero'];
@@ -3956,7 +4128,10 @@ class Component extends DCLogic {
 
       // ---- Objetivos (definidos por el usuario, hasta 5) ----
       goalCards: [{
-        id: '__cushion__', name: 'Colchón de emergencia', kind: 'months', isBuiltIn: true, isUserGoal: false,
+        id: '__cushion__', name: 'Colchón de emergencia', kind: 'months', isBuiltIn: true, isUserGoal: false, rank: 0,
+        cardOpacity: '1', cardOutline: '2px solid transparent',
+        onDragStart: () => {}, onDragEnd: () => {}, onDragOver: () => {}, onDrop: () => {},
+        onTouchStart: () => {}, onTouchMove: () => {}, onTouchEnd: () => {}, onEdit: () => {},
         sourceLabel: 'Tu ahorro frente a un gasto medio de ' + this.fmt(avgSpend) + '/mes',
         currentStr: (avgSpend > 0 ? cushionMonths.toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '0') + ' de ' + cushionGoal + ' meses',
         targetStr: '',
@@ -3997,13 +4172,38 @@ class Component extends DCLogic {
           pct: p.pct.toFixed(0) + '%', barPct: p.pct.toFixed(1) + '%', done: p.done,
           etaLabel: this.goalPace(g).label, hasEta: !!this.goalPace(g).label,
           isBuiltIn: false, isUserGoal: true,
+          rank: (this.d.goals || []).indexOf(g) + 1,
+          cardOpacity: (this.state.dragGoal === g.id) ? '0.45' : '1',
+          cardOutline: (this.state.dragGoalOver === g.id && this.state.dragGoal !== g.id) ? '2px dashed #1E3A8A' : '2px solid transparent',
+          onDragStart: (ev) => { if (ev.dataTransfer) { try { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', g.id); } catch (err) {} } this.setState({ dragGoal: g.id, dragGoalOver: null }); },
+          onDragEnd: () => this.setState({ dragGoal: null, dragGoalOver: null }),
+          onDragOver: (ev) => { ev.preventDefault(); if (this.state.dragGoal && this.state.dragGoal !== g.id && this.state.dragGoalOver !== g.id) this.setState({ dragGoalOver: g.id }); },
+          onDrop: (ev) => { ev.preventDefault(); ev.stopPropagation(); if (this.state.dragGoal) this.moveGoalTo(this.state.dragGoal, g.id); this.setState({ dragGoal: null, dragGoalOver: null }); },
+          onTouchStart: (ev) => { const t = ev.touches && ev.touches[0]; this.setState({ dragGoal: g.id, dragGoalOver: null, dragPos: t ? { x: t.clientX, y: t.clientY } : null }); },
+          onTouchMove: (ev) => {
+            if (!this.state.dragGoal) return;
+            const t = ev.touches && ev.touches[0]; if (!t) return;
+            const vh = window.innerHeight || 800;
+            if (t.clientY < 96) window.scrollBy(0, -14); else if (t.clientY > vh - 110) window.scrollBy(0, 14);
+            let el = document.elementFromPoint(t.clientX, t.clientY), k2 = null;
+            while (el && !k2) { if (el.getAttribute && el.getAttribute('data-goal-id')) k2 = el.getAttribute('data-goal-id'); el = el.parentElement; }
+            this.setState({ dragPos: { x: t.clientX, y: t.clientY }, dragGoalOver: k2 });
+          },
+          onTouchEnd: () => { const t = this.state.dragGoalOver; if (this.state.dragGoal && t) this.moveGoalTo(this.state.dragGoal, t); this.setState({ dragGoal: null, dragGoalOver: null, dragPos: null }); },
+          onEdit: () => this.setState({
+            modal: 'editgoal', editGoalId: g.id, egName: g.name,
+            egAmount: g.type === 'expense' ? this.num(g.limitAmount || 0) : this.num(g.targetAmount || 0),
+            egInitial: g.initial ? this.num(g.initial) : '',
+            egIncomeMode: g.incomeMode || 'percent', egIncomeValue: g.incomeValue ? this.num(g.incomeValue).replace(/,00$/, '') : '',
+            egInvestMode: g.investMode || 'value', egMonths: g.monthsRequired ? String(g.monthsRequired) : '6'
+          }),
           onDelete: () => { if (window.confirm('¿Eliminar el objetivo "' + g.name + '"?' + (g.type === 'savings' ? ' El dinero ahorrado seguirá en Ahorros, solo se deja de rastrear como objetivo.' : ''))) this.deleteGoal(g.id); }
         };
       })),
       hasGoals: true,
       hasUserGoals: (this.d.goals || []).length > 0,
-      canAddGoal: (this.d.goals || []).length < 5,
-      goalsCountLabel: (this.d.goals || []).length + ' de 5 objetivos',
+      canAddGoal: (this.d.goals || []).length < 8,
+      goalsCountLabel: (this.d.goals || []).length + ' de 8 objetivos',
 
       goalTypeOptions: [
         { id: 'savings', label: 'Ahorro' }, { id: 'income', label: 'Ingresos' },
@@ -4075,7 +4275,7 @@ class Component extends DCLogic {
           initial: this.parse(this.state.goalDraftInitial), existingGroupId: this.state.goalDraftLink };
         const ok = this.addGoal(cfg);
         if (ok) this.setState({ goalDraftName: '', goalDraftAmount: '', goalDraftInitial: '', goalDraftLink: '', goalDraftIncomeValue: '', goalDraftInvestRef: '', goalDraftExpenseRef: '', goalDraftMonths: '6' });
-        else window.alert('Revisa los campos del objetivo: falta algún dato o ya tienes 5 objetivos.');
+        else window.alert('Revisa los campos del objetivo: falta algún dato o ya tienes 8 objetivos.');
       },
       onGoalDraftKey: (e) => {
         if (e.key !== 'Enter') return;
@@ -4088,7 +4288,7 @@ class Component extends DCLogic {
           initial: this.parse(this.state.goalDraftInitial), existingGroupId: this.state.goalDraftLink };
         const ok = this.addGoal(cfg);
         if (ok) this.setState({ goalDraftName: '', goalDraftAmount: '', goalDraftInitial: '', goalDraftLink: '', goalDraftIncomeValue: '', goalDraftInvestRef: '', goalDraftExpenseRef: '', goalDraftMonths: '6' });
-        else window.alert('Revisa los campos del objetivo: falta algún dato o ya tienes 5 objetivos.');
+        else window.alert('Revisa los campos del objetivo: falta algún dato o ya tienes 8 objetivos.');
       },
 
       // ---- Siguiente Hito (usa el mejor objetivo del usuario; si no hay ninguno, cae en el colchón) ----
@@ -4288,6 +4488,61 @@ class Component extends DCLogic {
       hasDragGhost: !!(this.state.dragSub && this.state.dragPos),
       cancelDrag: () => this.setState({ dragSub: null, dragOver: null, dragPos: null }),
 
+      // ---- Editar un objetivo ----
+      editGoalOpen: this.state.modal === 'editgoal',
+      egName: this.state.egName, onEgName: (e) => this.setState({ egName: e.target.value }),
+      egAmount: this.state.egAmount, onEgAmount: (e) => this.setState({ egAmount: e.target.value }),
+      egInitial: this.state.egInitial, onEgInitial: (e) => this.setState({ egInitial: e.target.value }),
+      egIncomeValue: this.state.egIncomeValue, onEgIncomeValue: (e) => this.setState({ egIncomeValue: e.target.value }),
+      egMonths: this.state.egMonths, onEgMonths: (e) => this.setState({ egMonths: e.target.value }),
+      egGoal: (() => {
+        const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId);
+        return g || null;
+      })(),
+      egTitle: (() => { const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId); return g ? g.name : ''; })(),
+      egIsExpense: (() => { const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId); return !!(g && g.type === 'expense'); })(),
+      egIsAmount: (() => { const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId); return !!(g && g.type !== 'expense'); })(),
+      egIsIncome: (() => { const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId); return !!(g && g.type === 'income'); })(),
+      egIsInvest: (() => { const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId); return !!(g && g.type === 'investment'); })(),
+      egAmountLabel: (() => { const g = (this.d.goals || []).find(x => x.id === this.state.editGoalId); return g && g.type === 'expense' ? 'Límite al mes' : 'Importe objetivo'; })(),
+      egPctBd: this.state.egIncomeMode === 'percent' ? '#1E3A8A' : '#D7D4E8',
+      egPctBg: this.state.egIncomeMode === 'percent' ? '#1E3A8A' : '#FFFFFF',
+      egPctInk: this.state.egIncomeMode === 'percent' ? '#FFFFFF' : '#4A3B35',
+      egFixBd: this.state.egIncomeMode === 'fixed' ? '#1E3A8A' : '#D7D4E8',
+      egFixBg: this.state.egIncomeMode === 'fixed' ? '#1E3A8A' : '#FFFFFF',
+      egFixInk: this.state.egIncomeMode === 'fixed' ? '#FFFFFF' : '#4A3B35',
+      setEgPct: () => this.setState({ egIncomeMode: 'percent' }),
+      setEgFixed: () => this.setState({ egIncomeMode: 'fixed' }),
+      egValBd: this.state.egInvestMode === 'value' ? '#1E3A8A' : '#D7D4E8',
+      egValBg: this.state.egInvestMode === 'value' ? '#1E3A8A' : '#FFFFFF',
+      egValInk: this.state.egInvestMode === 'value' ? '#FFFFFF' : '#4A3B35',
+      egConBd: this.state.egInvestMode === 'contribution' ? '#1E3A8A' : '#D7D4E8',
+      egConBg: this.state.egInvestMode === 'contribution' ? '#1E3A8A' : '#FFFFFF',
+      egConInk: this.state.egInvestMode === 'contribution' ? '#FFFFFF' : '#4A3B35',
+      setEgValue: () => this.setState({ egInvestMode: 'value' }),
+      setEgContrib: () => this.setState({ egInvestMode: 'contribution' }),
+      saveGoalEdit: () => {
+        const ok2 = this.updateGoal(this.state.editGoalId, {
+          name: this.state.egName,
+          targetAmount: this.parse(this.state.egAmount),
+          limitAmount: this.parse(this.state.egAmount),
+          initial: this.parse(this.state.egInitial),
+          incomeMode: this.state.egIncomeMode, incomeValue: this.parse(this.state.egIncomeValue),
+          investMode: this.state.egInvestMode,
+          monthsRequired: this.parse(this.state.egMonths)
+        });
+        if (ok2) this.setState({ modal: null, editGoalId: null });
+        else window.alert('Revisa los campos: el nombre y el importe no pueden quedar vacíos.');
+      },
+      onEgKey: (e) => { if (e.key === 'Enter') { e.preventDefault();
+        const ok2 = this.updateGoal(this.state.editGoalId, {
+          name: this.state.egName, targetAmount: this.parse(this.state.egAmount), limitAmount: this.parse(this.state.egAmount),
+          initial: this.parse(this.state.egInitial), incomeMode: this.state.egIncomeMode, incomeValue: this.parse(this.state.egIncomeValue),
+          investMode: this.state.egInvestMode, monthsRequired: this.parse(this.state.egMonths)
+        });
+        if (ok2) this.setState({ modal: null, editGoalId: null });
+      } },
+
       // ---- Reparto por pestaña (50/30/20) ----
       splitOpen: this.state.modal === 'split',
       openSplit: () => this.setState({ modal: 'split', sheetPctDraft: {} }),
@@ -4421,6 +4676,17 @@ class Component extends DCLogic {
           };
         });
       })(),
+      cascadeRows: this.cascadePlan(Math.max(0, free)).plan.map(it => ({ name: it.name, amountStr: this.fmt(it.amount) })),
+      hasCascade: this.cascadePlan(Math.max(0, free)).plan.length > 0,
+      cascadeLeftLabel: (() => {
+        const r2 = this.cascadePlan(Math.max(0, free));
+        if (!r2.plan.length) return '';
+        return r2.left > 0.004 ? 'Sobran ' + this.fmt(r2.left) + ' después de completar tus objetivos' : 'Reparte los ' + this.fmt(Math.max(0, free)) + ' completos';
+      })(),
+      applyCascadeAction: () => {
+        const n2 = this.applyCascade(Math.max(0, free), m);
+        if (n2) this.setState({ modal: null, distAmount: '', distAmounts: {} });
+      },
       distAssignedLabel: (() => {
         const savers = this.gs('savings');
         const sumPct = savers.reduce((t, g) => t + (this.d.distribution.percentages[g.id] || 0), 0);
@@ -4460,7 +4726,7 @@ class Component extends DCLogic {
       },
 
       chartOpen: this.state.modal === 'chart', newTabOpen: this.state.modal === 'tab',
-      closeModal: () => this.setState({ modal: null, moveLine: null }), stop: (e) => e.stopPropagation(),
+      closeModal: () => this.setState({ modal: null, moveLine: null, editGoalId: null }), stop: (e) => e.stopPropagation(),
       stopClick: (e) => e.stopPropagation(),
       linePath: linePath, avgPath: avgPath, chartPoints: chartPoints, chartGrid: chartGrid, chartLabels: chartLabels,
       donut: donut, donutCenter: this.int(assigned) + '€',
