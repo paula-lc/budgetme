@@ -164,52 +164,6 @@
         </sc-if>
       </div>
     </div>
-    <div style="background:#F7F1E8;border:1px solid #E8E0D4;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:44px;height:44px;border-radius:50%;background:#1E3A8A;flex:none;display:flex;align-items:center;justify-content:center">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color:#FFFFFF">
-            <path d="M10 2 L17 5v5c0 4.5-3 7.2-7 8.5C6 17.2 3 14.5 3 10V5z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"></path>
-          </svg>
-        </div>
-        <div style="min-width:0">
-          <div style="font:800 12.5px/1.3 'Plus Jakarta Sans',sans-serif;letter-spacing:0.02em;text-transform:uppercase;color:#1E3A8A">Colchón de Emergencia</div>
-          <div style="font:400 12px/1.3 'Plus Jakarta Sans',sans-serif;color:#8B7355">Protección financiera</div>
-        </div>
-      </div>
-      <div>
-        <div style="display:flex;align-items:baseline;gap:6px">
-          <span style="font:900 38px/1 'Source Serif Pro',serif;color:#1E3A8A">{{ cushionMonths }}</span>
-          <span style="font:500 20px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355">/</span>
-          <input value="{{ cushionTarget }}" onChange="{{ onCushionTarget }}" onBlur="{{ onCushionBlur }}" inputMode="decimal" placeholder="6" style="width:44px;border:none;border-bottom:2px solid rgba(30,58,138,0.25);background:transparent;padding:0;font:900 26px/1 'Source Serif Pro',serif;color:#1E3A8A;outline:none" style-focus="border-color:#1E3A8A"></input>
-        </div>
-        <div style="margin-top:2px;font:400 13px/1.3 'Plus Jakarta Sans',sans-serif;color:#8B7355">meses cubiertos</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline">
-          <span style="font:700 10.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#8B7355">Avance <span style="color:#1E3A8A;font-weight:800">{{ cushionAvancePct }}</span></span>
-          <span style="font:400 11px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355">Meta: {{ cushionTarget }} meses</span>
-        </div>
-        <div style="background:#E8E0D4;height:7px;border-radius:999px;overflow:hidden">
-          <div style="background:#1E3A8A;height:100%;width:{{ cushionAvancePct }};border-radius:999px"></div>
-        </div>
-      </div>
-      <sc-if value="{{ hasTier }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:22px;height:22px;border-radius:50%;background:#1E3A8A;flex:none;display:flex;align-items:center;justify-content:center">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#FFFFFF"><circle cx="6" cy="4.5" r="2.8" stroke="currentColor" stroke-width="1.2" fill="none"></circle><path d="M4 6.8 3.2 11l2.8-1.3L8.8 11 8 6.8" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linejoin="round"></path></svg>
-          </div>
-          <span style="font:700 12.5px/1 'Plus Jakarta Sans',sans-serif;color:#1E3A8A">Nivel {{ cushionTierNum }}: {{ cushionTierName }}</span>
-        </div>
-      </sc-if>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <span style="display:inline-flex;gap:4px;align-items:center;font:700 12px/1 'Plus Jakarta Sans',sans-serif;color:#10B981">↗ {{ cushionDeltaStr }}</span>
-        <sc-if value="{{ hasCushionTrend }}" hint-placeholder-val="{{ false }}">
-          <span style="display:inline-flex;gap:3px;align-items:center;background:rgba(16,185,129,0.12);color:#10B981;font:700 11px/1 'Plus Jakarta Sans',sans-serif;padding:3px 8px;border-radius:999px">
-            <sc-if value="{{ cushionTrendUp }}" hint-placeholder-val="{{ true }}">↑</sc-if><sc-if value="{{ !cushionTrendUp }}" hint-placeholder-val="{{ false }}">↓</sc-if> {{ cushionTrendStr }}
-          </span>
-        </sc-if>
-      </div>
-    </div>
   </div>
 
   <div style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
@@ -348,20 +302,6 @@
         <span style="color:#B4690E">{{ alertNote }}</span>
       </sc-if>
     </div>
-
-    <sc-if value="{{ hasProjection }}" hint-placeholder-val="{{ false }}">
-      <div style="background:{{ projectionBg }};border:1px solid {{ projectionBd }};border-radius:14px;padding:16px 18px">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <span style="font:700 12px/1.3 'Plus Jakarta Sans',sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#8B7355">Si cumples tus presupuestos</span>
-          <span style="font:400 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A">{{ projectionSpentStr }} gastado · {{ projectionCommittedStr }} comprometido · {{ projectionAvailStr }} disponible</span>
-        </div>
-        <div style="position:relative;height:10px;background:#F3EFE8;border-radius:999px;margin-top:11px;overflow:hidden">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:{{ projectionBarPct }};background:repeating-linear-gradient(135deg,#C7D2F0,#C7D2F0 5px,#DDE5FF 5px,#DDE5FF 10px)"></div>
-          <div style="position:absolute;left:0;top:0;bottom:0;width:{{ projectionSpentPct }};background:#1E3A8A;border-radius:999px"></div>
-        </div>
-        <div style="font:600 12.5px/1.45 'Plus Jakarta Sans',sans-serif;color:{{ projectionInk }};margin-top:10px">{{ projectionNote }}</div>
-      </div>
-    </sc-if>
 
     <sc-if value="{{ hasWin }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;align-items:center;gap:11px;background:rgba(16,185,129,0.07);border:1px solid #10B981;border-radius:14px;padding:14px 16px">
@@ -1412,32 +1352,37 @@
       <sc-if value="{{ previsionOnTrack }}" hint-placeholder-val="{{ true }}">
         <div style="background:rgba(0,200,179,0.1);display:flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px">
           <span style="width:8px;height:8px;border-radius:4px;background:#1E3A8A;display:inline-block"></span>
-          <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;text-transform:uppercase;color:#1E3A8A;white-space:nowrap">Al día</span>
+          <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;text-transform:uppercase;color:#1E3A8A;white-space:nowrap">Cabe</span>
         </div>
       </sc-if>
       <sc-if value="{{ !previsionOnTrack }}" hint-placeholder-val="{{ false }}">
         <div style="background:rgba(239,68,68,0.08);display:flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px">
           <span style="width:8px;height:8px;border-radius:4px;background:#A03B2A;display:inline-block"></span>
-          <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;text-transform:uppercase;color:#A03B2A;white-space:nowrap">Excedido</span>
+          <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;text-transform:uppercase;color:#A03B2A;white-space:nowrap">No cabe</span>
         </div>
       </sc-if>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font:600 12px/1 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ previsionPct }} del objetivo</span>
-        <span style="font:600 12px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ gastadoRealStr }}</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font:600 12px/1 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ previsionPct }} ya gastado</span>
+        <span style="font:600 12px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ projectionAvailStr }} disponibles</span>
       </div>
-      <div style="background:#D7D4E8;height:8px;border-radius:999px;overflow:hidden">
-        <div style="background:{{ previsionBarColor }};height:100%;width:{{ previsionPct }};border-radius:999px"></div>
+      <div style="position:relative;height:8px;background:#D7D4E8;border-radius:999px;overflow:hidden">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:{{ projectionBarPct }};background:repeating-linear-gradient(135deg,#C7D2F0,#C7D2F0 5px,#DDE5FF 5px,#DDE5FF 10px)"></div>
+        <div style="position:absolute;left:0;top:0;bottom:0;width:{{ projectionSpentPct }};background:{{ previsionBarColor }};border-radius:999px"></div>
       </div>
+      <sc-if value="{{ hasProjection }}" hint-placeholder-val="{{ true }}">
+        <div style="font:500 11.5px/1.45 'Plus Jakarta Sans',sans-serif;color:{{ projectionInk }}">{{ projectionNote }}</div>
+      </sc-if>
     </div>
+
     <div style="display:flex;gap:12px">
       <div style="flex:1;background:#F8F7F4;border:1px solid #D7D4E8;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0">
         <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#8B7355;white-space:nowrap">Gastado</span>
         <span style="font:900 16px/1 'Source Serif Pro',serif;color:#1E3A8A;white-space:nowrap">{{ gastadoRealStr }}</span>
       </div>
       <div style="flex:1;background:#F8F7F4;border:1px solid #D7D4E8;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0">
-        <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#8B7355;white-space:nowrap">Disponible</span>
+        <span style="font:700 11px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#8B7355;white-space:nowrap">Cierre previsto</span>
         <span style="font:900 16px/1 'Source Serif Pro',serif;color:{{ previsionDiffInk }};white-space:nowrap">{{ previsionDiffStr }}</span>
       </div>
     </div>
@@ -3287,7 +3232,7 @@ class Component extends DCLogic {
     const inc = this.incomeTotal(m), carry = this.carryInto(m), avail = inc + carry, assigned = this.assigned(m);
     const totalTarget = this.monthlySheets().reduce((t, s) => t + this.gs(s.id).reduce((tt, g) => tt + this.groupTarget(g, m), 0), 0);
     const totalSpentMonthly = this.monthlySheets().reduce((t, s) => t + this.sheetTotal(s.id, m), 0);
-    const previsionDiff = totalTarget - totalSpentMonthly;
+    const previsionDiff = avail - this.committed(m);
     const showTarget = !compact && sheet.kind === 'monthly';
     const pad = compact ? '7px 12px' : '11px 14px';
 
@@ -3965,13 +3910,13 @@ class Component extends DCLogic {
 
       stats: stats, statCols: narrow ? 'repeat(2,minmax(0,1fr))' : 'repeat(' + stats.length + ',minmax(0,1fr))',
       linkOptions: linkOptions,
-      previsionStr: this.fmt(totalTarget), gastadoRealStr: this.fmt(totalSpentMonthly), availStr: this.fmt(avail),
+      previsionStr: this.fmt(this.committed(m)), gastadoRealStr: this.fmt(totalSpentMonthly), availStr: this.fmt(avail),
       gastadoRealInk: totalTarget > 0 && totalSpentMonthly > totalTarget ? '#F0A38C' : '#F8F7F4',
       previsionDiffStr: (previsionDiff >= 0 ? '+' : '−') + ' ' + this.fmt(Math.abs(previsionDiff)),
       previsionDiffInk: previsionDiff >= 0 ? '#1E3A8A' : '#A03B2A',
-      previsionPct: totalTarget > 0 ? Math.min(100, (totalSpentMonthly / totalTarget) * 100).toFixed(1) + '%' : (totalSpentMonthly > 0 ? '100%' : '0%'),
-      previsionBarColor: totalTarget > 0 && totalSpentMonthly > totalTarget ? '#A03B2A' : '#1E3A8A',
-      previsionOnTrack: previsionDiff >= 0,
+      previsionPct: this.committed(m) > 0 ? this.pct(Math.min(100, totalSpentMonthly / this.committed(m) * 100)) : '0%',
+      previsionBarColor: this.committed(m) > avail + 0.004 ? '#A03B2A' : '#1E3A8A',
+      previsionOnTrack: this.committed(m) <= avail + 0.004,
       bars: bars,
       paidLine: 'Pagado ' + this.fmt(paidSum) + ' · pendiente ' + this.fmt(pendSum),
       allocCards: this.pendingAllocations(m).map(pa => ({
