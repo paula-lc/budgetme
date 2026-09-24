@@ -455,6 +455,10 @@
         </sc-for>
         <button onClick="{{ openNewTab }}" title="Nueva pestaña" style="font:400 15px/1 'Plus Jakarta Sans',sans-serif;padding:8px 12px;border:1px solid #D7D4E8;background:transparent;color:#8B7355;cursor:pointer;border-radius:6px" style-hover="background:#F8F7F4">+</button>
       </div>
+      <button onClick="{{ openSplit }}" title="Repartir tus ingresos entre las pestañas" style="display:flex;align-items:center;gap:7px;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:9px 14px;border:1px solid #D7D4E8;background:#FFFFFF;color:#1E3A8A;cursor:pointer;border-radius:8px;flex:none" style-hover="border-color:#1E3A8A;background:rgba(30,58,138,0.04)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.4"></circle><line x1="8" y1="1.8" x2="8" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line><line x1="8" y1="8" x2="12.6" y2="11.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line></svg>
+        Reparto %
+      </button>
     </div>
 
   <div class="m-table" style="border:1px solid #D7D4E8;border-radius:12px;overflow:hidden">
@@ -483,7 +487,7 @@
       <sc-if value="{{ isMonthly }}" hint-placeholder-val="{{ true }}">
         <div style="min-width:{{ tableMinW }}">
           <sc-for list="{{ rows }}" as="row" hint-placeholder-count="5">
-            <div style="border-bottom:1px solid #D7D4E8">
+            <div data-drop-group="{{ row.dropKey }}" onDragOver="{{ row.onDragOver }}" onDragLeave="{{ row.onDragLeave }}" onDrop="{{ row.onDrop }}" style="border-bottom:1px solid #D7D4E8;background:{{ row.rowDropBg }};outline:{{ row.rowDropOutline }};outline-offset:-2px">
               <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
               <div class="m-row" style="display:grid;grid-template-columns:{{ gridCols }};align-items:center" title="{{ row.caption }}">
                 <div style="padding:12px 16px;min-width:0">
@@ -639,9 +643,12 @@
                   <sc-if value="{{ row.hasSubcats }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
                       <sc-for list="{{ row.subcats }}" as="sc" hint-placeholder-count="2">
-                        <div style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:10px;padding:11px 12px">
+                        <div draggable="true" onDragStart="{{ sc.onDragStart }}" onDragEnd="{{ sc.onDragEnd }}" style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:10px;padding:11px 12px;opacity:{{ sc.cardOpacity }}">
                           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                             <div class="m-subcat-head" style="display:flex;align-items:center;gap:6px;flex:1;min-width:110px">
+                              <span draggable="true" onDragStart="{{ sc.onDragStart }}" onDragEnd="{{ sc.onDragEnd }}" onTouchStart="{{ sc.onTouchStart }}" onTouchMove="{{ sc.onTouchMove }}" onTouchEnd="{{ sc.onTouchEnd }}" title="Arrastra para moverla a otra categoría" style="flex:none;display:flex;align-items:center;color:#C9C4BC;cursor:grab;touch-action:none;padding:4px 2px;margin:-4px 0" style-hover="color:#1E3A8A">
+                                <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><circle cx="3.5" cy="3" r="1.3"></circle><circle cx="8.5" cy="3" r="1.3"></circle><circle cx="3.5" cy="7" r="1.3"></circle><circle cx="8.5" cy="7" r="1.3"></circle><circle cx="3.5" cy="11" r="1.3"></circle><circle cx="8.5" cy="11" r="1.3"></circle></svg>
+                              </span>
                               <input value="{{ sc.nameVal }}" onChange="{{ sc.onName }}" onBlur="{{ sc.onNameBlur }}" style="flex:1;min-width:0;border:none;background:transparent;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
                               <button onClick="{{ sc.onDelete }}" title="Quitar subcategoría" style="border:none;background:none;color:#C9C4BC;cursor:pointer;padding:2px;font-size:15px;line-height:1;flex:none" style-hover="color:#A03B2A">×</button>
                             </div>
@@ -1786,6 +1793,50 @@
   </button>
 </sc-if>
 
+<sc-if value="{{ hasDragGhost }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:{{ dragGhostLeft }};top:{{ dragGhostTop }};transform:translate(-50%,-140%);background:#1E3A8A;color:#FFFFFF;font:600 12.5px/1 'Plus Jakarta Sans',sans-serif;padding:9px 13px;border-radius:999px;box-shadow:0 8px 22px rgba(30,58,138,0.36);pointer-events:none;z-index:70;white-space:nowrap">{{ dragName }}</div>
+</sc-if>
+
+<sc-if value="{{ isDragging }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:0;right:0;bottom:0;background:#1E3A8A;color:#FFFFFF;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;z-index:68;box-shadow:0 -6px 20px rgba(17,24,39,0.18);pointer-events:none">
+    <span style="font:600 12.5px/1.3 'Plus Jakarta Sans',sans-serif">Suelta «{{ dragName }}» sobre la categoría de destino</span>
+    <button onClick="{{ cancelDrag }}" style="border:1px solid rgba(255,255,255,0.45);background:transparent;color:#FFFFFF;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:8px 13px;border-radius:8px;cursor:pointer;flex:none;pointer-events:auto">Cancelar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ splitOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
+    <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px 28px;animation:card .2s ease">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div>
+          <h2 style="margin:0;font:600 28px/1.05 'Instrument Serif',serif;color:#3D2B1F">Reparto de tus ingresos</h2>
+          <p style="margin:7px 0 0;font:300 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355;max-width:44ch">Decide qué parte de tus {{ splitIncomeStr }} va a cada pestaña. Por ejemplo 50% ahorros, 30% fijos, 20% variables.</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0;flex:none">×</button>
+      </div>
+
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ splitRows }}" as="sp" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #D7D4E8;border-radius:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:120px">
+              <div style="font:600 13.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F">{{ sp.name }}</div>
+              <div style="font:400 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A;margin-top:3px">{{ sp.amountStr }} · llevas {{ sp.usedStr }}</div>
+            </div>
+            <input value="{{ sp.pctVal }}" onChange="{{ sp.onPct }}" inputMode="decimal" placeholder="0" style="width:72px;flex:none;border:1px solid #D7D4E8;border-radius:8px;background:#FFFFFF;padding:9px 10px;font:700 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#1E3A8A;outline:none" style-focus="border-color:#1E3A8A"></input>
+            <span style="font:600 13px/1 'Plus Jakarta Sans',sans-serif;color:#A8A29A;flex:none">%</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:12px 0 0;font:600 12.5px/1.4 'Plus Jakarta Sans',sans-serif;color:{{ splitSumInk }}">{{ splitSumLabel }}</p>
+      <p style="margin:8px 0 0;font:300 11.5px/1.45 'Plus Jakarta Sans',sans-serif;color:#A8A29A">No hace falta que sume 100%. Lo que no repartas se queda como remanente sin asignar.</p>
+
+      <div style="display:flex;gap:8px;margin-top:22px;justify-content:flex-end">
+        <button onClick="{{ closeModal }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 20px;border-radius:8px;cursor:pointer" style-hover="background:#16296B">Listo</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ moveLineOpen }}" hint-placeholder-val="{{ false }}">
   <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:62;animation:ov .16s ease">
     <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;padding:24px 26px 26px;animation:card .2s ease">
@@ -2109,7 +2160,8 @@ class Component extends DCLogic {
     newTab: { name: '', kind: 'monthly', accent: 'terracotta' },
     periodicDraft: {}, cashDraft: { month: '', type: 'entrada', amount: '', note: '' },
     distAmount: '', distAmounts: {}, distShowPct: false, rowMenu: null,
-    quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '',
+    quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '', sheetPctDraft: {},
+    dragSub: null, dragOver: null, dragPos: null,
     obIncome: '', obSelected: {}, dupFrom: '', dupSheets: {}, hiddenCols: {}, hiddenViews: {}
   };
 
@@ -2435,6 +2487,13 @@ class Component extends DCLogic {
   entriesOf(g, m) { return g.entries.filter(e => e.date === m); }
   groupTotal(g, m) { return this.entriesOf(g, m).reduce((s, e) => s + (e.amount || 0), 0); }
   sheetTotal(id, m) { return this.gs(id).reduce((s, g) => s + this.groupTotal(g, m), 0); }
+  // Bote de la pestaña: el % de tus ingresos que has decidido destinarle.
+  sheetBudget(id, m) {
+    const sh = this.d.sheets.find(x => x.id === id);
+    if (!sh || !(sh.pct > 0)) return 0;
+    return Math.round(this.incomeTotal(m) * sh.pct) / 100;
+  }
+  sheetPctSum() { return this.monthlySheets().reduce((t, sh) => t + (sh.pct || 0), 0); }
 
   reserve(p, m) {
     if (p.freq === 'deuda') {
@@ -2575,6 +2634,39 @@ class Component extends DCLogic {
     const ids = ((g.subs) || []).map(sb => sb.id);
     return this.entriesOf(g, month).filter(e => !e.subId || ids.indexOf(e.subId) < 0).reduce((t, e) => t + (e.amount || 0), 0);
   }
+  // Mueve una subcategoría (y sus líneas) a otra categoría.
+  moveSubcategory(fromSheetId, fromGroupId, subId, toSheetId, toGroupId) {
+    if (fromSheetId === toSheetId && fromGroupId === toGroupId) return false;
+    const fg = this.gs(fromSheetId).find(g => g.id === fromGroupId);
+    const tg = this.gs(toSheetId).find(g => g.id === toGroupId);
+    if (!fg || !tg) return false;
+    const i = ((fg.subs) || []).findIndex(sb => sb.id === subId);
+    if (i < 0) return false;
+    const sub = fg.subs[i];
+    fg.subs.splice(i, 1);
+    if (!tg.subs) tg.subs = [];
+    // Si el destino ya tiene una con ese nombre, la distinguimos.
+    let nm = sub.name;
+    if (tg.subs.some(sb => sb.name.trim().toLowerCase() === nm.trim().toLowerCase())) nm = nm + ' (2)';
+    sub.name = nm;
+    tg.subs.push(sub);
+    // Las líneas asignadas viajan con ella: no se pierde ningún importe.
+    const moving = ((fg.entries) || []).filter(e => e.subId === subId);
+    fg.entries = ((fg.entries) || []).filter(e => e.subId !== subId);
+    tg.entries = ((tg.entries) || []).concat(moving);
+    this.touch();
+    return true;
+  }
+
+  dropSubOn(destKey) {
+    const d = this.state.dragSub;
+    if (!d || !destKey) { this.setState({ dragSub: null, dragOver: null, dragPos: null }); return; }
+    const i = destKey.indexOf(':');
+    const toSheet = destKey.slice(0, i), toGroup = destKey.slice(i + 1);
+    this.moveSubcategory(d.sheetId, d.groupId, d.subId, toSheet, toGroup);
+    this.setState({ dragSub: null, dragOver: null, dragPos: null });
+  }
+
   addSubcategory(g, name) {
     const nm = (name || '').trim();
     if (!nm) return false;
@@ -3058,7 +3150,7 @@ class Component extends DCLogic {
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
       allocCards: [], hasAllocations: false,
       goalCards: [], hasGoals: false, hasUserGoals: false,
-      winNote: '', hasWin: false, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
+      winNote: '', hasWin: false, isDragging: false, hasDragGhost: false, dragName: '', dragGhostLeft: '0px', dragGhostTop: '0px', cancelDrag: () => {}, splitOpen: false, splitRows: [], splitSumLabel: '', splitSumInk: '#8B7355', splitIncomeStr: '', openSplit: () => {}, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
       showOnboarding: false, obChips: [], obHasSelection: false, obCountLabel: '', obIncome: '',
       obStepIncomeDone: false, obStepCatsDone: false, obStepGoalDone: false,
       obStepIncomePending: true, obStepCatsPending: true, obStepGoalPending: true,
@@ -3083,15 +3175,21 @@ class Component extends DCLogic {
     const go = (id) => () => this.setState({ sheetId: id, edits: {} });
     const stats = this.monthlySheets().map(s => {
       const t = this.sheetTotal(s.id, m), a = ACC[s.accent] || ACC.ink;
-      const pctNum = avail > 0 ? (t / avail * 100) : 0;
-      const pctText = avail > 0 ? this.pct(pctNum) + ' del disponible' : 'sin ingresos registrados';
+      const pot = this.sheetBudget(s.id, m);
+      const pctNum = pot > 0 ? (t / pot * 100) : (avail > 0 ? (t / avail * 100) : 0);
+      const pctText = pot > 0 ? this.num(s.pct).replace(/,00$/, '') + '% de tus ingresos' : (avail > 0 ? this.pct(pctNum) + ' del disponible' : 'sin ingresos registrados');
       const sumTgt = this.gs(s.id).reduce((tt, g) => tt + this.groupTarget(g, m), 0);
       const FIG_DOT = { fixed: '#F59E0B', variable: '#F59E0B', savings: '#06B6D4' };
       let statusLabel, statusMint;
-      if (s.id === 'savings') { statusMint = sumTgt === 0 || t >= sumTgt; statusLabel = sumTgt === 0 ? 'Sin objetivo' : (t >= sumTgt ? 'Objetivo cumplido' : 'Por debajo del objetivo'); }
+      if (pot > 0) {
+        if (s.id === 'savings') { statusMint = t >= pot; statusLabel = t >= pot ? 'Objetivo cumplido' : 'Faltan ' + this.fmt(pot - t); }
+        else { statusMint = t <= pot; statusLabel = t <= pot ? 'Quedan ' + this.fmt(pot - t) : 'Te pasas ' + this.fmt(t - pot); }
+      }
+      else if (s.id === 'savings') { statusMint = sumTgt === 0 || t >= sumTgt; statusLabel = sumTgt === 0 ? 'Sin objetivo' : (t >= sumTgt ? 'Objetivo cumplido' : 'Por debajo del objetivo'); }
       else { statusMint = sumTgt === 0 || t <= sumTgt; statusLabel = sumTgt === 0 ? 'Sin objetivo' : (t <= sumTgt ? 'Dentro de presupuesto' : 'Fuera de presupuesto'); }
-      return { name: s.name, value: this.fmt(t), ink: a.ink, dot: FIG_DOT[s.id] || a.dot, barPct: Math.min(100, pctNum).toFixed(1) + '%',
-        pctLabel: avail > 0 ? this.pct(pctNum) : '—',
+      return { name: s.name, value: this.fmt(t), ink: a.ink, dot: FIG_DOT[s.id] || a.dot,
+        barPct: (pot > 0 && countDown ? Math.max(0, 100 - Math.min(100, pctNum)) : Math.min(100, pctNum)).toFixed(1) + '%',
+        pctLabel: pot > 0 ? this.num(s.pct).replace(/,00$/, '') + '%' : (avail > 0 ? this.pct(pctNum) : '—'),
         statusLabel: statusLabel, statusMint: statusMint,
         statusIcon: statusMint ? 'check' : 'alert',
         statusBg: statusMint ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', statusInk: statusMint ? '#10B981' : '#EF4444',
@@ -3174,6 +3272,10 @@ class Component extends DCLogic {
       const es = this.entriesOf(g, m), total = es.reduce((s, e) => s + (e.amount || 0), 0);
       const key = sheet.id + ':' + g.id, exp = !!this.state.expanded[key];
       const subTargetSum = ((g.subs) || []).reduce((t, sb) => t + this.subTarget(sb, m), 0);
+      const dropKey = sheet.id + ':' + g.id;
+      const dragActive = !!this.state.dragSub;
+      const isDropTarget = dragActive && this.state.dragOver === dropKey && !(this.state.dragSub.groupId === g.id);
+      const canDropHere = dragActive && this.state.dragSub.groupId !== g.id;
       const target = this.groupTarget(g, m), over = target > 0 && total > target;
       const linkRef = isSavingsSheet ? this.findGroupByRef(g.linkId) : null;
       let linkedSavedTotal = 0, linkedSpentTotal = 0, linkedNet = 0;
@@ -3238,6 +3340,12 @@ class Component extends DCLogic {
         },
         linkedNetStr: linkRef ? this.fmt(linkedNet) : '', linkedNetInk: linkedNet < 0 ? '#A03B2A' : '#3D2B1F',
         linkedSavedStr: linkRef ? this.fmt(linkedSavedTotal) : '', linkedSpentStr: linkRef ? this.fmt(linkedSpentTotal) : '',
+        dropKey: dropKey,
+        rowDropBg: isDropTarget ? 'rgba(30,58,138,0.08)' : 'transparent',
+        rowDropOutline: isDropTarget ? '2px dashed #1E3A8A' : '2px solid transparent',
+        onDragOver: (ev) => { ev.preventDefault(); if (this.state.dragSub && this.state.dragSub.groupId !== g.id && this.state.dragOver !== dropKey) this.setState({ dragOver: dropKey }); },
+        onDragLeave: () => { if (this.state.dragOver === dropKey) this.setState({ dragOver: null }); },
+        onDrop: (ev) => { ev.preventDefault(); ev.stopPropagation(); this.dropSubOn(dropKey); },
         hasSubcats: ((g.subs) || []).length > 0,
         subcats: ((g.subs) || []).map(sb => {
           const st = this.subTarget(sb, m), sp = this.subSpent(g, sb, m), sOver = st > 0 && sp > st;
@@ -3265,6 +3373,30 @@ class Component extends DCLogic {
             barPct: st > 0 ? (countDown ? Math.max(0, Math.min(100, (st - sp) / st * 100)) : Math.min(100, sp / st * 100)).toFixed(1) + '%' : '0%',
             barColor: sOver ? '#B23A55' : (countDown ? '#1E3A8A' : '#8FB89E'),
             countStr: this.entriesOf(g, m).filter(e => e.subId === sb.id).length + ' líneas',
+            dragging: !!(this.state.dragSub && this.state.dragSub.subId === sb.id),
+            cardOpacity: (this.state.dragSub && this.state.dragSub.subId === sb.id) ? '0.45' : '1',
+            onDragStart: (ev) => {
+              if (ev.dataTransfer) { try { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', sb.id); } catch (err) {} }
+              this.setState({ dragSub: { sheetId: sheet.id, groupId: g.id, subId: sb.id, name: sb.name }, dragOver: null });
+            },
+            onDragEnd: () => this.setState({ dragSub: null, dragOver: null, dragPos: null }),
+            onTouchStart: (ev) => {
+              const t = ev.touches && ev.touches[0];
+              this.setState({ dragSub: { sheetId: sheet.id, groupId: g.id, subId: sb.id, name: sb.name }, dragOver: null, dragPos: t ? { x: t.clientX, y: t.clientY } : null });
+            },
+            onTouchMove: (ev) => {
+              if (!this.state.dragSub) return;
+              const t = ev.touches && ev.touches[0];
+              if (!t) return;
+              // Si el dedo se acerca a un borde, la página acompaña al arrastre.
+              const vh = window.innerHeight || 800;
+              if (t.clientY < 96) window.scrollBy(0, -14);
+              else if (t.clientY > vh - 110) window.scrollBy(0, 14);
+              let el = document.elementFromPoint(t.clientX, t.clientY), key = null;
+              while (el && !key) { if (el.getAttribute && el.getAttribute('data-drop-group')) key = el.getAttribute('data-drop-group'); el = el.parentElement; }
+              this.setState({ dragPos: { x: t.clientX, y: t.clientY }, dragOver: key });
+            },
+            onTouchEnd: () => { this.dropSubOn(this.state.dragOver); },
             onDelete: () => { if (window.confirm('¿Quitar la subcategoría "' + sb.name + '"? Sus líneas vuelven a ' + g.category + ', no se borra ningún importe.')) this.removeSubcategory(g, sb.id); }
           };
         }),
@@ -4000,6 +4132,43 @@ class Component extends DCLogic {
       },
       obGoToGoals: () => this.setState({ view: 'achievements', navOpen: false }),
       obDismiss: () => { this.d.onboardingDone = true; this.touch(); },
+
+      // ---- Arrastre de subcategorías ----
+      isDragging: !!this.state.dragSub,
+      dragName: this.state.dragSub ? this.state.dragSub.name : '',
+      dragGhostLeft: (this.state.dragPos ? this.state.dragPos.x : 0) + 'px',
+      dragGhostTop: (this.state.dragPos ? this.state.dragPos.y : 0) + 'px',
+      hasDragGhost: !!(this.state.dragSub && this.state.dragPos),
+      cancelDrag: () => this.setState({ dragSub: null, dragOver: null, dragPos: null }),
+
+      // ---- Reparto por pestaña (50/30/20) ----
+      splitOpen: this.state.modal === 'split',
+      openSplit: () => this.setState({ modal: 'split', sheetPctDraft: {} }),
+      splitIncomeStr: this.fmt(this.incomeTotal(m)),
+      splitRows: this.monthlySheets().map(sh => {
+        const pct = sh.pct || 0;
+        return {
+          id: sh.id, name: sh.name,
+          pctVal: this.state.sheetPctDraft[sh.id] !== undefined ? this.state.sheetPctDraft[sh.id] : (pct ? this.num(pct).replace(/,00$/, '') : ''),
+          onPct: (e) => {
+            const raw = e.target.value;
+            this.setState(st2 => ({ sheetPctDraft: Object.assign({}, st2.sheetPctDraft, { [sh.id]: raw }) }));
+            const v = this.parse(raw);
+            if (v > 0) sh.pct = v; else delete sh.pct;
+            this.touch();
+          },
+          amountStr: pct > 0 ? this.fmt(this.incomeTotal(m) * pct / 100) : '—',
+          usedStr: this.fmt(this.sheetTotal(sh.id, m))
+        };
+      }),
+      splitSumLabel: (() => {
+        const sum = this.sheetPctSum();
+        if (sum === 0) return 'Sin reparto definido';
+        if (Math.abs(sum - 100) < 0.01) return 'Repartes el 100% de tus ingresos';
+        if (sum < 100) return 'Repartes el ' + this.num(sum).replace(/,00$/, '') + '% · te queda un ' + this.num(100 - sum).replace(/,00$/, '') + '% sin asignar';
+        return 'Repartes el ' + this.num(sum).replace(/,00$/, '') + '% · te pasas un ' + this.num(sum - 100).replace(/,00$/, '') + '%';
+      })(),
+      splitSumInk: Math.abs(this.sheetPctSum() - 100) < 0.01 ? '#0D7A56' : (this.sheetPctSum() > 100 ? '#A03B2A' : '#8B7355'),
 
       // ---- Mover una línea a otra subcategoría ----
       moveLineOpen: this.state.modal === 'moveline',
