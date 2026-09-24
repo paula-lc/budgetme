@@ -349,6 +349,20 @@
       </sc-if>
     </div>
 
+    <sc-if value="{{ hasProjection }}" hint-placeholder-val="{{ false }}">
+      <div style="background:{{ projectionBg }};border:1px solid {{ projectionBd }};border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <span style="font:700 12px/1.3 'Plus Jakarta Sans',sans-serif;letter-spacing:0.04em;text-transform:uppercase;color:#8B7355">Si cumples tus presupuestos</span>
+          <span style="font:400 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A">{{ projectionSpentStr }} gastado · {{ projectionCommittedStr }} comprometido · {{ projectionAvailStr }} disponible</span>
+        </div>
+        <div style="position:relative;height:10px;background:#F3EFE8;border-radius:999px;margin-top:11px;overflow:hidden">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:{{ projectionBarPct }};background:repeating-linear-gradient(135deg,#C7D2F0,#C7D2F0 5px,#DDE5FF 5px,#DDE5FF 10px)"></div>
+          <div style="position:absolute;left:0;top:0;bottom:0;width:{{ projectionSpentPct }};background:#1E3A8A;border-radius:999px"></div>
+        </div>
+        <div style="font:600 12.5px/1.45 'Plus Jakarta Sans',sans-serif;color:{{ projectionInk }};margin-top:10px">{{ projectionNote }}</div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ hasWin }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;align-items:center;gap:11px;background:rgba(16,185,129,0.07);border:1px solid #10B981;border-radius:14px;padding:14px 16px">
         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="flex:none;color:#0D7A56"><path d="M6 17h8M10 13v4M5 3h10v4a5 5 0 0 1-10 0V3ZM5 4H3v1.5A3.5 3.5 0 0 0 6 9M15 4h2v1.5A3.5 3.5 0 0 1 14 9" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -490,8 +504,8 @@
             <div data-drop-group="{{ row.dropKey }}" onDragOver="{{ row.onDragOver }}" onDragLeave="{{ row.onDragLeave }}" onDrop="{{ row.onDrop }}" style="border-bottom:1px solid #D7D4E8;background:{{ row.rowDropBg }};outline:{{ row.rowDropOutline }};outline-offset:-2px">
               <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
               <div class="m-row" style="display:grid;grid-template-columns:{{ gridCols }};align-items:center" title="{{ row.caption }}">
-                <div style="padding:12px 16px;min-width:0">
-                  <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:600 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0" style-focus="color:#1E3A8A"></input>
+                <div onClick="{{ row.toggle }}" title="Ver el detalle" style="padding:12px 16px;min-width:0;cursor:pointer">
+                  <input onClick="{{ stopClick }}" value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="width:100%;border:none;background:transparent;font:600 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0" style-focus="color:#1E3A8A"></input>
                   <sc-if value="{{ row.hasTarget }}" hint-placeholder-val="{{ false }}">
                     <div style="height:6px;background:#EBEDF0;border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:100%;width:{{ row.barPct }};background:{{ row.barColor }};border-radius:3px"></div></div>
                   </sc-if>
@@ -556,8 +570,8 @@
 
               <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
               <div style="padding:14px 14px 12px" title="{{ row.caption }}">
-                <div style="display:flex;align-items:center;gap:8px">
-                  <input value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="flex:1;min-width:0;border:none;background:transparent;font:700 15px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
+                <div onClick="{{ row.toggle }}" title="Ver el detalle" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                  <input onClick="{{ stopClick }}" value="{{ row.category }}" onChange="{{ row.onCat }}" list="cat-suggest" style="flex:1;min-width:0;border:none;background:transparent;font:700 15px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
                   <button onClick="{{ row.onDelete }}" title="Eliminar categoría" style="border:none;background:none;color:#C9C4BC;cursor:pointer;padding:4px;display:flex;flex:none">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M6 4.5V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.5M12.5 4.5 12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1L3.5 4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                   </button>
@@ -640,6 +654,37 @@
                       </div>
                     </div>
                   </sc-if>
+                  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #E8E0D4">
+                    <span style="font:600 10.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.05em;text-transform:uppercase;color:#A8A29A;margin-right:2px">Cada cuánto se paga</span>
+                    <button onClick="{{ row.setFreq1 }}" style="border:1px solid {{ row.f1bd }};background:{{ row.f1bg }};color:{{ row.f1ink }};font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">Mensual</button>
+                    <button onClick="{{ row.setFreq2 }}" style="border:1px solid {{ row.f2bd }};background:{{ row.f2bg }};color:{{ row.f2ink }};font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">Bimensual</button>
+                    <button onClick="{{ row.setFreq3 }}" style="border:1px solid {{ row.f3bd }};background:{{ row.f3bg }};color:{{ row.f3ink }};font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">Trimestral</button>
+                    <button onClick="{{ row.setFreq6 }}" style="border:1px solid {{ row.f6bd }};background:{{ row.f6bg }};color:{{ row.f6ink }};font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">Semestral</button>
+                    <button onClick="{{ row.setFreq12 }}" style="border:1px solid {{ row.f12bd }};background:{{ row.f12bg }};color:{{ row.f12ink }};font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">Anual</button>
+                  </div>
+
+                  <sc-if value="{{ row.freqShowsConfig }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:10px;padding:12px;margin-bottom:12px">
+                      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <label style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px">
+                          <span style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#A8A29A">Importe del cargo</span>
+                          <input value="{{ row.freqAmountVal }}" onChange="{{ row.onFreqAmount }}" onBlur="{{ row.onFreqAmountBlur }}" inputMode="decimal" placeholder="0,00" style="width:100%;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:8px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+                        </label>
+                        <label style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px">
+                          <span style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#A8A29A">Primer cargo</span>
+                          <input type="month" value="{{ row.freqStartVal }}" onChange="{{ row.onFreqStart }}" style="width:100%;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:8px 10px;font:400 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none"></input>
+                        </label>
+                      </div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;margin-top:10px;font:400 11.5px/1.4 'Plus Jakarta Sans',sans-serif;color:#8B7355;flex-wrap:wrap">
+                        <span>Apartas {{ row.reserveStr }} cada mes · próximo cargo en {{ row.nextChargeLabel }}</span>
+                        <span style="font:700 11.5px/1.4 'Plus Jakarta Sans',sans-serif;color:{{ row.potInk }}">Llevas apartado {{ row.potStr }}</span>
+                      </div>
+                      <sc-if value="{{ row.isChargeMonth }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:10px;background:rgba(217,119,6,0.09);border:1px solid #D97706;border-radius:8px;padding:8px 11px;font:600 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#B4690E">{{ row.chargeNote }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+
                   <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
                     <sc-for list="{{ row.detail }}" as="d" hint-placeholder-count="3">
 
@@ -674,6 +719,15 @@
                         </div>
                       </sc-if>
 
+                      <sc-if value="{{ d.isForm }}" hint-placeholder-val="{{ false }}">
+                        <div class="m-subadd" style="display:flex;align-items:center;gap:8px;padding:6px 0 10px 10px;flex-wrap:wrap">
+                          <span style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.05em;text-transform:uppercase;color:#1E3A8A;flex:none">En {{ d.name }}</span>
+                          <input id="ln-{{ row.id }}" value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:120px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:7px 10px;font:400 12px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+                          <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:104px;flex:none;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:7px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+                          <button onClick="{{ row.addSub }}" style="border:none;background:#1E3A8A;color:#FFFFFF;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:8px 13px;border-radius:6px;cursor:pointer;flex:none" style-hover="background:#16296B">Añadir</button>
+                        </div>
+                      </sc-if>
+
                       <sc-if value="{{ d.isLine }}" hint-placeholder-val="{{ true }}">
                         <div style="display:flex;align-items:center;gap:10px;padding:5px 0 5px 10px">
                           <span style="width:4px;height:4px;border-radius:50%;background:#E8E0D4;flex:none"></span>
@@ -696,19 +750,13 @@
                     <button onClick="{{ row.addSubcat }}" style="border:1px solid #1E3A8A;background:transparent;color:#1E3A8A;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:8px 13px;border-radius:6px;cursor:pointer;flex:none" style-hover="background:rgba(30,58,138,0.06)">+ Subcategoría</button>
                   </div>
 
-                  <sc-if value="{{ row.hasSubcats }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0">
-                      <span style="font:400 11px/1.9 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-right:2px">Añadir en:</span>
-                      <sc-for list="{{ row.destChips }}" as="dc" hint-placeholder-count="3">
-                        <button onClick="{{ dc.onClick }}" style="border:1px solid {{ dc.bd }};background:{{ dc.bg }};color:{{ dc.ink }};font:500 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">{{ dc.name }}</button>
-                      </sc-for>
-                    </div>
-                  </sc-if>
+                  <sc-if value="{{ row.noSubcats }}" hint-placeholder-val="{{ true }}">
                   <div class="m-subadd" style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
                     <input id="ln-{{ row.id }}" value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;margin-left:14px" style-focus="border-color:#1E3A8A"></input>
                     <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
                     <button onClick="{{ row.addSub }}" style="border:none;background:#3D2B1F;color:#FFFFFF;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:7px 12px;border-radius:6px;cursor:pointer" style-hover="background:#1F2937">Añadir importe</button>
                   </div>
+                  </sc-if>
                 </div>
               </sc-if>
             </div>
@@ -1784,7 +1832,7 @@
   <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
     <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border:1px solid #3D2B1F;max-width:420px;width:100%;padding:24px 26px 26px;animation:card .2s ease">
       <h2 style="margin:0 0 4px;font:600 26px/1.1 'Instrument Serif',serif;color:#3D2B1F">Nueva pestaña</h2>
-      <p style="margin:0 0 18px;font:300 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355">Mensual para gastos que repites cada mes. Periódica para trimestrales, semestrales, anuales y deudas a plazos, con cuota mensual calculada sola.</p>
+      <p style="margin:0 0 18px;font:300 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355">Una pestaña agrupa categorías del mes. Para lo que no se paga cada mes, dale una frecuencia a la categoría dentro de su detalle.</p>
       <input value="{{ newTabName }}" onChange="{{ onNewTabName }}" placeholder="Nombre de la pestaña" style="width:100%;border:1px solid #D7D4E8;background:#FFFFFF;padding:11px 12px;font:400 14px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#3D2B1F"></input>
       <div style="display:flex;gap:8px;margin-top:12px">
         <sc-for list="{{ newTabKinds }}" as="k" hint-placeholder-count="2">
@@ -2130,6 +2178,11 @@ const KEY = 'presupuesto:v3';
 const ACCOUNTS_KEY = 'presupuesto:accounts';
 const SESSION_KEY = 'presupuesto:session';
 const FREQ = { trimestral: 3, semestral: 6, anual: 12 };
+const FREQ_OPTS = [
+  { v: 1, label: 'Mensual' }, { v: 2, label: 'Bimensual' }, { v: 3, label: 'Trimestral' },
+  { v: 6, label: 'Semestral' }, { v: 12, label: 'Anual' }
+];
+const FREQ_NAME = { 1: 'Mensual', 2: 'Bimensual', 3: 'Trimestral', 6: 'Semestral', 12: 'Anual' };
 const NAV_ITEMS = [
   { id: 'month', name: 'Inicio', icon: 'layout' },
   { id: 'periodics', name: 'Vencimientos', icon: 'clipboard' },
@@ -2508,6 +2561,13 @@ class Component extends DCLogic {
   entriesOf(g, m) { return g.entries.filter(e => e.date === m); }
   groupTotal(g, m) { return this.entriesOf(g, m).reduce((s, e) => s + (e.amount || 0), 0); }
   sheetTotal(id, m) { return this.gs(id).reduce((s, g) => s + this.groupTotal(g, m), 0); }
+  // Lo comprometido: por cada categoría, lo gastado o su presupuesto si aún no lo has agotado.
+  sheetCommitted(id, m) {
+    return this.gs(id).reduce((s, g) => s + Math.max(this.groupTotal(g, m), this.groupTarget(g, m)), 0);
+  }
+  committed(m) {
+    return this.monthlySheets().reduce((t, sh) => t + this.sheetCommitted(sh.id, m), 0) + this.allPeriodicTotal(m);
+  }
   // Bote de la pestaña: el % de tus ingresos que has decidido destinarle.
   sheetBudget(id, m) {
     const sh = this.d.sheets.find(x => x.id === id);
@@ -2631,8 +2691,37 @@ class Component extends DCLogic {
     return out.sort((a, b) => b.uses - a.uses).slice(0, limit || 8);
   }
 
+  // Categorías que no se pagan todos los meses: se reserva cada mes una parte del cargo.
+  isPeriodicCat(g) { return !!(g && g.freq > 1 && g.freqAmount > 0); }
+  monthlyReserve(g) { return this.isPeriodicCat(g) ? Math.round(g.freqAmount / g.freq * 100) / 100 : 0; }
+  // ¿Toca pagar este mes?
+  isChargeMonth(g, month) {
+    if (!this.isPeriodicCat(g) || !g.freqStart) return false;
+    const diff = idx(month) - idx(g.freqStart);
+    return diff >= 0 && diff % g.freq === 0;
+  }
+  nextCharge(g, month) {
+    if (!this.isPeriodicCat(g) || !g.freqStart) return '';
+    let k = g.freqStart;
+    let guard = 0;
+    while (idx(k) < idx(month) && guard < 400) { k = shift(k, g.freq); guard++; }
+    return k;
+  }
+  // Lo que llevas reservado y aún no has gastado en esa categoría.
+  freqPot(g, month) {
+    if (!this.isPeriodicCat(g)) return 0;
+    const since = g.freqSince || g.freqStart;
+    if (!since) return 0;
+    const months = Math.max(0, idx(month) - idx(since) + 1);
+    const reserved = this.monthlyReserve(g) * months;
+    const spent = (g.entries || []).filter(e => e.date && idx(e.date) <= idx(month) && idx(e.date) >= idx(since)).reduce((t, e) => t + (e.amount || 0), 0);
+    return Math.round((reserved - spent) * 100) / 100;
+  }
+
   // Presupuesto propio de una categoría: importe fijo, o % de los ingresos del mes.
   ownTarget(g, month) {
+    // Una categoría periódica presupuesta su reserva mensual, no el cargo entero.
+    if (this.isPeriodicCat(g)) return this.monthlyReserve(g);
     if (g && g.pct > 0) return Math.round(this.incomeTotal(month) * g.pct) / 100;
     return (g && g.targets && g.targets[month]) || 0;
   }
@@ -3180,11 +3269,12 @@ class Component extends DCLogic {
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
       allocCards: [], hasAllocations: false,
       goalCards: [], hasGoals: false, hasUserGoals: false,
-      winNote: '', hasWin: false, isDragging: false, hasDragGhost: false, dragName: '', dragGhostLeft: '0px', dragGhostTop: '0px', cancelDrag: () => {}, splitOpen: false, splitRows: [], splitSumLabel: '', splitSumInk: '#8B7355', splitIncomeStr: '', openSplit: () => {}, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
+      winNote: '', hasWin: false, hasProjection: false, projectionNote: '', projectionOver: false, projectionBd: '#D7D4E8', projectionBg: '#FFFFFF', projectionInk: '#4A3B35', projectionBarPct: '0%', projectionSpentPct: '0%', projectionSpentStr: '', projectionCommittedStr: '', projectionAvailStr: '', isDragging: false, hasDragGhost: false, dragName: '', dragGhostLeft: '0px', dragGhostTop: '0px', cancelDrag: () => {}, splitOpen: false, splitRows: [], splitSumLabel: '', splitSumInk: '#8B7355', splitIncomeStr: '', openSplit: () => {}, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
       showOnboarding: false, obChips: [], obHasSelection: false, obCountLabel: '', obIncome: '',
       obStepIncomeDone: false, obStepCatsDone: false, obStepGoalDone: false,
       obStepIncomePending: true, obStepCatsPending: true, obStepGoalPending: true,
       quickOpen: false, openQuick: () => {}, quickAddedNote: '', hasQuickAdded: false, quickChips: [], hasQuickChips: false, quickSheetOptions: [], quickIsNewCat: false, quickDestNote: '', quickMonthLabel: '',
+      stopClick: () => {},
       menuOpen: false, menuItems: [], toggleMenu: () => {}, closeMenu: () => {}, navOpen: false, navOpenAttr: '0', toggleNav: () => {}, closeNav: () => {}, tableMinW: '0' };
 
     const m = this.state.month, narrow = this.state.w < 900, compact = this.state.compact;
@@ -3321,10 +3411,12 @@ class Component extends DCLogic {
       const doDelete = () => { g.entries = g.entries.filter(e => e.date !== m); delete g.targets[m]; if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); };
       return {
         id: g.id, category: g.category, caption: caps.join(' · '), capInk: over ? '#3D2B1F' : '#A8A29A',
-        objectiveCaption: subTargetSum > 0 ? 'Suma de subcategorías · ' + this.fmt(target)
+        objectiveCaption: this.isPeriodicCat(g)
+            ? (FREQ_NAME[g.freq] || '') + ' · ' + this.fmt(g.freqAmount) + ' · reserva ' + this.fmt(this.monthlyReserve(g)) + '/mes · próximo ' + this.label(this.nextCharge(g, m))
+          : subTargetSum > 0 ? 'Suma de subcategorías · ' + this.fmt(target)
           : (g.pct > 0 ? this.num(g.pct).replace(/,00$/, '') + '% de tus ingresos · ' + this.fmt(target)
           : (target > 0 ? 'Objetivo ' + this.fmt(target) : 'Sin objetivo')),
-        targetEditable: !(subTargetSum > 0), targetCalcStr: this.fmt(target),
+        targetEditable: !(subTargetSum > 0) && !this.isPeriodicCat(g), targetCalcStr: this.fmt(target),
         subCaption: subTargetSum > 0 ? 'Suma de subcategorías' : (g.pct > 0 ? this.num(g.pct).replace(/,00$/, '') + '% de tus ingresos' : ''),
         onCat: (e) => { g.category = e.target.value; this.touch(); },
         single: es.length === 1, merged: es.length > 1, emptyEntries: es.length === 0, count: es.length,
@@ -3338,7 +3430,7 @@ class Component extends DCLogic {
         remainStr: target > 0 ? this.fmt(target - total) : '—',
         remainInk: over ? '#A03B2A' : '#1E3A8A',
         spentSmall: this.fmt(total) + (target > 0 ? ' de ' + this.fmt(target) : ''),
-        disponibleStr: isSavingsSheet ? (linkRef ? this.fmt(linkedNet) : this.fmt(this.allTimeTotal(g))) : (target > 0 ? this.fmt(target - total) : '—'),
+        disponibleStr: isSavingsSheet ? (linkRef ? this.fmt(linkedNet) : this.fmt(this.allTimeTotal(g))) : (this.isPeriodicCat(g) ? this.fmt(this.freqPot(g, m)) : (target > 0 ? this.fmt(target - total) : '—')),
         disponibleInk: isSavingsSheet ? (linkRef && linkedNet < 0 ? '#A03B2A' : '#3D2B1F') : (over ? '#A03B2A' : '#1E3A8A'),
         dispLabel: isSavingsSheet ? 'Total' : (countDown ? 'Quedan' : 'Disponible'),
         dispWeight: (!isSavingsSheet && countDown && target > 0) ? '800' : '600',
@@ -3370,13 +3462,37 @@ class Component extends DCLogic {
         },
         linkedNetStr: linkRef ? this.fmt(linkedNet) : '', linkedNetInk: linkedNet < 0 ? '#A03B2A' : '#3D2B1F',
         linkedSavedStr: linkRef ? this.fmt(linkedSavedTotal) : '', linkedSpentStr: linkRef ? this.fmt(linkedSpentTotal) : '',
+        isPeriodicCat: this.isPeriodicCat(g),
+        f1bd: !(g.freq > 1) ? '#1E3A8A' : '#D7D4E8', f1bg: !(g.freq > 1) ? '#1E3A8A' : '#FFFFFF', f1ink: !(g.freq > 1) ? '#FFFFFF' : '#4A3B35',
+        f2bd: g.freq === 2 ? '#1E3A8A' : '#D7D4E8', f2bg: g.freq === 2 ? '#1E3A8A' : '#FFFFFF', f2ink: g.freq === 2 ? '#FFFFFF' : '#4A3B35',
+        f3bd: g.freq === 3 ? '#1E3A8A' : '#D7D4E8', f3bg: g.freq === 3 ? '#1E3A8A' : '#FFFFFF', f3ink: g.freq === 3 ? '#FFFFFF' : '#4A3B35',
+        f6bd: g.freq === 6 ? '#1E3A8A' : '#D7D4E8', f6bg: g.freq === 6 ? '#1E3A8A' : '#FFFFFF', f6ink: g.freq === 6 ? '#FFFFFF' : '#4A3B35',
+        f12bd: g.freq === 12 ? '#1E3A8A' : '#D7D4E8', f12bg: g.freq === 12 ? '#1E3A8A' : '#FFFFFF', f12ink: g.freq === 12 ? '#FFFFFF' : '#4A3B35',
+        freqIsMensual: !(g.freq > 1), freqIs2: g.freq === 2, freqIs3: g.freq === 3, freqIs6: g.freq === 6, freqIs12: g.freq === 12,
+        setFreq1: () => { delete g.freq; delete g.freqAmount; delete g.freqStart; delete g.freqSince; this.touch(); },
+        setFreq2: () => { g.freq = 2; if (!g.freqStart) g.freqStart = m; if (!g.freqSince) g.freqSince = m; this.touch(); },
+        setFreq3: () => { g.freq = 3; if (!g.freqStart) g.freqStart = m; if (!g.freqSince) g.freqSince = m; this.touch(); },
+        setFreq6: () => { g.freq = 6; if (!g.freqStart) g.freqStart = m; if (!g.freqSince) g.freqSince = m; this.touch(); },
+        setFreq12: () => { g.freq = 12; if (!g.freqStart) g.freqStart = m; if (!g.freqSince) g.freqSince = m; this.touch(); },
+        freqAmountVal: this.ed('fa' + g.id, g.freqAmount ? this.num(g.freqAmount) : ''),
+        onFreqAmount: (e) => { this.setEd('fa' + g.id, e.target.value); const v = this.parse(e.target.value); if (v > 0) g.freqAmount = v; else delete g.freqAmount; this.touch(); },
+        onFreqAmountBlur: () => this.clearEd('fa' + g.id),
+        freqStartVal: g.freqStart || m,
+        onFreqStart: (e) => { const v = e.target.value; if (/^\d{4}-\d{2}$/.test(v)) { g.freqStart = v; if (!g.freqSince) g.freqSince = m; this.touch(); } },
+        freqShowsConfig: g.freq > 1,
+        reserveStr: this.fmt(this.monthlyReserve(g)),
+        nextChargeLabel: this.isPeriodicCat(g) ? this.label(this.nextCharge(g, m)) : '',
+        potStr: this.fmt(this.freqPot(g, m)),
+        potInk: this.freqPot(g, m) < 0 ? '#A03B2A' : '#0D7A56',
+        isChargeMonth: this.isChargeMonth(g, m),
+        chargeNote: this.isChargeMonth(g, m) ? 'Este mes toca pagar ' + this.fmt(g.freqAmount || 0) : '',
         dropKey: dropKey,
         rowDropBg: isDropTarget ? 'rgba(30,58,138,0.08)' : 'transparent',
         rowDropOutline: isDropTarget ? '2px dashed #1E3A8A' : '2px solid transparent',
         onDragOver: (ev) => { ev.preventDefault(); if (this.state.dragSub && this.state.dragSub.groupId !== g.id && this.state.dragOver !== dropKey) this.setState({ dragOver: dropKey }); },
         onDragLeave: () => { if (this.state.dragOver === dropKey) this.setState({ dragOver: null }); },
         onDrop: (ev) => { ev.preventDefault(); ev.stopPropagation(); this.dropSubOn(dropKey); },
-        hasSubcats: ((g.subs) || []).length > 0,
+        hasSubcats: ((g.subs) || []).length > 0, noSubcats: ((g.subs) || []).length === 0,
         subcatDraftVal: (this.state.subcatDraft[g.id] || ''),
         onSubcatDraft: (e) => this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: e.target.value }) })),
         addSubcat: () => { if (this.addSubcategory(g, this.state.subcatDraft[g.id] || '')) this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: '' }) })); },
@@ -3392,7 +3508,7 @@ class Component extends DCLogic {
           const subsList = (g.subs) || [];
           const out = [];
           const blank = {
-            isSub: false, isLine: false, isLoose: false,
+            isSub: false, isLine: false, isLoose: false, isForm: false,
             id: '', name: '', nameVal: '', onName: () => {}, onNameBlur: () => {},
             targetVal: '', onTarget: () => {}, onTargetBlur: () => {},
             mainStr: '', mainInk: '#3D2B1F', hasBar: false, barPct: '0%', barColor: '#8FB89E',
@@ -3469,10 +3585,12 @@ class Component extends DCLogic {
               onDelete: () => { if (window.confirm('¿Quitar la subcategoría "' + sb.name + '"? Sus líneas vuelven a ' + g.category + ', no se borra ningún importe.')) this.removeSubcategory(g, sb.id); }
             }));
             mine.forEach(e => out.push(lineItem(e)));
+            if ((this.state.lineDest[g.id] || '') === sb.id) out.push(Object.assign({}, blank, { isForm: true, id: 'form-' + sb.id, name: sb.name }));
           });
           const looseEs = es.filter(e => !e.subId || !subsList.some(sb => sb.id === e.subId));
           if (subsList.length && looseEs.length) out.push(Object.assign({}, blank, { isLoose: true, name: 'Sin subcategoría', mainStr: this.fmt(this.looseSpent(g, m)) }));
           looseEs.forEach(e => out.push(lineItem(e)));
+          if (subsList.length && !(this.state.lineDest[g.id] || '')) out.push(Object.assign({}, blank, { isForm: true, id: 'form-loose', name: 'Sin subcategoría' }));
           return out;
         })(),
         subTitleDraft: subDraft.title || '', subAmtDraft: subDraft.amt || '',
@@ -4145,6 +4263,27 @@ class Component extends DCLogic {
       })(),
       applyNet: () => { this.d.income[m] = [{ id: uid(), label: 'Nómina (neta)', amount: Math.round(sal.monthly * 100) / 100 }]; this.setState({ modal: null, edits: {} }); this.touch(); },
 
+      // ---- Proyección: qué pasa si gastas lo presupuestado ----
+      hasProjection: (() => {
+        const c = this.committed(m);
+        return c > assigned + 0.004 && (avail > 0 || assigned > 0);
+      })(),
+      projectionNote: (() => {
+        const c = this.committed(m);
+        const left = avail - c;
+        const pending = c - assigned;
+        const base = 'Te quedan ' + this.fmt(pending) + ' presupuestados sin gastar. Si los gastas todos, ';
+        if (left >= 0) return base + 'cerrarás el mes con ' + this.fmt(left) + '.';
+        return base + 'te pasarás ' + this.fmt(-left) + '.';
+      })(),
+      projectionOver: (() => this.committed(m) > avail + 0.004)(),
+      projectionBd: this.committed(m) > avail + 0.004 ? '#D97706' : '#D7D4E8',
+      projectionBg: this.committed(m) > avail + 0.004 ? 'rgba(217,119,6,0.07)' : '#FFFFFF',
+      projectionInk: this.committed(m) > avail + 0.004 ? '#B4690E' : '#4A3B35',
+      projectionBarPct: (avail > 0 ? Math.min(100, this.committed(m) / avail * 100) : 0).toFixed(1) + '%',
+      projectionSpentPct: (avail > 0 ? Math.min(100, assigned / avail * 100) : 0).toFixed(1) + '%',
+      projectionSpentStr: this.fmt(assigned), projectionCommittedStr: this.fmt(this.committed(m)), projectionAvailStr: this.fmt(avail),
+
       // ---- Un buen mes: lo que ha salido bien ----
       winNote: winNote,
       hasWin: !!winNote,
@@ -4377,6 +4516,7 @@ class Component extends DCLogic {
 
       chartOpen: this.state.modal === 'chart', newTabOpen: this.state.modal === 'tab',
       closeModal: () => this.setState({ modal: null, moveLine: null }), stop: (e) => e.stopPropagation(),
+      stopClick: (e) => e.stopPropagation(),
       linePath: linePath, avgPath: avgPath, chartPoints: chartPoints, chartGrid: chartGrid, chartLabels: chartLabels,
       donut: donut, donutCenter: this.int(assigned) + '€',
       topCats: topCats, upcoming: upcoming, hasUpcoming: upcoming.length > 0,
@@ -4427,7 +4567,8 @@ class Component extends DCLogic {
       allPeriodicMonthlyStr: this.fmt(allPeriodicMonthly) + '/mes',
       hasPeriodicSheets: periodicSheetsView.length > 0,
       views: (() => {
-        const all = NAV_ITEMS.map(v => {
+        const hasPeriodicData = this.d.sheets.some(sh => sh.kind === 'periodic' && ((this.d.prows[sh.id]) || []).length > 0);
+        const all = NAV_ITEMS.filter(v => v.id !== 'periodics' || hasPeriodicData).map(v => {
           const on = (this.state.view || 'month') === v.id;
           return { id: v.id, name: v.name, icon: v.icon,
             isLayout: v.icon === 'layout', isClipboard: v.icon === 'clipboard', isDollar: v.icon === 'dollar', isBars: v.icon === 'bars', isTrend: v.icon === 'trend', isTrophy: v.icon === 'trophy',
