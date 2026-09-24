@@ -53,6 +53,7 @@
     .m-exp{padding:10px 12px 14px 14px!important}
     .m-subadd{flex-wrap:wrap!important}
     .m-subadd > input:first-of-type{flex:1 1 100%!important;min-width:0!important}
+    .m-subcat-head{flex:1 1 100%!important}
     .m-authR{padding:28px 16px!important;min-height:100vh}
     .m-authCard{padding:26px 18px!important;border-radius:18px!important}
     main h1{font-size:26px!important}
@@ -490,13 +491,16 @@
                   <sc-if value="{{ row.hasTarget }}" hint-placeholder-val="{{ false }}">
                     <div style="height:6px;background:#EBEDF0;border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:100%;width:{{ row.barPct }};background:{{ row.barColor }};border-radius:3px"></div></div>
                   </sc-if>
-                  <sc-if value="{{ !row.hasTarget }}" hint-placeholder-val="{{ true }}">
-                    <div style="font:400 12px/1.3 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-top:3px">{{ row.objectiveCaption }}</div>
-                  </sc-if>
+                  <div style="font:400 11.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-top:4px">{{ row.objectiveCaption }}</div>
                 </div>
                 <sc-if value="{{ showTarget }}" hint-placeholder-val="{{ true }}">
                   <sc-if value="{{ !targetColHidden }}" hint-placeholder-val="{{ true }}">
+                    <sc-if value="{{ !row.targetEditable }}" hint-placeholder-val="{{ false }}">
+                      <div title="Calculado a partir de las subcategorías" style="padding:12px 16px;text-align:right;font:400 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:#A8A29A">{{ row.targetCalcStr }}</div>
+                    </sc-if>
+                    <sc-if value="{{ row.targetEditable }}" hint-placeholder-val="{{ true }}">
                     <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:400 14px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none;padding:12px 16px" style-focus="background:#F8F7F4;color:#3D2B1F"></input>
+                    </sc-if>
                   </sc-if>
                   <sc-if value="{{ targetColHidden }}" hint-placeholder-val="{{ false }}">
                     <div style="height:100%;background:#D7D4E8"></div>
@@ -523,7 +527,7 @@
                 </sc-if>
                 <sc-if value="{{ showTarget }}" hint-placeholder-val="{{ true }}">
                   <sc-if value="{{ !extraColHidden }}" hint-placeholder-val="{{ true }}">
-                    <div style="padding:12px 16px;text-align:right;font:600 13.5px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ row.disponibleInk }}">{{ row.disponibleStr }}</div>
+                    <div style="padding:12px 16px;text-align:right;font:{{ row.dispWeight }} {{ row.dispSize }}/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ row.disponibleInk }}">{{ row.disponibleStr }}</div>
                   </sc-if>
                   <sc-if value="{{ extraColHidden }}" hint-placeholder-val="{{ false }}">
                     <div style="height:100%;background:#D7D4E8"></div>
@@ -574,7 +578,12 @@
                   <sc-if value="{{ narrowShowTarget }}" hint-placeholder-val="{{ true }}">
                     <div style="width:104px;flex:none">
                       <div style="font:700 9.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;color:#A8A29A;margin-bottom:4px;text-align:right">Presupuesto</div>
-                      <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:500 15px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none;padding:0"></input>
+                      <sc-if value="{{ !row.targetEditable }}" hint-placeholder-val="{{ false }}">
+                        <div style="font:500 15px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#A8A29A">{{ row.targetCalcStr }}</div>
+                      </sc-if>
+                      <sc-if value="{{ row.targetEditable }}" hint-placeholder-val="{{ true }}">
+                        <input value="{{ row.targetStr }}" onChange="{{ row.onTarget }}" onBlur="{{ row.onTargetBlur }}" inputMode="decimal" placeholder="—" style="width:100%;border:none;background:transparent;font:500 15px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none;padding:0"></input>
+                      </sc-if>
                     </div>
                   </sc-if>
                 </div>
@@ -585,11 +594,12 @@
 
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
                   <sc-if value="{{ narrowShowTarget }}" hint-placeholder-val="{{ true }}">
-                    <span style="font:600 12px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ row.disponibleInk }}">Disponible {{ row.disponibleStr }}</span>
+                    <span style="font:{{ row.dispWeight }} 12.5px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ row.disponibleInk }}">{{ row.dispLabel }} {{ row.disponibleStr }}</span>
                   </sc-if>
                   <sc-if value="{{ !narrowShowTarget }}" hint-placeholder-val="{{ false }}">
                     <span style="font:400 12px/1.3 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ row.objectiveCaption }}</span>
                   </sc-if>
+                  <span style="font:400 10.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A;flex:1;min-width:0">{{ row.subCaption }}</span>
                   <button onClick="{{ row.toggle }}" style="border:1px solid #D7D4E8;background:#FFFFFF;color:#1E3A8A;font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;flex:none">
                     <sc-if value="{{ !row.expanded }}" hint-placeholder-val="{{ true }}">
                       <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><line x1="8" y1="3" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line><line x1="3" y1="8" x2="13" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></line></svg>
@@ -626,14 +636,59 @@
                       </div>
                     </div>
                   </sc-if>
+                  <sc-if value="{{ row.hasSubcats }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                      <sc-for list="{{ row.subcats }}" as="sc" hint-placeholder-count="2">
+                        <div style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:10px;padding:11px 12px">
+                          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <div class="m-subcat-head" style="display:flex;align-items:center;gap:6px;flex:1;min-width:110px">
+                              <input value="{{ sc.nameVal }}" onChange="{{ sc.onName }}" onBlur="{{ sc.onNameBlur }}" style="flex:1;min-width:0;border:none;background:transparent;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
+                              <button onClick="{{ sc.onDelete }}" title="Quitar subcategoría" style="border:none;background:none;color:#C9C4BC;cursor:pointer;padding:2px;font-size:15px;line-height:1;flex:none" style-hover="color:#A03B2A">×</button>
+                            </div>
+                            <input value="{{ sc.targetVal }}" onChange="{{ sc.onTarget }}" onBlur="{{ sc.onTargetBlur }}" placeholder="Presupuesto o %" style="width:118px;flex:none;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 8px;font:500 12.5px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none" style-focus="border-color:#1E3A8A"></input>
+                            <span style="font:700 14px/1 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ sc.mainInk }};flex:none;min-width:80px;text-align:right">{{ sc.mainStr }}</span>
+                          </div>
+                          <sc-if value="{{ sc.hasBar }}" hint-placeholder-val="{{ false }}">
+                            <div style="height:5px;background:#EBEDF0;border-radius:3px;margin-top:8px;overflow:hidden"><div style="height:100%;width:{{ sc.barPct }};background:{{ sc.barColor }};border-radius:3px"></div></div>
+                          </sc-if>
+                          <div style="display:flex;justify-content:space-between;gap:10px;margin-top:6px;font:400 10.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A">
+                            <span>{{ sc.countStr }} · {{ sc.spentStr }} gastado</span>
+                            <span>{{ sc.pctHint }}</span>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                    <input value="{{ row.subcatDraftVal }}" onChange="{{ row.onSubcatDraft }}" onKeyDown="{{ row.onSubcatKey }}" placeholder="Nueva subcategoría (ej. Luz)" style="flex:1;min-width:150px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:7px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+                    <button onClick="{{ row.addSubcat }}" style="border:1px solid #1E3A8A;background:transparent;color:#1E3A8A;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:8px 13px;border-radius:6px;cursor:pointer;flex:none" style-hover="background:rgba(30,58,138,0.06)">+ Subcategoría</button>
+                  </div>
+
                   <sc-for list="{{ row.subs }}" as="s" hint-placeholder-count="2">
                     <div style="display:flex;align-items:center;gap:10px;padding:5px 0">
                       <span style="width:4px;height:4px;border-radius:50%;background:#E8E0D4;flex:none"></span>
                       <input value="{{ s.titleVal }}" onChange="{{ s.onTitle }}" onBlur="{{ s.onTitleBlur }}" placeholder="Título (ej. Mercadona)" style="flex:1;min-width:0;border:none;background:transparent;font:400 12px/1 'Plus Jakarta Sans',sans-serif;color:#4A3B35;outline:none;padding:6px 0" style-focus="color:#3D2B1F"></input>
                       <input value="{{ s.amountStr }}" onChange="{{ s.onAmt }}" onBlur="{{ s.onBlur }}" inputMode="decimal" style="width:112px;border:none;background:#FFFFFF;padding:7px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="background:#fff"></input>
+                      <sc-if value="{{ s.hasSubLabel }}" hint-placeholder-val="{{ false }}">
+                        <span style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;color:#1E3A8A;background:rgba(30,58,138,0.08);border-radius:10px;padding:4px 8px;white-space:nowrap;flex:none">{{ s.subLabel }}</span>
+                      </sc-if>
+                      <sc-if value="{{ s.canMove }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ s.onMove }}" title="Mover a otra subcategoría" style="border:none;background:none;color:#A8A29A;cursor:pointer;padding:4px;display:flex;flex:none" style-hover="color:#1E3A8A">
+                          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><polyline points="9,3 13,7 9,11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="13" y1="7" x2="3" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line></svg>
+                        </button>
+                      </sc-if>
                       <button onClick="{{ s.onDelete }}" style="border:none;background:none;color:#E8E0D4;cursor:pointer;font-size:14px;line-height:1;padding:4px" style-hover="color:#A03B2A">×</button>
                     </div>
                   </sc-for>
+                  <sc-if value="{{ row.hasSubcats }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0">
+                      <span style="font:400 11px/1.9 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-right:2px">Añadir en:</span>
+                      <sc-for list="{{ row.destChips }}" as="dc" hint-placeholder-count="3">
+                        <button onClick="{{ dc.onClick }}" style="border:1px solid {{ dc.bd }};background:{{ dc.bg }};color:{{ dc.ink }};font:500 11.5px/1 'Plus Jakarta Sans',sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer">{{ dc.name }}</button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
                   <div class="m-subadd" style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
                     <input value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;margin-left:14px" style-focus="border-color:#1E3A8A"></input>
                     <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
@@ -1731,6 +1786,21 @@
   </button>
 </sc-if>
 
+<sc-if value="{{ moveLineOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="m-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:62;animation:ov .16s ease">
+    <div class="m-dlg" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;padding:24px 26px 26px;animation:card .2s ease">
+      <h2 style="margin:0;font:600 24px/1.1 'Instrument Serif',serif;color:#3D2B1F">Mover línea</h2>
+      <p style="margin:6px 0 16px;font:300 13px/1.45 'Plus Jakarta Sans',sans-serif;color:#8B7355">{{ moveLineTitle }}</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ moveLineOptions }}" as="mo" hint-placeholder-count="3">
+          <button onClick="{{ mo.onClick }}" style="width:100%;text-align:left;border:1px solid {{ mo.bd }};background:{{ mo.bg }};color:{{ mo.ink }};font:600 13.5px/1 'Plus Jakarta Sans',sans-serif;padding:13px 15px;border-radius:10px;cursor:pointer">{{ mo.name }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ closeModal }}" style="width:100%;margin-top:16px;border:1px solid #D7D4E8;background:transparent;color:#8B7355;font:400 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 16px;border-radius:9px;cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ quickOpen }}" hint-placeholder-val="{{ false }}">
   <div class="m-ovl m-sheet-ovl" onClick="{{ closeModal }}" style="position:fixed;inset:0;background:rgba(44,38,34,0.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:60;animation:ov .16s ease">
     <div class="m-dlg m-sheet" onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:24px 26px 26px;animation:card .2s ease">
@@ -2033,7 +2103,7 @@ class Component extends DCLogic {
     compact: false, modal: null, w: 1200, menu: false, navOpen: false,
     draft: { cat: '', amt: '', title: '', target: '', freq: 'trimestral', charge: '3', inst: '36' },
     draftTargetOnly: false, draftFormOpen: false,
-    subDraft: {}, view: 'month',
+    subDraft: {}, subcatDraft: {}, lineDest: {}, moveLine: null, view: 'month',
     invDraft: { name: '', type: 'indexado', invested: '', value: '' },
     imp: { step: 0, text: '', rows: [], header: true, map: { date: 0, concept: 1, amount: 2 }, pending: [], report: null },
     newTab: { name: '', kind: 'monthly', accent: 'terracotta' },
@@ -2349,15 +2419,15 @@ class Component extends DCLogic {
     return last; // el más antiguo encontrado en la ventana, o null
   }
   monthWithinBudget(mk) {
-    const fixedT = this.gs('fixed').reduce((s, g) => s + (g.targets[mk] || 0), 0);
-    const varT = this.gs('variable').reduce((s, g) => s + (g.targets[mk] || 0), 0);
+    const fixedT = this.gs('fixed').reduce((s, g) => s + this.groupTarget(g, mk), 0);
+    const varT = this.gs('variable').reduce((s, g) => s + this.groupTarget(g, mk), 0);
     const totalT = fixedT + varT;
     if (totalT <= 0) return false;
     const totalS = this.sheetTotal('fixed', mk) + this.sheetTotal('variable', mk);
     return totalS <= totalT;
   }
   monthSavingsGoalMet(mk) {
-    const savT = this.gs('savings').reduce((s, g) => s + (g.targets[mk] || 0), 0);
+    const savT = this.gs('savings').reduce((s, g) => s + this.groupTarget(g, mk), 0);
     if (savT <= 0) return false;
     return this.sheetTotal('savings', mk) >= savT;
   }
@@ -2481,6 +2551,47 @@ class Component extends DCLogic {
     return out.sort((a, b) => b.uses - a.uses).slice(0, limit || 8);
   }
 
+  // Presupuesto propio de una categoría: importe fijo, o % de los ingresos del mes.
+  ownTarget(g, month) {
+    if (g && g.pct > 0) return Math.round(this.incomeTotal(month) * g.pct) / 100;
+    return (g && g.targets && g.targets[month]) || 0;
+  }
+  subTarget(sb, month) {
+    if (sb && sb.pct > 0) return Math.round(this.incomeTotal(month) * sb.pct) / 100;
+    return (sb && sb.targets && sb.targets[month]) || 0;
+  }
+  // Si la categoría tiene subcategorías con presupuesto, el suyo es la suma de ellas.
+  groupTarget(g, month) {
+    const subs = (g && g.subs) || [];
+    const subSum = subs.reduce((t, sb) => t + this.subTarget(sb, month), 0);
+    if (subSum > 0) return subSum;
+    return this.ownTarget(g, month);
+  }
+  groupHasTarget(g, month) { return this.groupTarget(g, month) > 0; }
+  subSpent(g, sb, month) {
+    return this.entriesOf(g, month).filter(e => e.subId === sb.id).reduce((t, e) => t + (e.amount || 0), 0);
+  }
+  looseSpent(g, month) {
+    const ids = ((g.subs) || []).map(sb => sb.id);
+    return this.entriesOf(g, month).filter(e => !e.subId || ids.indexOf(e.subId) < 0).reduce((t, e) => t + (e.amount || 0), 0);
+  }
+  addSubcategory(g, name) {
+    const nm = (name || '').trim();
+    if (!nm) return false;
+    if (!g.subs) g.subs = [];
+    if (g.subs.some(sb => sb.name.trim().toLowerCase() === nm.toLowerCase())) return false;
+    g.subs.push({ id: uid(), name: nm, targets: {} });
+    this.touch();
+    return true;
+  }
+  removeSubcategory(g, subId) {
+    if (!g.subs) return;
+    g.subs = g.subs.filter(sb => sb.id !== subId);
+    // Las líneas que colgaban de ella vuelven a la categoría, no se pierde dinero.
+    (g.entries || []).forEach(e => { if (e.subId === subId) delete e.subId; });
+    this.touch();
+  }
+
   addTargetOnly(sheetId, cat, targetAmt, month) {
     const c = (cat || '').trim(), tgt = this.parse(targetAmt);
     if (!c || !tgt) return;
@@ -2516,8 +2627,16 @@ class Component extends DCLogic {
       if (!this.d.groups[sheetId]) return;
       this.gs(sheetId).forEach(g => {
         if (g.targets[fromMonth] && !g.targets[this.state.month]) g.targets[this.state.month] = g.targets[fromMonth];
+        // Los presupuestos de las subcategorías también viajan al mes nuevo.
+        ((g.subs) || []).forEach(sb => {
+          if (sb.targets && sb.targets[fromMonth] && !sb.targets[this.state.month]) sb.targets[this.state.month] = sb.targets[fromMonth];
+        });
         if (cfg.mode === 'full') {
-          this.entriesOf(g, fromMonth).forEach(e => g.entries.push({ id: uid(), amount: e.amount, date: this.state.month, paid: false, title: e.title || '' }));
+          this.entriesOf(g, fromMonth).forEach(e => {
+            const copy = { id: uid(), amount: e.amount, date: this.state.month, paid: false, title: e.title || '' };
+            if (e.subId) copy.subId = e.subId;
+            g.entries.push(copy);
+          });
         }
       });
     });
@@ -2529,11 +2648,12 @@ class Component extends DCLogic {
     let nNew = 0;
     this.monthlySheets().forEach(s => {
       this.gs(s.id).forEach(g => {
-        const hasThisMonth = (g.targets[from] || 0) > 0 || this.entriesOf(g, from).length > 0;
+        const hasThisMonth = this.groupTarget(g, from) > 0 || this.entriesOf(g, from).length > 0;
         if (!hasThisMonth) return;
-        const already = (g.targets[to] || 0) > 0 || this.entriesOf(g, to).length > 0;
+        const already = this.groupTarget(g, to) > 0 || this.entriesOf(g, to).length > 0;
         if (already) return;
         g.targets[to] = 0;
+        ((g.subs) || []).forEach(sb => { if (sb.targets && sb.targets[from] && !sb.targets[to]) sb.targets[to] = 0; });
         nNew++;
       });
     });
@@ -2651,8 +2771,8 @@ class Component extends DCLogic {
 
         // Cerrar dentro de presupuesto en todas las pestañas de gasto con objetivo.
         const spendSheets = this.monthlySheets().filter(sh => sh.id !== 'savings');
-        const withTarget = spendSheets.filter(sh => this.gs(sh.id).reduce((t, g) => t + (g.targets[m] || 0), 0) > 0);
-        if (withTarget.length && withTarget.every(sh => this.sheetTotal(sh.id, m) <= this.gs(sh.id).reduce((t, g) => t + (g.targets[m] || 0), 0))) {
+        const withTarget = spendSheets.filter(sh => this.gs(sh.id).reduce((t, g) => t + this.groupTarget(g, m), 0) > 0);
+        if (withTarget.length && withTarget.every(sh => this.sheetTotal(sh.id, m) <= this.gs(sh.id).reduce((t, g) => t + this.groupTarget(g, m), 0))) {
           return 'Dentro de presupuesto en ' + withTarget.map(sh => sh.name.toLowerCase()).join(' y ') + '. Bien gestionado.';
         }
 
@@ -2931,14 +3051,14 @@ class Component extends DCLogic {
     if (!this.state.ready || !this.d) return { ready: false, isMonthly: true, showTarget: true, gridCols: 'minmax(0,1fr) 108px 128px 40px 34px', statCols: 'repeat(4,1fr)', padCell: '11px 14px', tableMinWidth: '0',
       isAuthed: true, showSetup: false,
       monthShort: '', monthLabel: '', incomeTotalStr: '', paidLine: '', saveText: '', accentInk: '#3D2B1F', densityLabel: '', draftPlaceholder: '', draftAmtPlaceholder: '', emptyText: '', periodicTotalStr: '',
-      isNarrow: false, isWide: true, narrowShowTarget: false, showHeadRow: true,
+      isNarrow: false, isWide: true, narrowShowTarget: false, showHeadRow: true, countDown: true, countUp: false, toggleCountDown: () => {},
       canUndo: false, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoInk: '#A8A29A', redoInk: '#A8A29A', undoCursor: 'default', redoCursor: 'default', views: [],
       previsionStr: '', gastadoRealStr: '', availStr: '', gastadoRealInk: '#3D2B1F', previsionDiffStr: '', previsionDiffInk: '#3D2B1F', previsionPct: '0%', previsionBarColor: '#1E3A8A', previsionOnTrack: true,
       distributeOpen: false, distHasSavers: false, distNoSavers: true, distRows: [], distShowPct: false,
       savingsRate: '', cushionMonths: '', cushionInk: '#3D2B1F', cushionTarget: '', onCushionTarget: () => {}, onCushionBlur: () => {}, cushionNote: '',
       allocCards: [], hasAllocations: false,
       goalCards: [], hasGoals: false, hasUserGoals: false,
-      winNote: '', hasWin: false,
+      winNote: '', hasWin: false, moveLineOpen: false, moveLineOptions: [], moveLineTitle: '',
       showOnboarding: false, obChips: [], obHasSelection: false, obCountLabel: '', obIncome: '',
       obStepIncomeDone: false, obStepCatsDone: false, obStepGoalDone: false,
       obStepIncomePending: true, obStepCatsPending: true, obStepGoalPending: true,
@@ -2946,13 +3066,14 @@ class Component extends DCLogic {
       menuOpen: false, menuItems: [], toggleMenu: () => {}, closeMenu: () => {}, navOpen: false, navOpenAttr: '0', toggleNav: () => {}, closeNav: () => {}, tableMinW: '0' };
 
     const m = this.state.month, narrow = this.state.w < 900, compact = this.state.compact;
+    const countDown = this.d.countDown !== false;
     this.ensureIncome(m);
     if (!this.d.calc) this.d.calc = { gross: '', pagas: '12', contract: 'indefinido', kids: '', kidsU3: '', override: '' };
     const c = this.d.calc, sal = this.salary();
     const sheet = this.d.sheets.find(s => s.id === this.state.sheetId && s.kind === 'monthly') || this.monthlySheets()[0] || this.d.sheets[0];
     const acc = ACC[sheet.accent] || ACC.ink;
     const inc = this.incomeTotal(m), carry = this.carryInto(m), avail = inc + carry, assigned = this.assigned(m);
-    const totalTarget = this.monthlySheets().reduce((t, s) => t + this.gs(s.id).reduce((tt, g) => tt + (g.targets[m] || 0), 0), 0);
+    const totalTarget = this.monthlySheets().reduce((t, s) => t + this.gs(s.id).reduce((tt, g) => tt + this.groupTarget(g, m), 0), 0);
     const totalSpentMonthly = this.monthlySheets().reduce((t, s) => t + this.sheetTotal(s.id, m), 0);
     const previsionDiff = totalTarget - totalSpentMonthly;
     const showTarget = !compact && sheet.kind === 'monthly';
@@ -2964,7 +3085,7 @@ class Component extends DCLogic {
       const t = this.sheetTotal(s.id, m), a = ACC[s.accent] || ACC.ink;
       const pctNum = avail > 0 ? (t / avail * 100) : 0;
       const pctText = avail > 0 ? this.pct(pctNum) + ' del disponible' : 'sin ingresos registrados';
-      const sumTgt = this.gs(s.id).reduce((tt, g) => tt + (g.targets[m] || 0), 0);
+      const sumTgt = this.gs(s.id).reduce((tt, g) => tt + this.groupTarget(g, m), 0);
       const FIG_DOT = { fixed: '#F59E0B', variable: '#F59E0B', savings: '#06B6D4' };
       let statusLabel, statusMint;
       if (s.id === 'savings') { statusMint = sumTgt === 0 || t >= sumTgt; statusLabel = sumTgt === 0 ? 'Sin objetivo' : (t >= sumTgt ? 'Objetivo cumplido' : 'Por debajo del objetivo'); }
@@ -3049,10 +3170,11 @@ class Component extends DCLogic {
     this.monthlySheets().filter(s => s.id !== 'savings').forEach(s => {
       this.gs(s.id).forEach(g2 => linkOptions.push({ value: s.id + ':' + g2.id, label: s.name + ' › ' + g2.category }));
     });
-    const rows = this.gs(sheet.id).filter(g => this.entriesOf(g, m).length > 0 || (g.targets[m] || 0) > 0 || g.targets.hasOwnProperty(m)).map(g => {
+    const rows = this.gs(sheet.id).filter(g => this.entriesOf(g, m).length > 0 || this.groupTarget(g, m) > 0 || g.targets.hasOwnProperty(m) || ((g.subs || []).length > 0)).map(g => {
       const es = this.entriesOf(g, m), total = es.reduce((s, e) => s + (e.amount || 0), 0);
       const key = sheet.id + ':' + g.id, exp = !!this.state.expanded[key];
-      const target = g.targets[m] || 0, over = target > 0 && total > target;
+      const subTargetSum = ((g.subs) || []).reduce((t, sb) => t + this.subTarget(sb, m), 0);
+      const target = this.groupTarget(g, m), over = target > 0 && total > target;
       const linkRef = isSavingsSheet ? this.findGroupByRef(g.linkId) : null;
       let linkedSavedTotal = 0, linkedSpentTotal = 0, linkedNet = 0;
       if (linkRef) { linkedSavedTotal = this.allTimeTotal(g); linkedSpentTotal = this.allTimeTotal(linkRef.group); linkedNet = linkedSavedTotal - linkedSpentTotal; }
@@ -3067,20 +3189,41 @@ class Component extends DCLogic {
       const doDelete = () => { g.entries = g.entries.filter(e => e.date !== m); delete g.targets[m]; if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); };
       return {
         id: g.id, category: g.category, caption: caps.join(' · '), capInk: over ? '#3D2B1F' : '#A8A29A',
-        objectiveCaption: target > 0 ? 'Objetivo ' + this.fmt(target) : 'Sin objetivo',
+        objectiveCaption: subTargetSum > 0 ? 'Suma de subcategorías · ' + this.fmt(target)
+          : (g.pct > 0 ? this.num(g.pct).replace(/,00$/, '') + '% de tus ingresos · ' + this.fmt(target)
+          : (target > 0 ? 'Objetivo ' + this.fmt(target) : 'Sin objetivo')),
+        targetEditable: !(subTargetSum > 0), targetCalcStr: this.fmt(target),
+        subCaption: subTargetSum > 0 ? 'Suma de subcategorías' : (g.pct > 0 ? this.num(g.pct).replace(/,00$/, '') + '% de tus ingresos' : ''),
         onCat: (e) => { g.category = e.target.value; this.touch(); },
         single: es.length === 1, merged: es.length > 1, emptyEntries: es.length === 0, count: es.length,
         chevron: exp ? '▲' : '▼',
         amountStr: es.length === 1 ? this.ed('a' + es[0].id, this.num(total)) : this.fmt(total),
         onAmt: (e) => { if (!es[0]) return; this.setEd('a' + es[0].id, e.target.value); es[0].amount = this.parse(e.target.value); this.touch(); },
         onAmtBlur: () => { if (es[0]) this.clearEd('a' + es[0].id); },
-        hasTarget: target > 0, barPct: target > 0 ? Math.min(100, total / target * 100).toFixed(1) + '%' : '0%',
-        barColor: over ? '#B23A55' : '#8FB89E',
+        hasTarget: target > 0,
+        barPct: target > 0 ? (countDown ? Math.max(0, Math.min(100, (target - total) / target * 100)) : Math.min(100, total / target * 100)).toFixed(1) + '%' : '0%',
+        barColor: over ? '#B23A55' : (countDown ? '#1E3A8A' : '#8FB89E'),
+        remainStr: target > 0 ? this.fmt(target - total) : '—',
+        remainInk: over ? '#A03B2A' : '#1E3A8A',
+        spentSmall: this.fmt(total) + (target > 0 ? ' de ' + this.fmt(target) : ''),
         disponibleStr: isSavingsSheet ? (linkRef ? this.fmt(linkedNet) : this.fmt(this.allTimeTotal(g))) : (target > 0 ? this.fmt(target - total) : '—'),
         disponibleInk: isSavingsSheet ? (linkRef && linkedNet < 0 ? '#A03B2A' : '#3D2B1F') : (over ? '#A03B2A' : '#1E3A8A'),
-        targetStr: this.ed('t' + g.id + m, target ? this.num(target) : ''),
-        onTarget: (e) => { this.setEd('t' + g.id + m, e.target.value); const v = this.parse(e.target.value); if (v) g.targets[m] = v; else delete g.targets[m]; this.touch(); },
+        dispLabel: isSavingsSheet ? 'Total' : (countDown ? 'Quedan' : 'Disponible'),
+        dispWeight: (!isSavingsSheet && countDown && target > 0) ? '800' : '600',
+        dispSize: (!isSavingsSheet && countDown && target > 0) ? '15px' : '13.5px',
+        targetStr: this.ed('t' + g.id + m, g.pct > 0 ? this.num(g.pct).replace(/,00$/, '') + '%' : (target ? this.num(target) : '')),
+        onTarget: (e) => {
+          const raw = e.target.value;
+          this.setEd('t' + g.id + m, raw);
+          const v = this.parse(raw);
+          if (/%/.test(raw)) { if (v > 0) { g.pct = v; delete g.targets[m]; } else delete g.pct; }
+          else { delete g.pct; if (v) g.targets[m] = v; else delete g.targets[m]; }
+          this.touch();
+        },
         onTargetBlur: () => this.clearEd('t' + g.id + m),
+        targetLocked: subTargetSum > 0,
+        targetHint: g.pct > 0 ? this.num(g.pct).replace(/,00$/, '') + '% de tus ingresos = ' + this.fmt(target) : '',
+        hasTargetHint: g.pct > 0,
         toggle: doToggle, expanded: exp,
         isSavingsSheet: isSavingsSheet, linkValue: g.linkId || '',
         isLinked: !!linkRef, linkedName: linkRef ? linkRef.sheetName + ' › ' + linkRef.group.category : '',
@@ -3095,6 +3238,47 @@ class Component extends DCLogic {
         },
         linkedNetStr: linkRef ? this.fmt(linkedNet) : '', linkedNetInk: linkedNet < 0 ? '#A03B2A' : '#3D2B1F',
         linkedSavedStr: linkRef ? this.fmt(linkedSavedTotal) : '', linkedSpentStr: linkRef ? this.fmt(linkedSpentTotal) : '',
+        hasSubcats: ((g.subs) || []).length > 0,
+        subcats: ((g.subs) || []).map(sb => {
+          const st = this.subTarget(sb, m), sp = this.subSpent(g, sb, m), sOver = st > 0 && sp > st;
+          return {
+            id: sb.id, name: sb.name,
+            nameVal: this.ed('sn' + sb.id, sb.name),
+            onName: (ev) => { this.setEd('sn' + sb.id, ev.target.value); sb.name = ev.target.value; this.touch(); },
+            onNameBlur: () => this.clearEd('sn' + sb.id),
+            targetVal: this.ed('st' + sb.id + m, sb.pct > 0 ? this.num(sb.pct).replace(/,00$/, '') + '%' : (st ? this.num(st) : '')),
+            onTarget: (ev) => {
+              const raw = ev.target.value;
+              this.setEd('st' + sb.id + m, raw);
+              const v = this.parse(raw);
+              if (/%/.test(raw)) { if (v > 0) { sb.pct = v; delete sb.targets[m]; } else delete sb.pct; }
+              else { delete sb.pct; if (v) sb.targets[m] = v; else delete sb.targets[m]; }
+              this.touch();
+            },
+            onTargetBlur: () => this.clearEd('st' + sb.id + m),
+            hasPct: sb.pct > 0, pctHint: sb.pct > 0 ? '= ' + this.fmt(st) : '',
+            spentStr: this.fmt(sp),
+            mainStr: countDown && st > 0 ? this.fmt(st - sp) : this.fmt(sp),
+            mainLabel: countDown && st > 0 ? 'queda' : 'gastado',
+            mainInk: sOver ? '#A03B2A' : '#1E3A8A',
+            hasBar: st > 0,
+            barPct: st > 0 ? (countDown ? Math.max(0, Math.min(100, (st - sp) / st * 100)) : Math.min(100, sp / st * 100)).toFixed(1) + '%' : '0%',
+            barColor: sOver ? '#B23A55' : (countDown ? '#1E3A8A' : '#8FB89E'),
+            countStr: this.entriesOf(g, m).filter(e => e.subId === sb.id).length + ' líneas',
+            onDelete: () => { if (window.confirm('¿Quitar la subcategoría "' + sb.name + '"? Sus líneas vuelven a ' + g.category + ', no se borra ningún importe.')) this.removeSubcategory(g, sb.id); }
+          };
+        }),
+        subcatDraftVal: (this.state.subcatDraft[g.id] || ''),
+        onSubcatDraft: (e) => this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: e.target.value }) })),
+        addSubcat: () => { if (this.addSubcategory(g, this.state.subcatDraft[g.id] || '')) this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: '' }) })); },
+        onSubcatKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); if (this.addSubcategory(g, this.state.subcatDraft[g.id] || '')) this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: '' }) })); } },
+        looseLabel: ((g.subs) || []).length ? 'Sin subcategoría · ' + this.fmt(this.looseSpent(g, m)) : '',
+        destChips: [{ id: '', name: 'Sin subcategoría' }].concat(((g.subs) || []).map(sb => ({ id: sb.id, name: sb.name }))).map(d => {
+          const on = (this.state.lineDest[g.id] || '') === d.id;
+          return { name: d.name,
+            bd: on ? '#1E3A8A' : '#D7D4E8', bg: on ? '#1E3A8A' : '#FFFFFF', ink: on ? '#FFFFFF' : '#4A3B35',
+            onClick: () => this.setState(st2 => ({ lineDest: Object.assign({}, st2.lineDest, { [g.id]: d.id }) })) };
+        }),
         subs: es.map((e) => ({
           titleVal: this.ed('ti' + e.id, e.title || ''),
           onTitle: (ev) => { this.setEd('ti' + e.id, ev.target.value); e.title = ev.target.value; this.touch(); },
@@ -3102,13 +3286,17 @@ class Component extends DCLogic {
           amountStr: this.ed('a' + e.id, this.num(e.amount)),
           onAmt: (ev) => { this.setEd('a' + e.id, ev.target.value); e.amount = this.parse(ev.target.value); this.touch(); },
           onBlur: () => this.clearEd('a' + e.id),
-          onDelete: () => { g.entries = g.entries.filter(x => x.id !== e.id); if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); }
+          onDelete: () => { g.entries = g.entries.filter(x => x.id !== e.id); if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); },
+          hasSubLabel: !!(e.subId && ((g.subs) || []).some(sb => sb.id === e.subId)),
+          subLabel: (((g.subs) || []).find(sb => sb.id === e.subId) || {}).name || '',
+          canMove: ((g.subs) || []).length > 0,
+          onMove: () => this.setState({ modal: 'moveline', moveLine: { sheetId: sheet.id, groupId: g.id, entryId: e.id } })
         })),
         subTitleDraft: subDraft.title || '', subAmtDraft: subDraft.amt || '',
         onSubTitleDraft: (e) => this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: Object.assign({}, subDraft, { title: e.target.value }) }) })),
         onSubDraft: (e) => this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: Object.assign({}, subDraft, { amt: e.target.value }) }) })),
-        addSub: () => { const v = this.parse(subDraft.amt); if (!v) return; g.entries.push({ id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); },
-        onSubKey: (e) => { if (e.key === 'Enter') { const v = this.parse(subDraft.amt); if (v) { g.entries.push({ id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); } } },
+        addSub: () => { const v = this.parse(subDraft.amt); if (!v) return; const dest = this.state.lineDest[g.id] || ''; const ent = { id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }; if (dest) ent.subId = dest; g.entries.push(ent); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); },
+        onSubKey: (e) => { if (e.key === 'Enter') { const v = this.parse(subDraft.amt); if (v) { const dest = this.state.lineDest[g.id] || ''; const ent = { id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }; if (dest) ent.subId = dest; g.entries.push(ent); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); } } },
         onDelete: doDelete
       };
     });
@@ -3363,7 +3551,7 @@ class Component extends DCLogic {
     const carryOn = !!this.d.carry[m];
     const isSavingsTab = sheet.id === 'savings';
     const targetLabel = isSavingsTab ? 'Objetivo' : 'Presupuesto';
-    const extraLabel = isSavingsTab ? 'Total' : 'Disponible';
+    const extraLabel = isSavingsTab ? 'Total' : (countDown ? 'Queda' : 'Disponible');
     const colHid = (key) => !!this.state.hiddenCols[sheet.id + ':' + key];
     const toggleCol = (key) => () => this.setState(s => ({ hiddenCols: Object.assign({}, s.hiddenCols, { [sheet.id + ':' + key]: !s.hiddenCols[sheet.id + ':' + key] }) }));
     const targetColHidden = colHid('target'), actualColHidden = colHid('actual'), extraColHidden = colHid('extra');
@@ -3380,7 +3568,7 @@ class Component extends DCLogic {
     const gridCols = narrow && sheet.kind === 'monthly' && showTarget
       ? 'minmax(118px,1fr) ' + colW(targetColHidden, '80px') + ' ' + colW(actualColHidden, '84px') + ' ' + colW(extraColHidden, '80px') + ' 62px'
       : sheet.kind === 'monthly'
-      ? (showTarget ? 'minmax(0,1fr) ' + colW(targetColHidden, '105px') + ' ' + colW(actualColHidden, '105px') + ' ' + colW(extraColHidden, '100px') + ' 60px' : 'minmax(0,1fr) ' + colW(actualColHidden, '120px') + ' 64px')
+      ? (showTarget ? 'minmax(0,1fr) ' + colW(targetColHidden, '104px') + ' ' + colW(actualColHidden, '124px') + ' ' + colW(extraColHidden, '104px') + ' 60px' : 'minmax(0,1fr) ' + colW(actualColHidden, '120px') + ' 64px')
       : 'minmax(0,1fr) 116px 132px 150px 130px 36px';
 
     const winNote = this.monthWin(m, assigned);
@@ -3440,6 +3628,7 @@ class Component extends DCLogic {
           } },
         { label: 'Carta para el banco', note: 'hipoteca', act: () => this.setState({ modal: 'letter' }) },
         { label: 'Salario neto', note: 'calculadora', act: () => this.setState({ modal: 'calc' }) },
+        { label: countDown ? 'Mostrar lo gastado' : 'Mostrar lo que queda', note: countDown ? 'ahora cuenta hacia abajo' : 'ahora suma lo gastado', act: () => { this.d.countDown = !countDown; this.touch(); } },
         { label: compact ? 'Densidad cómoda' : 'Densidad compacta', note: compact ? 'ahora compacta' : 'ahora cómoda', act: () => this.setState({ compact: !compact }) }
       ].map(it => ({ label: it.label, note: it.note, noteInk: it.hot ? '#1E3A8A' : '#A8A29A',
         onClick: () => { it.act(); this.setState({ menu: false, navOpen: false }); } })),
@@ -3688,6 +3877,8 @@ class Component extends DCLogic {
 
       isMonthly: sheet.kind === 'monthly', isPeriodic: sheet.kind === 'periodic',
       showHeadRow: !(narrow && sheet.kind === 'monthly'),
+      countDown: countDown, countUp: !countDown,
+      toggleCountDown: () => { this.d.countDown = !countDown; this.touch(); },
       showTarget: showTarget, heads: heads, gridCols: gridCols, tableMinW: tableMinW, padCell: pad,
       isNarrow: narrow, isWide: !narrow, narrowShowTarget: narrow && showTarget,
       targetColHidden: targetColHidden, actualColHidden: actualColHidden, extraColHidden: extraColHidden,
@@ -3810,6 +4001,26 @@ class Component extends DCLogic {
       obGoToGoals: () => this.setState({ view: 'achievements', navOpen: false }),
       obDismiss: () => { this.d.onboardingDone = true; this.touch(); },
 
+      // ---- Mover una línea a otra subcategoría ----
+      moveLineOpen: this.state.modal === 'moveline',
+      moveLineTitle: (() => {
+        const ml = this.state.moveLine; if (!ml) return '';
+        const grp = this.gs(ml.sheetId).find(x => x.id === ml.groupId); if (!grp) return '';
+        const ent = (grp.entries || []).find(x => x.id === ml.entryId); if (!ent) return '';
+        return (ent.title || this.fmt(ent.amount));
+      })(),
+      moveLineOptions: (() => {
+        const ml = this.state.moveLine; if (!ml) return [];
+        const grp = this.gs(ml.sheetId).find(x => x.id === ml.groupId); if (!grp) return [];
+        const ent = (grp.entries || []).find(x => x.id === ml.entryId); if (!ent) return [];
+        return [{ id: '', name: 'Sin subcategoría' }].concat(((grp.subs) || []).map(sb => ({ id: sb.id, name: sb.name }))).map(d => {
+          const on = (ent.subId || '') === d.id;
+          return { name: d.name,
+            bd: on ? '#1E3A8A' : '#D7D4E8', bg: on ? 'rgba(30,58,138,0.07)' : '#FFFFFF', ink: on ? '#1E3A8A' : '#4A3B35',
+            onClick: () => { if (d.id) ent.subId = d.id; else delete ent.subId; this.setState({ modal: null, moveLine: null }); this.touch(); } };
+        });
+      })(),
+
       // ---- Alta rápida ----
       quickOpen: this.state.modal === 'quick',
       openQuick: () => this.setState({ modal: 'quick', quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' }),
@@ -3929,7 +4140,7 @@ class Component extends DCLogic {
       },
 
       chartOpen: this.state.modal === 'chart', newTabOpen: this.state.modal === 'tab',
-      closeModal: () => this.setState({ modal: null }), stop: (e) => e.stopPropagation(),
+      closeModal: () => this.setState({ modal: null, moveLine: null }), stop: (e) => e.stopPropagation(),
       linePath: linePath, avgPath: avgPath, chartPoints: chartPoints, chartGrid: chartGrid, chartLabels: chartLabels,
       donut: donut, donutCenter: this.int(assigned) + '€',
       topCats: topCats, upcoming: upcoming, hasUpcoming: upcoming.length > 0,
