@@ -640,54 +640,62 @@
                       </div>
                     </div>
                   </sc-if>
-                  <sc-if value="{{ row.hasSubcats }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-                      <sc-for list="{{ row.subcats }}" as="sc" hint-placeholder-count="2">
-                        <div draggable="true" onDragStart="{{ sc.onDragStart }}" onDragEnd="{{ sc.onDragEnd }}" style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:10px;padding:11px 12px;opacity:{{ sc.cardOpacity }}">
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+                    <sc-for list="{{ row.detail }}" as="d" hint-placeholder-count="3">
+
+                      <sc-if value="{{ d.isSub }}" hint-placeholder-val="{{ false }}">
+                        <div draggable="true" onDragStart="{{ d.onDragStart }}" onDragEnd="{{ d.onDragEnd }}" style="background:#FFFFFF;border:1px solid #D7D4E8;border-radius:10px;padding:11px 12px;margin-top:6px;opacity:{{ d.cardOpacity }}">
                           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                             <div class="m-subcat-head" style="display:flex;align-items:center;gap:6px;flex:1;min-width:110px">
-                              <span draggable="true" onDragStart="{{ sc.onDragStart }}" onDragEnd="{{ sc.onDragEnd }}" onTouchStart="{{ sc.onTouchStart }}" onTouchMove="{{ sc.onTouchMove }}" onTouchEnd="{{ sc.onTouchEnd }}" title="Arrastra para moverla a otra categoría" style="flex:none;display:flex;align-items:center;color:#C9C4BC;cursor:grab;touch-action:none;padding:4px 2px;margin:-4px 0" style-hover="color:#1E3A8A">
+                              <span draggable="true" onDragStart="{{ d.onDragStart }}" onDragEnd="{{ d.onDragEnd }}" onTouchStart="{{ d.onTouchStart }}" onTouchMove="{{ d.onTouchMove }}" onTouchEnd="{{ d.onTouchEnd }}" title="Arrastra para moverla a otra categoría" style="flex:none;display:flex;align-items:center;color:#C9C4BC;cursor:grab;touch-action:none;padding:4px 2px;margin:-4px 0" style-hover="color:#1E3A8A">
                                 <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><circle cx="3.5" cy="3" r="1.3"></circle><circle cx="8.5" cy="3" r="1.3"></circle><circle cx="3.5" cy="7" r="1.3"></circle><circle cx="8.5" cy="7" r="1.3"></circle><circle cx="3.5" cy="11" r="1.3"></circle><circle cx="8.5" cy="11" r="1.3"></circle></svg>
                               </span>
-                              <input value="{{ sc.nameVal }}" onChange="{{ sc.onName }}" onBlur="{{ sc.onNameBlur }}" style="flex:1;min-width:0;border:none;background:transparent;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
-                              <button onClick="{{ sc.onDelete }}" title="Quitar subcategoría" style="border:none;background:none;color:#C9C4BC;cursor:pointer;padding:2px;font-size:15px;line-height:1;flex:none" style-hover="color:#A03B2A">×</button>
+                              <input value="{{ d.nameVal }}" onChange="{{ d.onName }}" onBlur="{{ d.onNameBlur }}" style="flex:1;min-width:0;border:none;background:transparent;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;padding:0"></input>
+                              <button onClick="{{ d.onAddHere }}" title="Añadir un importe aquí" style="border:1px solid #D7D4E8;background:#FFFFFF;color:#1E3A8A;cursor:pointer;padding:3px 8px;border-radius:6px;font:700 13px/1.3 'Plus Jakarta Sans',sans-serif;flex:none" style-hover="border-color:#1E3A8A;background:rgba(30,58,138,0.06)">+</button>
+                              <button onClick="{{ d.onDelete }}" title="Quitar subcategoría" style="border:none;background:none;color:#C9C4BC;cursor:pointer;padding:2px;font-size:15px;line-height:1;flex:none" style-hover="color:#A03B2A">×</button>
                             </div>
-                            <input value="{{ sc.targetVal }}" onChange="{{ sc.onTarget }}" onBlur="{{ sc.onTargetBlur }}" placeholder="Presupuesto o %" style="width:118px;flex:none;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 8px;font:500 12.5px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none" style-focus="border-color:#1E3A8A"></input>
-                            <span style="font:700 14px/1 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ sc.mainInk }};flex:none;min-width:80px;text-align:right">{{ sc.mainStr }}</span>
+                            <input value="{{ d.targetVal }}" onChange="{{ d.onTarget }}" onBlur="{{ d.onTargetBlur }}" placeholder="Presupuesto o %" style="width:118px;flex:none;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 8px;font:500 12.5px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#8B7355;outline:none" style-focus="border-color:#1E3A8A"></input>
+                            <span style="font:700 14px/1 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:{{ d.mainInk }};flex:none;min-width:80px;text-align:right">{{ d.mainStr }}</span>
                           </div>
-                          <sc-if value="{{ sc.hasBar }}" hint-placeholder-val="{{ false }}">
-                            <div style="height:5px;background:#EBEDF0;border-radius:3px;margin-top:8px;overflow:hidden"><div style="height:100%;width:{{ sc.barPct }};background:{{ sc.barColor }};border-radius:3px"></div></div>
+                          <sc-if value="{{ d.hasBar }}" hint-placeholder-val="{{ false }}">
+                            <div style="height:5px;background:#EBEDF0;border-radius:3px;margin-top:8px;overflow:hidden"><div style="height:100%;width:{{ d.barPct }};background:{{ d.barColor }};border-radius:3px"></div></div>
                           </sc-if>
                           <div style="display:flex;justify-content:space-between;gap:10px;margin-top:6px;font:400 10.5px/1.3 'Plus Jakarta Sans',sans-serif;color:#A8A29A">
-                            <span>{{ sc.countStr }} · {{ sc.spentStr }} gastado</span>
-                            <span>{{ sc.pctHint }}</span>
+                            <span>{{ d.countStr }}</span>
+                            <span>{{ d.pctHint }}</span>
                           </div>
                         </div>
-                      </sc-for>
-                    </div>
-                  </sc-if>
+                      </sc-if>
+
+                      <sc-if value="{{ d.isLoose }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:10px;padding:0 2px">
+                          <span style="font:700 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:0.07em;text-transform:uppercase;color:#A8A29A">{{ d.name }}</span>
+                          <span style="font:600 11.5px/1 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:#8B7355">{{ d.mainStr }}</span>
+                        </div>
+                      </sc-if>
+
+                      <sc-if value="{{ d.isLine }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;align-items:center;gap:10px;padding:5px 0 5px 10px">
+                          <span style="width:4px;height:4px;border-radius:50%;background:#E8E0D4;flex:none"></span>
+                          <input value="{{ d.titleVal }}" onChange="{{ d.onTitle }}" onBlur="{{ d.onTitleBlur }}" placeholder="Título (ej. Mercadona)" style="flex:1;min-width:0;border:none;background:transparent;font:400 12px/1 'Plus Jakarta Sans',sans-serif;color:#4A3B35;outline:none;padding:0"></input>
+                          <input value="{{ d.amountStr }}" onChange="{{ d.onAmt }}" onBlur="{{ d.onBlur }}" inputMode="decimal" style="width:112px;border:none;background:#FFFFFF;padding:7px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none;border-radius:6px" style-focus="background:#F3EFE8"></input>
+                          <sc-if value="{{ d.canMove }}" hint-placeholder-val="{{ false }}">
+                            <button onClick="{{ d.onMove }}" title="Mover a otra subcategoría" style="border:none;background:none;color:#A8A29A;cursor:pointer;padding:4px;display:flex;flex:none" style-hover="color:#1E3A8A">
+                              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><polyline points="9,3 13,7 9,11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="13" y1="7" x2="3" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line></svg>
+                            </button>
+                          </sc-if>
+                          <button onClick="{{ d.onDelete }}" style="border:none;background:none;color:#E8E0D4;cursor:pointer;font-size:14px;line-height:1;padding:4px;flex:none" style-hover="color:#A03B2A">×</button>
+                        </div>
+                      </sc-if>
+
+                    </sc-for>
+                  </div>
 
                   <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
                     <input value="{{ row.subcatDraftVal }}" onChange="{{ row.onSubcatDraft }}" onKeyDown="{{ row.onSubcatKey }}" placeholder="Nueva subcategoría (ej. Luz)" style="flex:1;min-width:150px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:7px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
                     <button onClick="{{ row.addSubcat }}" style="border:1px solid #1E3A8A;background:transparent;color:#1E3A8A;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:8px 13px;border-radius:6px;cursor:pointer;flex:none" style-hover="background:rgba(30,58,138,0.06)">+ Subcategoría</button>
                   </div>
 
-                  <sc-for list="{{ row.subs }}" as="s" hint-placeholder-count="2">
-                    <div style="display:flex;align-items:center;gap:10px;padding:5px 0">
-                      <span style="width:4px;height:4px;border-radius:50%;background:#E8E0D4;flex:none"></span>
-                      <input value="{{ s.titleVal }}" onChange="{{ s.onTitle }}" onBlur="{{ s.onTitleBlur }}" placeholder="Título (ej. Mercadona)" style="flex:1;min-width:0;border:none;background:transparent;font:400 12px/1 'Plus Jakarta Sans',sans-serif;color:#4A3B35;outline:none;padding:6px 0" style-focus="color:#3D2B1F"></input>
-                      <input value="{{ s.amountStr }}" onChange="{{ s.onAmt }}" onBlur="{{ s.onBlur }}" inputMode="decimal" style="width:112px;border:none;background:#FFFFFF;padding:7px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#3D2B1F;outline:none" style-focus="background:#fff"></input>
-                      <sc-if value="{{ s.hasSubLabel }}" hint-placeholder-val="{{ false }}">
-                        <span style="font:600 10px/1 'Plus Jakarta Sans',sans-serif;color:#1E3A8A;background:rgba(30,58,138,0.08);border-radius:10px;padding:4px 8px;white-space:nowrap;flex:none">{{ s.subLabel }}</span>
-                      </sc-if>
-                      <sc-if value="{{ s.canMove }}" hint-placeholder-val="{{ false }}">
-                        <button onClick="{{ s.onMove }}" title="Mover a otra subcategoría" style="border:none;background:none;color:#A8A29A;cursor:pointer;padding:4px;display:flex;flex:none" style-hover="color:#1E3A8A">
-                          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><polyline points="9,3 13,7 9,11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="13" y1="7" x2="3" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line></svg>
-                        </button>
-                      </sc-if>
-                      <button onClick="{{ s.onDelete }}" style="border:none;background:none;color:#E8E0D4;cursor:pointer;font-size:14px;line-height:1;padding:4px" style-hover="color:#A03B2A">×</button>
-                    </div>
-                  </sc-for>
                   <sc-if value="{{ row.hasSubcats }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0">
                       <span style="font:400 11px/1.9 'Plus Jakarta Sans',sans-serif;color:#8B7355;margin-right:2px">Añadir en:</span>
@@ -697,7 +705,7 @@
                     </div>
                   </sc-if>
                   <div class="m-subadd" style="display:flex;align-items:center;gap:10px;padding:8px 0 0">
-                    <input value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;margin-left:14px" style-focus="border-color:#1E3A8A"></input>
+                    <input id="ln-{{ row.id }}" value="{{ row.subTitleDraft }}" onChange="{{ row.onSubTitleDraft }}" onKeyDown="{{ row.onSubKey }}" placeholder="Título (ej. Lidl)" style="flex:1;min-width:0;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:400 12.5px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none;margin-left:14px" style-focus="border-color:#1E3A8A"></input>
                     <input value="{{ row.subAmtDraft }}" onChange="{{ row.onSubDraft }}" onKeyDown="{{ row.onSubKey }}" inputMode="decimal" placeholder="0,00" style="width:112px;border:1px solid #D7D4E8;border-radius:6px;background:#FFFFFF;padding:6px 10px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
                     <button onClick="{{ row.addSub }}" style="border:none;background:#3D2B1F;color:#FFFFFF;font:600 12px/1 'Plus Jakarta Sans',sans-serif;padding:7px 12px;border-radius:6px;cursor:pointer" style-hover="background:#1F2937">Añadir importe</button>
                   </div>
@@ -1159,6 +1167,13 @@
             <input value="{{ goalDraftName }}" onChange="{{ onGoalDraftName }}" onKeyDown="{{ onGoalDraftKey }}" placeholder="Nombre del objetivo (ej. Vacaciones)" style="flex:1;min-width:180px;border:1px solid #D7D4E8;border-radius:8px;background:#FFFFFF;padding:9px 12px;font:400 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
 
             <sc-if value="{{ isDraftSavings }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ hasSavingsGroups }}" hint-placeholder-val="{{ false }}">
+                <select value="{{ goalDraftLink }}" onChange="{{ onGoalDraftLink }}" style="flex:1;min-width:190px;border:1px solid #D7D4E8;border-radius:8px;background:#FFFFFF;padding:10px 11px;font:400 13px/1.2 'Plus Jakarta Sans',sans-serif;color:#3D2B1F;outline:none">
+                  <sc-for list="{{ linkGroupOptions }}" as="lg" hint-placeholder-count="2">
+                    <option value="{{ lg.value }}">{{ lg.label }}</option>
+                  </sc-for>
+                </select>
+              </sc-if>
               <input value="{{ goalDraftAmount }}" onChange="{{ onGoalDraftAmount }}" onKeyDown="{{ onGoalDraftKey }}" inputMode="decimal" placeholder="Importe objetivo €" style="width:160px;border:1px solid #D7D4E8;border-radius:8px;background:#FFFFFF;padding:9px 12px;font:600 13px/1.2 'Plus Jakarta Sans',sans-serif;text-align:right;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
             </sc-if>
 
@@ -1206,6 +1221,9 @@
               <span style="font:400 11.5px/1 'Plus Jakarta Sans',sans-serif;color:#8B7355;white-space:nowrap">meses</span>
             </sc-if>
 
+            <sc-if value="{{ showsInitial }}" hint-placeholder-val="{{ true }}">
+              <input value="{{ goalDraftInitial }}" onChange="{{ onGoalDraftInitial }}" onKeyDown="{{ onGoalDraftKey }}" inputMode="decimal" placeholder="Ya tengo €" title="Lo que ya llevas ahorrado y no está registrado como movimiento" style="width:130px;border:1px solid #D7D4E8;border-radius:8px;background:#FFFFFF;padding:10px 11px;font:400 13px/1.2 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;color:#3D2B1F;outline:none" style-focus="border-color:#1E3A8A"></input>
+            </sc-if>
             <button onClick="{{ addGoalAction }}" style="border:none;border-radius:8px;background:#1E3A8A;color:#FFFFFF;font:600 13px/1 'Plus Jakarta Sans',sans-serif;padding:10px 16px;cursor:pointer">+ Añadir</button>
           </div>
         </div>
@@ -1863,8 +1881,11 @@
         <button onClick="{{ closeModal }}" style="border:1px solid #D7D4E8;background:transparent;color:#8B7355;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;line-height:1;padding:0;flex:none">×</button>
       </div>
 
+      <sc-if value="{{ hasQuickAdded }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px;background:rgba(16,185,129,0.09);border:1px solid #10B981;border-radius:10px;padding:9px 12px;font:600 12px/1.3 'Plus Jakarta Sans',sans-serif;color:#0D7A56">{{ quickAddedNote }}</div>
+      </sc-if>
       <div style="display:flex;align-items:center;gap:10px;margin-top:18px;border:1px solid #D7D4E8;border-radius:12px;padding:12px 16px">
-        <input value="{{ quickAmt }}" onChange="{{ onQuickAmt }}" onKeyDown="{{ onQuickKey }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;background:transparent;font:900 32px/1.1 'Source Serif Pro',serif;font-variant-numeric:tabular-nums;color:#1E3A8A;outline:none;padding:0"></input>
+        <input id="quick-amt" value="{{ quickAmt }}" onChange="{{ onQuickAmt }}" onKeyDown="{{ onQuickKey }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;background:transparent;font:900 32px/1.1 'Source Serif Pro',serif;font-variant-numeric:tabular-nums;color:#1E3A8A;outline:none;padding:0"></input>
         <span style="font:900 26px/1 'Source Serif Pro',serif;color:#A8A29A;flex:none">€</span>
       </div>
 
@@ -2147,7 +2168,7 @@ class Component extends DCLogic {
     authed: false, authReady: false, authView: 'login', authError: '', accountId: null, showSetup: false, setupStep: 0,
     loginEmail: '', loginPassword: '', loginRemember: true,
     regName: '', regEmail: '', regPassword: '', regAccept: false, showPw: false,
-    goalDraftName: '', goalDraftAmount: '', goalDraftType: 'savings',
+    goalDraftName: '', goalDraftAmount: '', goalDraftInitial: '', goalDraftLink: '', goalDraftType: 'savings',
     goalDraftIncomeMode: 'percent', goalDraftIncomeValue: '',
     goalDraftInvestMode: 'value', goalDraftInvestRef: '',
     goalDraftExpenseRef: '', goalDraftMonths: '6',
@@ -2761,9 +2782,15 @@ class Component extends DCLogic {
     const goal = { id: uid(), name: trimmed, type: cfg.type, createdAt: this.thisMonth() };
     if (cfg.type === 'savings') {
       if (!(cfg.targetAmount > 0)) return false;
-      const groupId = uid();
-      this.gs('savings').push({ id: groupId, category: trimmed, targets: {}, entries: [] });
+      let groupId = cfg.existingGroupId || '';
+      if (groupId && !this.gs('savings').some(x => x.id === groupId)) groupId = '';
+      if (!groupId) {
+        groupId = uid();
+        this.gs('savings').push({ id: groupId, category: trimmed, targets: {}, entries: [] });
+      }
       goal.targetAmount = cfg.targetAmount; goal.groupId = groupId;
+      // Lo que ya tienes ahorrado y no está registrado como movimiento.
+      if (cfg.initial > 0) goal.initial = cfg.initial;
     } else if (cfg.type === 'income') {
       if (!(cfg.targetAmount > 0) || !(cfg.incomeValue > 0)) return false;
       // El objetivo de ingresos también tiene su categoría en Ahorros: lo que aparta es dinero real.
@@ -2771,9 +2798,11 @@ class Component extends DCLogic {
       this.gs('savings').push({ id: gidIncome, category: trimmed, targets: {}, entries: [] });
       goal.targetAmount = cfg.targetAmount; goal.incomeMode = cfg.incomeMode; goal.incomeValue = cfg.incomeValue;
       goal.groupId = gidIncome; goal.applied = {};
+      if (cfg.initial > 0) goal.initial = cfg.initial;
     } else if (cfg.type === 'investment') {
       if (!(cfg.targetAmount > 0) || !cfg.investRef) return false;
       goal.targetAmount = cfg.targetAmount; goal.investMode = cfg.investMode; goal.investRef = cfg.investRef;
+      if (cfg.initial > 0) goal.initial = cfg.initial;
     } else if (cfg.type === 'expense') {
       if (!(cfg.limitAmount > 0) || !cfg.expenseGroupRef || !(cfg.monthsRequired > 0)) return false;
       goal.limitAmount = cfg.limitAmount; goal.expenseGroupRef = cfg.expenseGroupRef; goal.monthsRequired = Math.round(cfg.monthsRequired);
@@ -2886,7 +2915,7 @@ class Component extends DCLogic {
     if (!group || !group.entries.length) return { rate: 0, label: 'Aún sin aportaciones — añade la primera para estimar la fecha' };
     const dates = group.entries.map(e => e.date).filter(Boolean).sort();
     const elapsed = Math.max(1, idx(this.state.month) - idx(dates[0]) + 1);
-    const rate = p.current / elapsed;
+    const rate = this.allTimeTotal(group) / elapsed;
     const remaining = p.target - p.current;
     if (!(rate > 0)) return { rate: 0, label: '' };
     const need = Math.ceil(remaining / rate);
@@ -2898,7 +2927,7 @@ class Component extends DCLogic {
     if (goal.type === 'income') {
       // Progreso = lo realmente apartado en su categoría de Ahorros, no un cálculo sobre nóminas ya gastadas.
       const groupInc = this.gs('savings').find(g => g.id === goal.groupId);
-      const current = groupInc ? this.allTimeTotal(groupInc) : 0;
+      const current = (groupInc ? this.allTimeTotal(groupInc) : 0) + (goal.initial || 0);
       const pct = goal.targetAmount > 0 ? Math.min(100, current / goal.targetAmount * 100) : 0;
       return { current: current, target: goal.targetAmount, pct: pct, done: goal.targetAmount > 0 && current >= goal.targetAmount, kind: 'amount' };
     }
@@ -2907,6 +2936,7 @@ class Component extends DCLogic {
       const holdings = (this.d.invest && this.d.invest.holdings) || [];
       const relevant = goal.investRef === 'all' ? holdings : holdings.filter(h => h.id === goal.investRef);
       relevant.forEach(h => { current += goal.investMode === 'value' ? (h.value || 0) : (h.invested || 0); });
+      current += goal.initial || 0;
       const pct = goal.targetAmount > 0 ? Math.min(100, current / goal.targetAmount * 100) : 0;
       return { current: current, target: goal.targetAmount, pct: pct, done: goal.targetAmount > 0 && current >= goal.targetAmount, kind: 'amount' };
     }
@@ -2932,7 +2962,7 @@ class Component extends DCLogic {
     }
     // savings (default)
     const group = this.gs('savings').find(g => g.id === goal.groupId);
-    const current = group ? this.allTimeTotal(group) : 0;
+    const current = (group ? this.allTimeTotal(group) : 0) + (goal.initial || 0);
     const pct = goal.targetAmount > 0 ? Math.min(100, current / goal.targetAmount * 100) : 0;
     return { current: current, target: goal.targetAmount, pct: pct, done: goal.targetAmount > 0 && current >= goal.targetAmount, kind: 'amount' };
   }
@@ -3154,7 +3184,7 @@ class Component extends DCLogic {
       showOnboarding: false, obChips: [], obHasSelection: false, obCountLabel: '', obIncome: '',
       obStepIncomeDone: false, obStepCatsDone: false, obStepGoalDone: false,
       obStepIncomePending: true, obStepCatsPending: true, obStepGoalPending: true,
-      quickOpen: false, openQuick: () => {}, quickChips: [], hasQuickChips: false, quickSheetOptions: [], quickIsNewCat: false, quickDestNote: '', quickMonthLabel: '',
+      quickOpen: false, openQuick: () => {}, quickAddedNote: '', hasQuickAdded: false, quickChips: [], hasQuickChips: false, quickSheetOptions: [], quickIsNewCat: false, quickDestNote: '', quickMonthLabel: '',
       menuOpen: false, menuItems: [], toggleMenu: () => {}, closeMenu: () => {}, navOpen: false, navOpenAttr: '0', toggleNav: () => {}, closeNav: () => {}, tableMinW: '0' };
 
     const m = this.state.month, narrow = this.state.w < 900, compact = this.state.compact;
@@ -3347,59 +3377,6 @@ class Component extends DCLogic {
         onDragLeave: () => { if (this.state.dragOver === dropKey) this.setState({ dragOver: null }); },
         onDrop: (ev) => { ev.preventDefault(); ev.stopPropagation(); this.dropSubOn(dropKey); },
         hasSubcats: ((g.subs) || []).length > 0,
-        subcats: ((g.subs) || []).map(sb => {
-          const st = this.subTarget(sb, m), sp = this.subSpent(g, sb, m), sOver = st > 0 && sp > st;
-          return {
-            id: sb.id, name: sb.name,
-            nameVal: this.ed('sn' + sb.id, sb.name),
-            onName: (ev) => { this.setEd('sn' + sb.id, ev.target.value); sb.name = ev.target.value; this.touch(); },
-            onNameBlur: () => this.clearEd('sn' + sb.id),
-            targetVal: this.ed('st' + sb.id + m, sb.pct > 0 ? this.num(sb.pct).replace(/,00$/, '') + '%' : (st ? this.num(st) : '')),
-            onTarget: (ev) => {
-              const raw = ev.target.value;
-              this.setEd('st' + sb.id + m, raw);
-              const v = this.parse(raw);
-              if (/%/.test(raw)) { if (v > 0) { sb.pct = v; delete sb.targets[m]; } else delete sb.pct; }
-              else { delete sb.pct; if (v) sb.targets[m] = v; else delete sb.targets[m]; }
-              this.touch();
-            },
-            onTargetBlur: () => this.clearEd('st' + sb.id + m),
-            hasPct: sb.pct > 0, pctHint: sb.pct > 0 ? '= ' + this.fmt(st) : '',
-            spentStr: this.fmt(sp),
-            mainStr: countDown && st > 0 ? this.fmt(st - sp) : this.fmt(sp),
-            mainLabel: countDown && st > 0 ? 'queda' : 'gastado',
-            mainInk: sOver ? '#A03B2A' : '#1E3A8A',
-            hasBar: st > 0,
-            barPct: st > 0 ? (countDown ? Math.max(0, Math.min(100, (st - sp) / st * 100)) : Math.min(100, sp / st * 100)).toFixed(1) + '%' : '0%',
-            barColor: sOver ? '#B23A55' : (countDown ? '#1E3A8A' : '#8FB89E'),
-            countStr: this.entriesOf(g, m).filter(e => e.subId === sb.id).length + ' líneas',
-            dragging: !!(this.state.dragSub && this.state.dragSub.subId === sb.id),
-            cardOpacity: (this.state.dragSub && this.state.dragSub.subId === sb.id) ? '0.45' : '1',
-            onDragStart: (ev) => {
-              if (ev.dataTransfer) { try { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', sb.id); } catch (err) {} }
-              this.setState({ dragSub: { sheetId: sheet.id, groupId: g.id, subId: sb.id, name: sb.name }, dragOver: null });
-            },
-            onDragEnd: () => this.setState({ dragSub: null, dragOver: null, dragPos: null }),
-            onTouchStart: (ev) => {
-              const t = ev.touches && ev.touches[0];
-              this.setState({ dragSub: { sheetId: sheet.id, groupId: g.id, subId: sb.id, name: sb.name }, dragOver: null, dragPos: t ? { x: t.clientX, y: t.clientY } : null });
-            },
-            onTouchMove: (ev) => {
-              if (!this.state.dragSub) return;
-              const t = ev.touches && ev.touches[0];
-              if (!t) return;
-              // Si el dedo se acerca a un borde, la página acompaña al arrastre.
-              const vh = window.innerHeight || 800;
-              if (t.clientY < 96) window.scrollBy(0, -14);
-              else if (t.clientY > vh - 110) window.scrollBy(0, 14);
-              let el = document.elementFromPoint(t.clientX, t.clientY), key = null;
-              while (el && !key) { if (el.getAttribute && el.getAttribute('data-drop-group')) key = el.getAttribute('data-drop-group'); el = el.parentElement; }
-              this.setState({ dragPos: { x: t.clientX, y: t.clientY }, dragOver: key });
-            },
-            onTouchEnd: () => { this.dropSubOn(this.state.dragOver); },
-            onDelete: () => { if (window.confirm('¿Quitar la subcategoría "' + sb.name + '"? Sus líneas vuelven a ' + g.category + ', no se borra ningún importe.')) this.removeSubcategory(g, sb.id); }
-          };
-        }),
         subcatDraftVal: (this.state.subcatDraft[g.id] || ''),
         onSubcatDraft: (e) => this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: e.target.value }) })),
         addSubcat: () => { if (this.addSubcategory(g, this.state.subcatDraft[g.id] || '')) this.setState(st2 => ({ subcatDraft: Object.assign({}, st2.subcatDraft, { [g.id]: '' }) })); },
@@ -3411,24 +3388,98 @@ class Component extends DCLogic {
             bd: on ? '#1E3A8A' : '#D7D4E8', bg: on ? '#1E3A8A' : '#FFFFFF', ink: on ? '#FFFFFF' : '#4A3B35',
             onClick: () => this.setState(st2 => ({ lineDest: Object.assign({}, st2.lineDest, { [g.id]: d.id }) })) };
         }),
-        subs: es.map((e) => ({
-          titleVal: this.ed('ti' + e.id, e.title || ''),
-          onTitle: (ev) => { this.setEd('ti' + e.id, ev.target.value); e.title = ev.target.value; this.touch(); },
-          onTitleBlur: () => this.clearEd('ti' + e.id),
-          amountStr: this.ed('a' + e.id, this.num(e.amount)),
-          onAmt: (ev) => { this.setEd('a' + e.id, ev.target.value); e.amount = this.parse(ev.target.value); this.touch(); },
-          onBlur: () => this.clearEd('a' + e.id),
-          onDelete: () => { g.entries = g.entries.filter(x => x.id !== e.id); if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); },
-          hasSubLabel: !!(e.subId && ((g.subs) || []).some(sb => sb.id === e.subId)),
-          subLabel: (((g.subs) || []).find(sb => sb.id === e.subId) || {}).name || '',
-          canMove: ((g.subs) || []).length > 0,
-          onMove: () => this.setState({ modal: 'moveline', moveLine: { sheetId: sheet.id, groupId: g.id, entryId: e.id } })
-        })),
+        detail: (() => {
+          const subsList = (g.subs) || [];
+          const out = [];
+          const blank = {
+            isSub: false, isLine: false, isLoose: false,
+            id: '', name: '', nameVal: '', onName: () => {}, onNameBlur: () => {},
+            targetVal: '', onTarget: () => {}, onTargetBlur: () => {},
+            mainStr: '', mainInk: '#3D2B1F', hasBar: false, barPct: '0%', barColor: '#8FB89E',
+            countStr: '', pctHint: '', spentStr: '', onDelete: () => {},
+            cardOpacity: '1', onDragStart: () => {}, onDragEnd: () => {},
+            onTouchStart: () => {}, onTouchMove: () => {}, onTouchEnd: () => {}, onAddHere: () => {},
+            titleVal: '', onTitle: () => {}, onTitleBlur: () => {},
+            amountStr: '', onAmt: () => {}, onBlur: () => {}, canMove: false, onMove: () => {}
+          };
+          const lineItem = (e) => Object.assign({}, blank, {
+            isLine: true, id: e.id,
+            titleVal: this.ed('ti' + e.id, e.title || ''),
+            onTitle: (ev) => { this.setEd('ti' + e.id, ev.target.value); e.title = ev.target.value; this.touch(); },
+            onTitleBlur: () => this.clearEd('ti' + e.id),
+            amountStr: this.ed('a' + e.id, this.num(e.amount)),
+            onAmt: (ev) => { this.setEd('a' + e.id, ev.target.value); e.amount = this.parse(ev.target.value); this.touch(); },
+            onBlur: () => this.clearEd('a' + e.id),
+            canMove: subsList.length > 0,
+            onMove: () => this.setState({ modal: 'moveline', moveLine: { sheetId: sheet.id, groupId: g.id, entryId: e.id } }),
+            onDelete: () => { g.entries = g.entries.filter(x => x.id !== e.id); if (!g.entries.length && !Object.keys(g.targets || {}).length) this.d.groups[sheet.id] = this.gs(sheet.id).filter(x => x.id !== g.id); this.touch(); }
+          });
+          subsList.forEach(sb => {
+            const st = this.subTarget(sb, m), sp = this.subSpent(g, sb, m), sOver = st > 0 && sp > st;
+            const mine = es.filter(e => e.subId === sb.id);
+            out.push(Object.assign({}, blank, {
+              isSub: true, id: sb.id, name: sb.name,
+              nameVal: this.ed('sn' + sb.id, sb.name),
+              onName: (ev) => { this.setEd('sn' + sb.id, ev.target.value); sb.name = ev.target.value; this.touch(); },
+              onNameBlur: () => this.clearEd('sn' + sb.id),
+              targetVal: this.ed('st' + sb.id + m, sb.pct > 0 ? this.num(sb.pct).replace(/,00$/, '') + '%' : (st ? this.num(st) : '')),
+              onTarget: (ev) => {
+                const raw = ev.target.value;
+                this.setEd('st' + sb.id + m, raw);
+                const v = this.parse(raw);
+                if (/%/.test(raw)) { if (v > 0) { sb.pct = v; delete sb.targets[m]; } else delete sb.pct; }
+                else { delete sb.pct; if (v) sb.targets[m] = v; else delete sb.targets[m]; }
+                this.touch();
+              },
+              onTargetBlur: () => this.clearEd('st' + sb.id + m),
+              pctHint: sb.pct > 0 ? '= ' + this.fmt(st) : '',
+              spentStr: this.fmt(sp),
+              mainStr: countDown && st > 0 ? this.fmt(st - sp) : this.fmt(sp),
+              mainInk: sOver ? '#A03B2A' : '#1E3A8A',
+              hasBar: st > 0,
+              barPct: st > 0 ? (countDown ? Math.max(0, Math.min(100, (st - sp) / st * 100)) : Math.min(100, sp / st * 100)).toFixed(1) + '%' : '0%',
+              barColor: sOver ? '#B23A55' : (countDown ? '#1E3A8A' : '#8FB89E'),
+              countStr: mine.length + (mine.length === 1 ? ' línea' : ' líneas') + ' · ' + this.fmt(sp),
+              cardOpacity: (this.state.dragSub && this.state.dragSub.subId === sb.id) ? '0.45' : '1',
+              onAddHere: () => {
+                this.setState(st2 => ({ lineDest: Object.assign({}, st2.lineDest, { [g.id]: sb.id }), expanded: Object.assign({}, st2.expanded, { [key]: true }) }));
+                setTimeout(() => { const el = document.getElementById('ln-' + g.id); if (el) el.focus(); }, 40);
+              },
+              onDragStart: (ev) => {
+                if (ev.dataTransfer) { try { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', sb.id); } catch (err) {} }
+                this.setState({ dragSub: { sheetId: sheet.id, groupId: g.id, subId: sb.id, name: sb.name }, dragOver: null });
+              },
+              onDragEnd: () => this.setState({ dragSub: null, dragOver: null, dragPos: null }),
+              onTouchStart: (ev) => {
+                const t = ev.touches && ev.touches[0];
+                this.setState({ dragSub: { sheetId: sheet.id, groupId: g.id, subId: sb.id, name: sb.name }, dragOver: null, dragPos: t ? { x: t.clientX, y: t.clientY } : null });
+              },
+              onTouchMove: (ev) => {
+                if (!this.state.dragSub) return;
+                const t = ev.touches && ev.touches[0];
+                if (!t) return;
+                const vh = window.innerHeight || 800;
+                if (t.clientY < 96) window.scrollBy(0, -14);
+                else if (t.clientY > vh - 110) window.scrollBy(0, 14);
+                let el = document.elementFromPoint(t.clientX, t.clientY), k2 = null;
+                while (el && !k2) { if (el.getAttribute && el.getAttribute('data-drop-group')) k2 = el.getAttribute('data-drop-group'); el = el.parentElement; }
+                this.setState({ dragPos: { x: t.clientX, y: t.clientY }, dragOver: k2 });
+              },
+              onTouchEnd: () => { this.dropSubOn(this.state.dragOver); },
+              onDelete: () => { if (window.confirm('¿Quitar la subcategoría "' + sb.name + '"? Sus líneas vuelven a ' + g.category + ', no se borra ningún importe.')) this.removeSubcategory(g, sb.id); }
+            }));
+            mine.forEach(e => out.push(lineItem(e)));
+          });
+          const looseEs = es.filter(e => !e.subId || !subsList.some(sb => sb.id === e.subId));
+          if (subsList.length && looseEs.length) out.push(Object.assign({}, blank, { isLoose: true, name: 'Sin subcategoría', mainStr: this.fmt(this.looseSpent(g, m)) }));
+          looseEs.forEach(e => out.push(lineItem(e)));
+          return out;
+        })(),
         subTitleDraft: subDraft.title || '', subAmtDraft: subDraft.amt || '',
         onSubTitleDraft: (e) => this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: Object.assign({}, subDraft, { title: e.target.value }) }) })),
         onSubDraft: (e) => this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: Object.assign({}, subDraft, { amt: e.target.value }) }) })),
         addSub: () => { const v = this.parse(subDraft.amt); if (!v) return; const dest = this.state.lineDest[g.id] || ''; const ent = { id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }; if (dest) ent.subId = dest; g.entries.push(ent); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); },
-        onSubKey: (e) => { if (e.key === 'Enter') { const v = this.parse(subDraft.amt); if (v) { const dest = this.state.lineDest[g.id] || ''; const ent = { id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }; if (dest) ent.subId = dest; g.entries.push(ent); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); } } },
+        onSubKey: (e) => { if (e.key === 'Enter') { const v = this.parse(subDraft.amt); if (v) { const dest = this.state.lineDest[g.id] || ''; const ent = { id: uid(), amount: v, date: m, paid: false, title: (subDraft.title || '').trim() }; if (dest) ent.subId = dest; g.entries.push(ent); this.setState(s => ({ subDraft: Object.assign({}, s.subDraft, { [g.id]: { amt: '', title: '' } }) })); this.touch(); setTimeout(() => { const el = document.getElementById('ln-' + g.id); if (el) el.focus(); }, 40); } } },
         onDelete: doDelete
       };
     });
@@ -3907,6 +3958,16 @@ class Component extends DCLogic {
 
       goalDraftName: this.state.goalDraftName, onGoalDraftName: (e) => this.setState({ goalDraftName: e.target.value }),
       goalDraftAmount: this.state.goalDraftAmount, onGoalDraftAmount: (e) => this.setState({ goalDraftAmount: e.target.value }),
+      goalDraftInitial: this.state.goalDraftInitial, onGoalDraftInitial: (e) => this.setState({ goalDraftInitial: e.target.value }),
+      showsInitial: this.state.goalDraftType !== 'expense',
+      goalDraftLink: this.state.goalDraftLink,
+      linkGroupOptions: [{ value: '', label: 'Crear una categoría nueva' }].concat(this.gs('savings').map(gg => ({ value: gg.id, label: gg.category + ' · ya tienes ' + this.fmt(this.allTimeTotal(gg)) }))),
+      onGoalDraftLink: (e) => {
+        const v = e.target.value;
+        const gg = this.gs('savings').find(x => x.id === v);
+        this.setState({ goalDraftLink: v, goalDraftName: (gg && !this.state.goalDraftName.trim()) ? gg.category : this.state.goalDraftName });
+      },
+      hasSavingsGroups: this.gs('savings').length > 0,
 
       goalDraftIncomeModePct: this.state.goalDraftIncomeMode === 'percent',
       setIncomeModePct: () => this.setState({ goalDraftIncomeMode: 'percent' }),
@@ -3947,9 +4008,10 @@ class Component extends DCLogic {
           targetAmount: this.parse(this.state.goalDraftAmount),
           incomeMode: this.state.goalDraftIncomeMode, incomeValue: this.parse(this.state.goalDraftIncomeValue),
           investMode: this.state.goalDraftInvestMode, investRef: this.state.goalDraftInvestRef,
-          expenseGroupRef: this.state.goalDraftExpenseRef, limitAmount: this.parse(this.state.goalDraftAmount), monthsRequired: this.parse(this.state.goalDraftMonths) };
+          expenseGroupRef: this.state.goalDraftExpenseRef, limitAmount: this.parse(this.state.goalDraftAmount), monthsRequired: this.parse(this.state.goalDraftMonths),
+          initial: this.parse(this.state.goalDraftInitial), existingGroupId: this.state.goalDraftLink };
         const ok = this.addGoal(cfg);
-        if (ok) this.setState({ goalDraftName: '', goalDraftAmount: '', goalDraftIncomeValue: '', goalDraftInvestRef: '', goalDraftExpenseRef: '', goalDraftMonths: '6' });
+        if (ok) this.setState({ goalDraftName: '', goalDraftAmount: '', goalDraftInitial: '', goalDraftLink: '', goalDraftIncomeValue: '', goalDraftInvestRef: '', goalDraftExpenseRef: '', goalDraftMonths: '6' });
         else window.alert('Revisa los campos del objetivo: falta algún dato o ya tienes 5 objetivos.');
       },
       onGoalDraftKey: (e) => {
@@ -3959,9 +4021,10 @@ class Component extends DCLogic {
           targetAmount: this.parse(this.state.goalDraftAmount),
           incomeMode: this.state.goalDraftIncomeMode, incomeValue: this.parse(this.state.goalDraftIncomeValue),
           investMode: this.state.goalDraftInvestMode, investRef: this.state.goalDraftInvestRef,
-          expenseGroupRef: this.state.goalDraftExpenseRef, limitAmount: this.parse(this.state.goalDraftAmount), monthsRequired: this.parse(this.state.goalDraftMonths) };
+          expenseGroupRef: this.state.goalDraftExpenseRef, limitAmount: this.parse(this.state.goalDraftAmount), monthsRequired: this.parse(this.state.goalDraftMonths),
+          initial: this.parse(this.state.goalDraftInitial), existingGroupId: this.state.goalDraftLink };
         const ok = this.addGoal(cfg);
-        if (ok) this.setState({ goalDraftName: '', goalDraftAmount: '', goalDraftIncomeValue: '', goalDraftInvestRef: '', goalDraftExpenseRef: '', goalDraftMonths: '6' });
+        if (ok) this.setState({ goalDraftName: '', goalDraftAmount: '', goalDraftInitial: '', goalDraftLink: '', goalDraftIncomeValue: '', goalDraftInvestRef: '', goalDraftExpenseRef: '', goalDraftMonths: '6' });
         else window.alert('Revisa los campos del objetivo: falta algún dato o ya tienes 5 objetivos.');
       },
 
@@ -4192,7 +4255,7 @@ class Component extends DCLogic {
 
       // ---- Alta rápida ----
       quickOpen: this.state.modal === 'quick',
-      openQuick: () => this.setState({ modal: 'quick', quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' }),
+      openQuick: () => this.setState({ modal: 'quick', quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '', quickAdded: 0 }),
       quickAmt: this.state.quickAmt,
       onQuickAmt: (e) => this.setState({ quickAmt: e.target.value }),
       quickCat: this.state.quickCat,
@@ -4228,13 +4291,17 @@ class Component extends DCLogic {
         this.addOrMerge(target, cat, this.state.quickAmt, m, this.state.quickTitle);
         this.setState({ modal: null, quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' });
       },
+      // Enter añade y deja la hoja abierta para encadenar varios gastos seguidos.
       onQuickKey: (e) => { if (e.key === 'Enter') { e.preventDefault();
         const cat = this.state.quickCat.trim(), amt = this.parse(this.state.quickAmt);
         if (!cat || !(amt > 0)) return;
         const target = this.sheetOfCategory(cat) || this.state.quickSheet || 'variable';
         this.addOrMerge(target, cat, this.state.quickAmt, m, this.state.quickTitle);
-        this.setState({ modal: null, quickAmt: '', quickCat: '', quickTitle: '', quickSheet: '' });
+        this.setState({ quickAmt: '', quickTitle: '', quickAdded: (this.state.quickAdded || 0) + 1 });
+        setTimeout(() => { const el = document.getElementById('quick-amt'); if (el) el.focus(); }, 40);
       } },
+      quickAddedNote: this.state.quickAdded ? (this.state.quickAdded === 1 ? '1 gasto añadido · sigue escribiendo o cierra' : this.state.quickAdded + ' gastos añadidos · sigue escribiendo o cierra') : '',
+      hasQuickAdded: !!this.state.quickAdded,
 
       // ---- Repartir lo que sobra ----
       distributeOpen: this.state.modal === 'distribute',
