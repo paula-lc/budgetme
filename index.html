@@ -1,8 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="utf-8">
+<title>Presupuesto al detalle</title>
+<meta name="description" content="Gestiona tu presupuesto mensual: gastos fijos y variables, ahorros, objetivos y previsión. Tus datos se guardan solo en tu navegador.">
+<meta name="theme-color" content="#1E3A8A">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./vendor/react.production.min.js"></script>
+<script src="./vendor/react-dom.production.min.js"></script>
 <script src="./support.js"></script>
 <template id="__bundler_thumbnail">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#F8F7F4"></rect><rect x="0" y="0" width="100" height="14" fill="#3D2B1F"></rect><text x="50" y="62" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="700" fill="#3D2B1F">P</text><text x="50" y="80" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-style="italic" fill="#1E3A8A">presupuesto</text></svg>
@@ -12,10 +17,11 @@
 <x-dc>
 <helmet data-dc-atomics>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Pinyon+Script&family=GFS+Didot&family=Source+Serif+Pro:wght@700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Pinyon+Script&family=GFS+Didot&family=Source+Serif+Pro:wght@700;900&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;padding:0}
-  body{background:#F8F7F4;color:#3D2B1F;font-family:Outfit,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:#F8F7F4;color:#3D2B1F;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   *{box-sizing:border-box}
   input,select,button{font-family:inherit}
   a{color:#1E3A8A;text-decoration:none}
@@ -2239,10 +2245,15 @@ const STARTERS = [
   { name: 'Ropa', sheet: 'variable' }, { name: 'Farmacia', sheet: 'variable' }
 ];
 const SUGG = ['Alquiler','Hipoteca','Comunidad','Factura de luz','Factura de agua','Internet','Factura de móvil','Seguro de salud','Seguro del hogar','Seguro del coche','Transporte (abono)','Gimnasio','Netflix','Spotify','Supermercado','Cena fuera','Ocio','Ropa','Gasolina','Farmacia','Regalos','Viajes','Peluquería','Imprevistos','Fondo de emergencia','Vacaciones','Inversión indexada','Jubilación','ITV','Préstamo personal'];
+// Formateadores reutilizados: crear uno por llamada (toLocaleString) es lo más caro de cada render.
+const NF_NUM = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' });
+const NF_INT = new Intl.NumberFormat('es-ES', { useGrouping: 'always' });
+const NF_PCT = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
 let _seq = 1;
-const uid = () => 'i' + (_seq++) + Math.random().toString(36).slice(2, 6);
+// Incluye la marca de tiempo: el contador se reinicia en cada recarga y, sin ella, podían repetirse ids.
+const uid = () => 'i' + Date.now().toString(36) + (_seq++).toString(36) + Math.random().toString(36).slice(2, 6);
 const idx = (k) => { const p = k.split('-'); return (+p[0]) * 12 + (+p[1]) - 1; };
 const fromIdx = (n) => Math.floor(n / 12) + '-' + String((n % 12) + 1).padStart(2, '0');
 const shift = (k, d) => fromIdx(idx(k) + d);
@@ -2379,7 +2390,14 @@ class Component extends DCLogic {
       ready: true, month: m, w: window.innerWidth, view: 'month', edits: {}, expanded: {} });
   }
 
-  save() { try { if (this.state.accountId) localStorage.setItem(this.dataKeyFor(this.state.accountId), JSON.stringify(this.d)); } catch (e) {} }
+  save(json) { try { if (this.state.accountId) localStorage.setItem(this.dataKeyFor(this.state.accountId), json || JSON.stringify(this.d)); } catch (e) {} }
+  // Caché de cálculos derivados (totales por mes, primer mes…). Vive solo durante un
+  // bloque síncrono (un render o un handler) y se invalida en cuanto cambian los datos.
+  memo() {
+    if (!this._memo) { this._memo = { gmt: new WeakMap(), year: {} }; queueMicrotask(() => { this._memo = null; }); }
+    return this._memo;
+  }
+  invalidate() { this._memo = null; }
   load() {
     try { const r = localStorage.getItem(KEY); if (r) { const p = JSON.parse(r); if (p && p.v === 3) return p; } } catch (e) {}
     return this.seed();
@@ -2390,24 +2408,27 @@ class Component extends DCLogic {
       if (this._undo.length > 80) this._undo.shift();
       this._redo = [];
     }
+    this.invalidate();
     this._snap = JSON.stringify(this.d);
-    this.save();
+    this.save(this._snap);
     this.forceUpdate();
   }
   undo() {
     if (!this._undo || !this._undo.length) return;
     this._redo.push(JSON.stringify(this.d));
     this.d = JSON.parse(this._undo.pop());
+    this.invalidate();
     this._snap = JSON.stringify(this.d);
-    this.save();
+    this.save(this._snap);
     this.setState({ edits: {} });
   }
   redo() {
     if (!this._redo || !this._redo.length) return;
     this._undo.push(JSON.stringify(this.d));
     this.d = JSON.parse(this._redo.pop());
+    this.invalidate();
     this._snap = JSON.stringify(this.d);
-    this.save();
+    this.save(this._snap);
     this.setState({ edits: {} });
   }
 
@@ -2521,9 +2542,9 @@ class Component extends DCLogic {
   }
 
   fmt(n) { return this.num(n) + ' €'; }
-  num(n) { return (isNaN(n) ? 0 : n).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' }); }
-  int(n) { return Math.round(isNaN(n) ? 0 : n).toLocaleString('es-ES', { useGrouping: 'always' }); }
-  pct(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+  num(n) { return NF_NUM.format(isNaN(n) ? 0 : n); }
+  int(n) { return NF_INT.format(Math.round(isNaN(n) ? 0 : n)); }
+  pct(n) { return NF_PCT.format(n) + '%'; }
   parse(s) {
     if (s === '' || s == null) return 0;
     let t = String(s).replace(/[^\d.,-]/g, '');
@@ -2543,6 +2564,7 @@ class Component extends DCLogic {
     for (let i = 1; i <= 24; i++) { const p = shift(m, -i); if (this.d.income[p]) { src = this.d.income[p]; break; } }
     this.d.income[m] = src ? src.map(r => ({ id: uid(), label: r.label, amount: r.amount })) : [{ id: uid(), label: 'Nómina', amount: 0 }];
     if (this.d.carry[m] === undefined) this.d.carry[m] = true;
+    this.invalidate();
     this.save();
   }
 
@@ -2601,7 +2623,12 @@ class Component extends DCLogic {
   }
 
   entriesOf(g, m) { return g.entries.filter(e => e.date === m); }
-  groupTotal(g, m) { return this.entriesOf(g, m).reduce((s, e) => s + (e.amount || 0), 0); }
+  groupTotal(g, m) {
+    const c = this.memo().gmt;
+    let t = c.get(g);
+    if (!t) { t = {}; for (const e of g.entries) t[e.date] = (t[e.date] || 0) + (e.amount || 0); c.set(g, t); }
+    return t[m] || 0;
+  }
   sheetTotal(id, m) { return this.gs(id).reduce((s, g) => s + this.groupTotal(g, m), 0); }
   // Lo comprometido: por cada categoría, lo gastado o su presupuesto si aún no lo has agotado.
   sheetCommitted(id, m) {
@@ -2666,9 +2693,13 @@ class Component extends DCLogic {
   incomeTotal(m) { return (this.d.income[m] || []).reduce((s, r) => s + (r.amount || 0), 0); }
   assigned(m) { return this.monthlySheets().reduce((t, s) => t + this.sheetTotal(s.id, m), 0) + this.allPeriodicTotal(m); }
   firstMonth() {
-    let all = Object.keys(this.d.income);
-    this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => g.entries.forEach(e => all.push(e.date))));
-    return all.sort()[0] || this.thisMonth();
+    const c = this.memo();
+    if (c.first !== undefined) return c.first;
+    let first = null;
+    const see = (k) => { if (k && (first === null || k < first)) first = k; };
+    Object.keys(this.d.income).forEach(see);
+    this.monthlySheets().forEach(s => this.gs(s.id).forEach(g => g.entries.forEach(e => see(e.date))));
+    return (c.first = first || this.thisMonth());
   }
   carryInto(m, depth) {
     if (!this.d.carry[m]) return 0;
@@ -3279,6 +3310,8 @@ class Component extends DCLogic {
     return Array.from(set).sort();
   }
   yearAuto(y) {
+    const c = this.memo().year;
+    if (c[y]) return Object.assign({}, c[y]);
     let income = 0, fixed = 0, variable = 0, savings = 0, periodic = 0;
     for (let i = 1; i <= 12; i++) {
       const k = y + '-' + String(i).padStart(2, '0');
@@ -3292,7 +3325,8 @@ class Component extends DCLogic {
       if (['fixed', 'variable', 'savings'].includes(s.id)) return;
       for (let i = 1; i <= 12; i++) variable += this.sheetTotal(s.id, y + '-' + String(i).padStart(2, '0'));
     });
-    return { income, fixed, variable, savings, periodic };
+    c[y] = { income, fixed, variable, savings, periodic };
+    return Object.assign({}, c[y]);
   }
   yearVal(y, field) {
     const f = (this.d.forecast || {})[y] || {};
@@ -3345,6 +3379,7 @@ class Component extends DCLogic {
   }
 
   renderVals() {
+    this.invalidate();
     if (!this.state.authed) {
       const pw = this.state.regPassword || '';
       const hasUpper = /[A-Z]/.test(pw), hasNum = /[0-9]/.test(pw), longEnough = pw.length >= 8;
@@ -5062,7 +5097,7 @@ class Component extends DCLogic {
       },
 
       saveText: 'Guardado en este dispositivo',
-      reset: () => { if (!window.confirm('¿Borrar todos los datos guardados en este dispositivo?')) return; try { localStorage.removeItem(KEY); } catch (e) {} this.d = this.seed(); this.setState({ month: this.thisMonth(), sheetId: 'fixed', edits: {}, expanded: {} }); this.touch(); }
+      reset: () => { if (!window.confirm('¿Borrar todos los datos guardados en este dispositivo?')) return; try { localStorage.removeItem(KEY); } catch (e) {} this.d = this.emptyProfile(); this.ensureIncome(this.thisMonth()); this.setState({ month: this.thisMonth(), sheetId: 'fixed', edits: {}, expanded: {} }); this.touch(); }
     };
   }
 }
